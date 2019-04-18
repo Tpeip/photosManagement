@@ -1,0 +1,572 @@
+<!-- <!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<style>
+			button{
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">上传照片</h1>
+		</header>
+		<div class="mui-content">
+			<button type="button" class="mui-btn mui-btn-blue">上传照片</button>
+		</div>
+		<script src="../js/mui.js"></script>
+		<script type="text/javascript">
+			mui.init()
+		</script>
+	</body>
+
+</html>
+ -->
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+		<link rel="stylesheet" type="text/css" href="../css/common.css">
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/mui.imageviewer.css" rel="stylesheet" />
+
+
+		<style type="text/css">
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+
+				100% {
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+
+				100% {
+					opacity: 1;
+				}
+			}
+
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+
+				100% {
+					opacity: 0;
+				}
+			}
+
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+
+				100% {
+					opacity: 0;
+				}
+			}
+
+			p img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			.con_img {
+				position: relative;
+				width: 100%;
+				height: auto;
+			}
+
+			.ms {
+				position: absolute;
+				/*position: relative;*/
+				bottom: 5px;
+				left: 0;
+				width: 100%;
+				height: 40%;
+				background: #A9A9A9;
+				opacity: 0.6;
+				filter: alpha(opacity=60);
+				-moz-opacity: 0.6;
+			}
+
+			.toumingzi {
+				width: 100%;
+				left: 10px;
+				position: absolute;
+				top: 50%;
+			}
+
+			.image-border {
+				width: 33%;
+				height: 128px;
+				display: inline-block;
+				margin-right: 1px;
+			}
+
+			.images {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.del {
+				position: absolute;
+				top: 10px;
+				right: -1px;
+				display: block;
+				line-height: 1;
+				cursor: pointer;
+				color: #6D6D72;
+				font-weight: bold;
+				font-size: 18px;
+			}
+
+			/* .del:hover {
+				color: #ff3333;
+			} */
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<!-- <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a> -->
+			<button id="cancel" class="mui-pull-left mui-btn-link">
+				<span style="font-size: 18px;">取消</span>
+			</button>
+			<h1 class="mui-title">传照片</h1>
+			<!-- <a class="mui-icon-right-nav mui-pull-right">
+				<span id="headImage" class="mui-icon mui-icon-camera"></span>
+			</a>
+			<a class="mui-icon-right-nav mui-pull-right">
+				<span id="uploadImage" class="mui-icon mui-icon-upload"></span>
+			</a> -->
+			<button id="uploadImage" class="mui-pull-right mui-btn-link">
+				<span style="font-size: 18px;">上传</span>
+			</button>
+		</header>
+		<div class="mui-content mui-content-padded" style="background-color:#fff">
+			<ul id="imgs" class="mui-table-view mui-grid-view">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 image-border">
+					<a id="choose"><img class="images" style="height:128px" class="mui-media-object" src="../images/camera.jpg" /></a>
+				</li>
+				<!--<li class="mui-table-view-cell mui-media mui-col-xs-6">
+					<a href="#">
+						<img class="mui-media-object" src="images/shuijiao.jpg">
+						<span class="mui-icon mui-icon-trash deleteBtn"></span>
+						<div class="mui-media-body">
+							<input type="text" class="remark" placeholder="备注">
+						</div>
+					</a>
+				</li>-->
+			</ul>
+		</div>
+
+		<script type="text/javascript">
+
+		</script>
+	</body>
+
+</html>
+<script src="../js/mui.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/exif.js"></script>
+<script type="text/javascript" src="../js/facepp_sdk.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script src="../js/mui.zoom.js"></script>
+<script type="text/javascript" src="../js/mui.imageViewer.js"></script>
+<script src="../js/mui.previewimage1.js"></script>
+<script>
+	mui.previewImage();
+	var fileArr = [];
+	mui.init({
+		// 		beforeback: function() {
+		// 			//获得列表界面的webview
+		// 			var list = plus.webview.currentWebview().opener();
+		// 			//触发列表界面的自定义事件（refresh）,从而进行数据刷新
+		// 			mui.fire(list, 'refresh');
+		// 			//返回true，继续页面关闭逻辑
+		// 			return true;
+		// 		},
+		swipeBack: true //启用右滑关闭功能
+	});
+	// 	document.querySelector('.mui-action-back').addEventListener('tap', function(e) {
+	// 		plus.webview.currentWebview().close();
+	// 		e.preventDefault();
+	// 		e.stopPropagation();
+	// 	}, true);
+	// document.getElementById('headImage').addEventListener('tap', function() {
+	//初始选择照片进行上传
+	mui.plusReady(function() {
+		chooseImage();
+		// }, false);			
+	});
+	document.getElementById("choose").addEventListener('tap', function() {
+		chooseImage();
+	}, false);
+	//刷新父页面数据并且关闭当前页面
+	function refreshParent() {
+		//获得列表界面的webview
+		var list = plus.webview.currentWebview().opener();
+		//触发列表界面的自定义事件（refresh）,从而进行数据刷新
+		mui.fire(list, 'refresh');
+		//关闭当前页面
+		plus.webview.currentWebview().close();
+	}
+
+	function chooseImage() {
+		if (mui.os.plus) {
+			var buttonTit = [{
+				title: "拍照"
+			}, {
+				title: "从手机相册选择"
+			}];
+			plus.nativeUI.actionSheet({
+				title: "上传图片",
+				cancel: "取消",
+				buttons: buttonTit
+			}, function(b) { /*actionSheet 按钮点击事件*/
+				switch (b.index) {
+					case 0:
+						plus.webview.currentWebview().close();
+						// 					    mui.openWindow({
+						// 							url: 'main.html',
+						// 							show: {
+						// 								autoShow: true,
+						// 								aniShow: 'slide-in-right',
+						// 								duration: 0
+						// 							}
+						// 						});
+						break;
+					case 1:
+						getImage(); /*拍照*/
+						break;
+					case 2:
+						galleryImg(); /*打开相册*/
+						break;
+					default:
+						break;
+				}
+			})
+		}
+	}
+	// 拍照获取图片  
+	function getImage() {
+		var c = plus.camera.getCamera();
+		c.captureImage(function(e) {
+			plus.io.resolveLocalFileSystemURL(e, function(entry) {
+				var imgSrc = entry.toLocalURL() + "?version=" + new Date().getTime(); //拿到图片路径  
+				setFile(imgSrc);
+				setHtml(imgSrc);
+			}, function(e) {
+				console.log("读取拍照文件错误：" + e.message);
+			});
+		}, function(s) {
+			console.log("error" + s.message);
+		}, {
+			filename: "_doc/camera/"
+		})
+	}
+	// 从相册中选择图片   
+	function galleryImg() {
+		// 从相册中选择图片  
+		plus.gallery.pick(function(e) {
+			for (var i in e.files) {
+				var fileSrc = e.files[i];
+				// console.log(e.files[i]);
+				setFile(fileSrc);
+				setHtml(fileSrc);
+				console.log("choose photo");
+			}
+		}, function(e) {
+			console.log("取消选择图片");
+		}, {
+			filter: "image",
+			multiple: true,
+			//maximum: 5,
+			system: false,
+			onmaxed: function() {
+				plus.nativeUI.alert('最多只能选择5张图片');
+			}
+		});
+	}
+
+
+	function setHtml(path) {
+		var str = '';
+		str = '<li id="' + path + '" class="mui-table-view-cell mui-media mui-col-xs-4 image-border">' +
+			'<img class="images" data-preview-src="" data-preview-group="1" class="mui-media-object" src="' + path + '">' +
+			//					'<img data-preview-src="" data-preview-group="1"  src="'+path+'">'+
+			'<span id="delete" class="mui-icon mui-icon-close del" onclick="delHtml(\'' + path + '\')"></span>' +
+			//					'<div class="mui-media-body">'+
+			//						'<input type="text" class="remark" placeholder="备注">'+
+			//					'</div>'+
+			'</li>';
+		jQuery("#imgs").append(str);
+	}
+
+	function delHtml(id) {
+		var child = document.getElementById(id);
+		var parent = child.parentNode;
+		var btnArray = ['取消', '确认'];
+		mui.confirm('确认删除照片？', '删除', btnArray, function(e) {
+			if (e.index == 1) {
+				parent.removeChild(child);
+				delFile(id);
+			} else {
+				document.getElementById('delete').style.color = '#6D6D72';
+			}
+		});
+
+
+	}
+
+	function setFile(fileSrc) {
+		var image = new Image();
+		image.src = fileSrc;
+		// console.log('****', image.src);
+		fileArr.push(image);
+	}
+
+	//删除待上传照片文件
+	function delFile(fileSrc) {
+		var delpos = 0;
+		for (var i = 0; i < fileArr.length; i++) {
+			if (fileArr[i].src == fileSrc) {
+				delpos = i;
+				break;
+			}
+		}
+		for (var i = delpos; i < fileArr.length - 1; i++) {
+			fileArr[i] = fileArr[i + 1];
+		}
+		fileArr.length--;
+	}
+
+	//取消上传照片
+	document.getElementById('cancel').addEventListener('tap', function() {
+		var el = document.getElementById("imgs");
+		if (el.childNodes.length == 5) {
+			refreshParent();
+		} else {
+			var buttonAry = [{
+				title: '放弃上传',
+				style: 'destructive'
+			}];
+			plus.nativeUI.actionSheet({
+				cancel: '取消',
+				buttons: buttonAry
+			}, function(event) {
+				var index = event.index;
+				switch (index) {
+					case 0:
+						break;
+					case 1:
+						{
+							refreshParent();
+							break;
+						}
+
+				}
+			});
+		}
+
+	});
+	//上传照片
+	document.getElementById('uploadImage').addEventListener('tap', function() {
+		var files = fileArr;
+		var wt = plus.nativeUI.showWaiting();
+		var task = plus.uploader.createUpload('http://192.168.1.114:3000/photoUpload', {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				console.log('abc');
+				if (status == 200) {
+					console.log('********');
+					alert("上传成功");
+					plus.webview.currentWebview().close();
+					refreshParent();
+					wt.close(); //关闭等待提示按钮
+				} else {
+					alert("上传失败：" + status);
+					wt.close(); //关闭等待提示按钮
+				}
+			}
+		);
+		console.log(435356546);
+		//将文件集合添加到上传队列中
+		// 				console.log(files[0].src);
+		// 				task.addFile(files[0].src,{
+		// 					key: 1
+		// 				});
+		var name = localStorage.getItem("user");
+
+		task.addData("user_name", name);
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			console.log("00000");
+			var src = f.src;
+			task.addFile(f.src, {
+				key: i
+			});
+			// task.addData("src",f.src);
+			console.log("=======");
+		}
+		//传其他的参数 如备注
+		//添加其他参数
+		//遍历5个input框
+		task.start();
+	});
+</script>

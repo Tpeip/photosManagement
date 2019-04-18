@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/icons-extra.css" />
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<button id="bars" class="mui-pull-left mui-btn-link">
+				<span class="mui-icon mui-icon-bars" style="font-size: 26px;font-weight: bold;"></span>
+			</button>
+			<h1 id="title" class="mui-title">照片</h1>
+			<button id="upload" class="mui-pull-right mui-btn-link">
+				<span class="mui-icon mui-icon-upload" style="font-size: 28px;font-weight: bold;"></span>
+				<!-- <span style="font-size: 18px;">上传</span> -->
+			</button>
+		</header>
+		<nav class="mui-bar mui-bar-tab">
+			<a id="defaultTab" class="mui-tab-item mui-active" href="tab-photos.html">
+				<span class="mui-icon mui-icon-image"></span>
+				<span class="mui-tab-label">照片</span>
+			</a>
+			<a class="mui-tab-item" href="tab-types.html">
+				<span class="mui-icon mui-icon-extra mui-icon-extra-class"></span>
+				<span class="mui-tab-label">分类</span>
+			</a>
+			<a class="mui-tab-item" href="tab-persons.html">
+				<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
+				<span class="mui-tab-label">关系</span>
+			</a>
+			<!-- <a class="mui-tab-item" href="test.html">
+				<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
+				<span class="mui-tab-label">测试</span>
+			</a> -->
+		</nav>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			var first = null;
+			mui.back = function() {
+				if (!first) {
+					first = new Date().getTime();
+					mui.toast('再按一次退出应用');
+					setTimeout(function() {
+						first = null;
+					}, 1000);
+				} else {
+					if (new Date().getTime() - first < 1000) {
+						plus.runtime.quit();
+					}
+				}
+			};
+			// var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html','test.html'];
+			var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html'];
+			var subpage_style = {
+				top: '45px',
+				bottom: '51px'
+			};
+			//刷新页面
+			window.addEventListener('refresh', function(event) {
+				//通过event.detail可获得传递过来的参数内容
+				location.reload();
+			});
+
+			var aniShow = {};
+
+			//创建子页面，首个选项卡页面显示，其它均隐藏；
+			mui.plusReady(function() {
+				//获取当前页面所属的webview窗口对象
+				var self = plus.webview.currentWebview();
+				for (var i = 0; i < 3; i++) {
+					var temp = {};
+					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
+					//不是第一个就隐藏
+					if (i > 0) {
+						sub.hide();
+					} else { //第一个不隐藏,并且在标志数组中记录下来
+						temp[subpages[i]] = "true";
+						mui.extend(aniShow, temp);
+					}
+					//加入子页面
+					self.append(sub);
+				}
+			});
+			//当前激活选项
+			var activeTab = subpages[0];
+			// var upload = '<button class="mui-pull-right mui-btn-link"><span class="mui-icon mui-icon-upload"></span></button>';
+			var title = document.getElementById("title");
+			//选项卡点击事件
+			mui('.mui-bar-tab').on('tap', 'a', function(e) {
+				var targetTab = this.getAttribute('href');
+				//除首页选项卡，其他选项卡显示隐藏上传图标
+				var uploader = document.getElementById('upload');
+				if (targetTab != subpages[0]) {
+					uploader.classList.add('mui-hidden');
+				} else {
+					uploader.classList.remove('mui-hidden');
+				}
+				if (targetTab == activeTab) {
+					return;
+				}
+				//更换标题
+				title.innerHTML = this.querySelector('.mui-tab-label').innerHTML;
+				console.log(this.querySelector('.mui-tab-label').innerHTML);
+				//显示目标选项卡
+				//若为iOS平台或非首次显示，则直接显示
+				if (mui.os.ios || aniShow[targetTab]) {
+					// console.log('111',targetTab);
+					plus.webview.show(targetTab);
+				} else {
+					//否则，使用fade-in动画，且保存变量
+					var temp = {};
+					temp[targetTab] = "true";
+					mui.extend(aniShow, temp);
+					plus.webview.show(targetTab, "fade-in", 300);
+				}
+				//隐藏当前;
+				plus.webview.hide(activeTab);
+				//更改当前活跃的选项卡
+				activeTab = targetTab;
+				// console.log('activeTab',activeTab);
+			});
+			//自定义事件，模拟点击“首页选项卡”
+
+			// 			mui.plusReady(function(){
+			// 				var defaultTab = document.getElementById("defaultTab");
+			// 				//模拟首页点击
+			// 				mui.trigger(defaultTab, 'tap');
+			// 				//切换选项卡高亮
+			// 				var current = document.querySelector(".mui-bar-tab>.mui-tab-item.mui-active");
+			// 				if (defaultTab !== current) {
+			// 					current.classList.remove('mui-active');
+			// 					defaultTab.classList.add('mui-active');
+			// 				}
+			// 			});
+			document.addEventListener('gohome', function() {
+				var defaultTab = document.getElementById("defaultTab");
+				//模拟首页点击
+				mui.trigger(defaultTab, 'tap');
+				//切换选项卡高亮
+				var current = document.querySelector(".mui-bar-tab>.mui-tab-item.mui-active");
+				if (defaultTab !== current) {
+					current.classList.remove('mui-active');
+					defaultTab.classList.add('mui-active');
+				}
+			});
+			//上传照片
+			document.getElementById('upload').addEventListener('tap', function() {
+				mui.openWindow({
+					id: 'upload',
+					url: 'html/uploading.html',
+					show: {
+						autoShow: true,
+						aniShow: 'slide-in-left',
+						duration: 0
+					}
+				})
+			});
+			document.getElementById('bars').addEventListener('tap', function() {
+				mui.openWindow({
+					url: 'html/setting.html',
+					show: {
+						autoShow: true,
+						aniShow: 'slide-in-right',
+						duration: 300
+					}
+				})
+			});
+		</script>
+	</body>
+</html>
