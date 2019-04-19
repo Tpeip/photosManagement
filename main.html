@@ -31,6 +31,10 @@
 				<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
 				<span class="mui-tab-label">关系</span>
 			</a>
+			<a class="mui-tab-item" href="tab-test.html">
+				<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
+				<span class="mui-tab-label">测试</span>
+			</a>
 			<!-- <a class="mui-tab-item" href="test.html">
 				<span class="mui-icon mui-icon-extra mui-icon-extra-peoples"></span>
 				<span class="mui-tab-label">测试</span>
@@ -53,8 +57,8 @@
 					}
 				}
 			};
-			// var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html','test.html'];
-			var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html'];
+			var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html','tab-test.html'];
+			// var subpages = ['tab-photos.html', 'tab-types.html', 'tab-persons.html'];
 			var subpage_style = {
 				top: '45px',
 				bottom: '51px'
@@ -71,7 +75,7 @@
 			mui.plusReady(function() {
 				//获取当前页面所属的webview窗口对象
 				var self = plus.webview.currentWebview();
-				for (var i = 0; i < 3; i++) {
+				for (var i = 0; i < 4; i++) {
 					var temp = {};
 					var sub = plus.webview.create(subpages[i], subpages[i], subpage_style);
 					//不是第一个就隐藏
