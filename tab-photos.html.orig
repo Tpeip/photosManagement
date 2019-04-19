@@ -202,13 +202,11 @@
 				width: 33%;
 				height: 128px;
 				display: inline-block;
-				
 				margin-right: 1px;
 				margin-top: -9px;
 				/* margin: 0px;
 				margin-right: -3px;
 				margin-top: -3px;
-				
 				padding: 0px; */
 			}
 
@@ -221,7 +219,6 @@
 			.mui-content {
 				margin: 0px;
 				padding: 0px;
-				
 				padding-top: 15px;
 			}
 			.mui-color{
@@ -242,8 +239,13 @@
 				</p>
 				</div> -->
 				
+<<<<<<< HEAD
 				<!-- <p class="image-border">
+					<img class="images" src="images/muwu.jpg" data-preview-src="" data-preview-group="1" >
+=======
+				<p class="image-border">
 					<img class="images" src="file:///storage/emulated/0/Pictures/Screenshots/Screenshot_20190417_204823_io.dcloud.HBuilder.jpg" data-preview-src="" data-preview-group="1" >
+>>>>>>> 12e7ee7913857f2878e2f5628a06d4b04771a607
 				</p>
 				
 				<p class="image-border">
@@ -278,23 +280,6 @@
 // 		});
 
 		mui.plusReady(function() {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			
 			getAllImage().then(function(result){
 				for (var i=0;i<result.rows.length;i++) {

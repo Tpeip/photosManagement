@@ -426,7 +426,7 @@
 		plus.gallery.pick(function(e) {
 			for (var i in e.files) {
 				var fileSrc = e.files[i];
-				// console.log(e.files[i]);
+				console.log('src',e.files[i]);
 				setFile(fileSrc);
 				setHtml(fileSrc);
 				console.log("choose photo");
@@ -446,6 +446,7 @@
 
 
 	function setHtml(path) {
+		console.log(path);
 		var str = '';
 		str = '<li id="' + path + '" class="mui-table-view-cell mui-media mui-col-xs-4 image-border">' +
 			'<img class="images" data-preview-src="" data-preview-group="1" class="mui-media-object" src="' + path + '">' +
