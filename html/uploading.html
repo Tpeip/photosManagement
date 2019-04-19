@@ -37,6 +37,7 @@
 		<meta charset="utf-8">
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="../js/websql.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="../css/common.css">
 		<link href="../css/mui.css" rel="stylesheet" />
@@ -528,45 +529,24 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		var task = plus.uploader.createUpload('http://192.168.1.114:3000/photoUpload', {
-				method: "POST"
-			},
-			function(t, status) { //上传完成
-				console.log('abc');
-				if (status == 200) {
-					console.log('********');
-					alert("上传成功");
-					plus.webview.currentWebview().close();
-					refreshParent();
-					wt.close(); //关闭等待提示按钮
-				} else {
-					alert("上传失败：" + status);
-					wt.close(); //关闭等待提示按钮
-				}
-			}
-		);
-		console.log(435356546);
-		//将文件集合添加到上传队列中
-		// 				console.log(files[0].src);
-		// 				task.addFile(files[0].src,{
-		// 					key: 1
-		// 				});
-		var name = localStorage.getItem("user");
-
-		task.addData("user_name", name);
-		for (var i = 0; i < files.length; i++) {
-			var f = files[i];
-			console.log("00000");
-			var src = f.src;
-			task.addFile(f.src, {
-				key: i
-			});
-			// task.addData("src",f.src);
-			console.log("=======");
+		var pm=[];
+		for(var i=0;i<files.length;i++){
+			let image_path=files[i].src;
+			pm.push(InsertToImage(image_path,' ',' ').then().catch(function(err){
+// 				console.log(err);
+// 				alert("上传失败：" + err);
+// 				 wt.close(); 
+			})
+			);
 		}
-		//传其他的参数 如备注
-		//添加其他参数
-		//遍历5个input框
-		task.start();
+		Promise.all(pm).then(function(){
+			alert("上传成功");
+			plus.webview.currentWebview().close();
+			refreshParent();
+			 wt.close(); 
+		}).catch(function(err){
+			alert("上传失败：" + err);
+			 wt.close();
+		});
 	});
 </script>

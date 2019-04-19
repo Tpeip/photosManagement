@@ -7,6 +7,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<!--标准mui.css-->
+		<script src="js/websql.js"></script>
 		<link rel="stylesheet" href="css/mui.min.css">
 		<link rel="stylesheet" type="text/css" href="css/icons-extra.css" />
 		<!--App自定义的css-->
@@ -201,10 +202,12 @@
 				width: 33%;
 				height: 128px;
 				display: inline-block;
-				margin: 0px;
+				margin-right: 1px;
+				margin-top: -9px;
+				/* margin: 0px;
 				margin-right: -3px;
 				margin-top: -3px;
-				padding: 0px;
+				padding: 0px; */
 			}
 
 			.images {
@@ -216,7 +219,7 @@
 			.mui-content {
 				margin: 0px;
 				padding: 0px;
-				padding-top: 10px;
+				padding-top: 15px;
 			}
 			.mui-color{
 				background-color: white;
@@ -226,6 +229,7 @@
 	</head>
 
 	<body id="photos">
+		<!-- <button onclick="deleteAllImage()">删除</button> -->
 		<div id="image-content" class="mui-content">
 			<!-- <div  class="mui-content-padded"> -->
 				<!-- <div>
@@ -235,7 +239,7 @@
 				</p>
 				</div> -->
 				
-				<p class="image-border">
+				<!-- <p class="image-border">
 					<img class="images" src="images/muwu.jpg" data-preview-src="" data-preview-group="1" >
 				</p>
 				
@@ -254,7 +258,7 @@
 				</p>
 				<p class="image-border">
 					<img class="images" src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
-				</p>
+				</p> -->
 			<!-- </div> -->
 		</div>
 	</body>
@@ -264,31 +268,23 @@
 	<script src="js/mui.previewimage.js"></script>
 	<script>
 		var image_template = document.getElementById('image-content');
+		createImageTable();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
 // 			location.reload();
 // 		});
 
 		mui.plusReady(function() {
-			var user = localStorage.getItem("user");
-			// console.log("photo_name",name);
-			var src = 'http://192.168.1.114:3000/upload/' + user + '/';
-			mui.ajax('http://192.168.1.114:3000/photoSearch', {
-				data: {
-					'user_name': user
-				},
-				dataType: 'json',
-				type: 'get',
-				success: function(data) {
-					// console.log(data.length);
-					for (var i in data) {
-						// console.log(data[i].image_name);
-						image = '<p class="image-border"><img class="images" src="' + src + data[i].image_name +
-							'" data-preview-src="" data-preview-group="1" /></p>';
-						jQuery('#image-content').append(image);
-					}
+			
+			getAllImage().then(function(result){
+				for (var i=0;i<result.rows.length;i++) {
+					// console.log(data[i].image_name);
+					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +
+						'" data-preview-src="" data-preview-group="1" /></p>';
+					jQuery('#image-content').append(image);
 				}
 			});
+			
 		});
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({
