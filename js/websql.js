@@ -45,7 +45,7 @@ function websqlCreatTable(tableName,params){
  */
 function createImageTable(){
 	var tableName='image';
-	var params="image_id INTEGER PRIMARY KEY AUTOINCREMENT,image_path text,image_type text,image_keyword text";
+	var params="image_id INTEGER PRIMARY KEY AUTOINCREMENT,image_path text NOT NULL,image_main_type text NOT NULL,image_type text NOT NULL,image_keyword text NOT NULL";
 	websqlCreatTable(tableName,params);
 }
 
@@ -57,9 +57,9 @@ function deleteAllImage(){
     localStorage.removeItem('image');
     dataBase.transaction(function (ctx,result) {
         ctx.executeSql(deleteTableSQL,[],function(ctx,result){
-            console.log("删除表成功 " );
+            console.log("删除表数据成功 " );
         },function(tx, error){ 
-            console.log('删除表失败:'  + error.message);
+            console.log('删除表数据失败:'  + error.message);
         });
     });
 }
@@ -81,17 +81,61 @@ function getAllImage(){
 	 return pm;
 }
 
-function InsertToImage(image_path,image_type,image_keyword){
+function getAllType(){
 	websqlOpenDB();
-	var insterImageSQL = 'INSERT INTO image (image_path,image_type,image_keyword) VALUES (?,?,?)';
+	 var selectALLSQL = 'SELECT distinct(image_main_type) FROM image';
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectALLSQL,[],function (ctx,result){
+		   //      console.log("查询" +   + "成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
+}
+
+function getTypeOne(image_type){
+	websqlOpenDB();
+	console.log("123");
+	console.log(image_type);
+	 var selectSQL = 'SELECT image_path FROM image where image_main_type=? ORDER BY image_id DESC';
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectSQL,[image_type],function (ctx,result){
+		         console.log("查询成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
+}
+
+
+function InsertToImage(num,imageArr){
+	websqlOpenDB();
+	var insertImageSQL = 'INSERT INTO image (image_path,image_main_type,image_type,image_keyword) VALUES (?,?,?,?)';
+	for(var i=0;i<num-1;i++){
+		insertImageSQL+=',(?,?,?,?)';
+	}
+	console.log(insertImageSQL);
+	console.log(imageArr);
 	var pm=new Promise(function(resolve,reject){
 		dataBase.transaction(function (ctx) {
-		    ctx.executeSql(insterImageSQL,[image_path,image_type,image_keyword],function (ctx,result){
-		  //      console.log("插入" +   + "成功");
+		    ctx.executeSql(insertImageSQL,imageArr,function (ctx,result){
+		        console.log("插入成功");
 				resolve(result);
 		    },
 		    function (tx, error) {
-		      //  console.log('插入失败: ' + error.message);
+		        console.log('插入失败: ' + error.message);
 				reject(error);
 		    });
 		});

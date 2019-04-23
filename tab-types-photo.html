@@ -183,16 +183,16 @@
 				}
 			}
 			.mui-content {
-				margin: 0;
-				padding: 0;
-				margin-top: 8px;
-				margin-left: 5px;
+				margin: 0px;
+				padding: 0px;
+				margin-top:15px;
 			}
 			.image-border {
-				width: 32%;
-				height: 128px;
+				width: 33%;
+				height: 120px;
 				display: inline-block;
-				margin-right: 4px;
+				margin-right: 1px;
+				 margin-top: -4px; 
 			}
 			
 			.images {
@@ -214,7 +214,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a id="backing" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<h1 id="title" class="mui-title">title</h1>
+			<h1 id="title" class="mui-title"> </h1>
 		</header>
 		<div id="image-content" class="mui-content"></div>
 		
@@ -223,26 +223,28 @@
 	<script src="js/jquery.min.js"></script>
 	<script src="js/mui.zoom.js"></script>
 	<script src="js/mui.previewimage.js"></script>
+	<script src="js/websql.js"></script>
 	<script type="text/javascript">
 		mui.init({
 			swipeBack: true
 		});
-		var type = localStorage.getItem('type');
-		console.log(type);
-		var user = localStorage.getItem('user');
+
 		mui.plusReady(function() {
+			var type = localStorage.getItem('type');
+			console.log("5612");
+			console.log(type);
+			console.log("5612");
 			replaceHeader();
-			var src = 'http://192.168.1.114:3000/upload/' + user + '/'
-			mui.get('http://192.168.1.114:3000/photoTypeSearch', {
-				'user_name': user,
-				'image_type': type
-			}, function(data) {
-				for (var i in data) {
-					image = '<p class="image-border"><img class="images" src="' + src + data[i].image_name +
-						'" data-preview-src="" data-preview-group="1" /></p>';
-					jQuery('#image-content').append(image);
-				}
-			}, 'json');
+		 getTypeOne(type).then(function(result){
+			 for (let i=0;i<result.rows.length;i++) {
+				 let src=result.rows.item(i).image_path;
+				 image = '<p class="image-border"><img class="images" src="' + src  +
+			     '" data-preview-src="" data-preview-group="1" /></p>';
+			  	jQuery('#image-content').append(image);
+			  	}
+		 }).catch(function(err){
+				console.log(err);
+		})
 		});
 		
 		// mui.previewImage();
@@ -260,7 +262,8 @@
 	
 		function replaceHeader() {
 			var el = document.getElementById('title').innerHTML;
-			document.getElementById('title').innerHTML = el.replace('title', type);
+			var type = localStorage.getItem('type');
+			document.getElementById('title').innerHTML = type;
 		}
 		document.getElementById('backing').addEventListener('tap', function() {
 			plus.webview.currentWebview().close();

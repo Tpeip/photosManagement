@@ -5,7 +5,7 @@
 			'<div class="mui-preview-header">'+
 				'<header id="header-nav" class="mui-bar mui-bar-nav">'+
 				'<div id="back"><a class="mui-icon mui-icon-left-nav mui-pull-left" style="font-size:28px;"></a></div>' +
-				'<a id="menu" class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;font-weight:bold;" href="#popover"></a>{{header}}' +
+				'<a id="menu" class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;" href="#popover"></a>{{header}}' +
 				'</header>'+
 			'</div>'+
 			'<div class="mui-slider-group"></div>' +
@@ -17,13 +17,13 @@
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
 						'<a id="delete" class="mui-tab-item" style="text-align:center;vertical-align:middle;">'+
-							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;font-weight:bolder;"></span>'+
+							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a id="forward" class="mui-tab-item">'+
-							'<span class="mui-icon mui-icon-redo" style="font-size:32px;margin-bottom:14px;font-weight:bolder;"></span>'+
+							'<span class="mui-icon mui-icon-redo" style="font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 					'</nav>'+'{{footer}}'+
 				'</div>'+

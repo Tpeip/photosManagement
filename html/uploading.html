@@ -38,6 +38,7 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<script src="../js/websql.js"></script>
+		<script src="../js/aipImageClassify.js"></script>
 
 		<link rel="stylesheet" type="text/css" href="../css/common.css">
 		<link href="../css/mui.css" rel="stylesheet" />
@@ -251,8 +252,8 @@
 			}
 
 			.image-border {
-				width: 33%;
-				height: 128px;
+				width: 34%;
+				height: 120px;
 				display: inline-block;
 				margin-right: 1px;
 			}
@@ -301,7 +302,7 @@
 		<div class="mui-content mui-content-padded" style="background-color:#fff">
 			<ul id="imgs" class="mui-table-view mui-grid-view">
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 image-border">
-					<a id="choose"><img class="images" style="height:128px" class="mui-media-object" src="../images/camera.jpg" /></a>
+					<a id="choose"><img class="images" style="height:120px" class="mui-media-object" src="../images/camera.jpg" /></a>
 				</li>
 				<!--<li class="mui-table-view-cell mui-media mui-col-xs-6">
 					<a href="#">
@@ -426,7 +427,7 @@
 		plus.gallery.pick(function(e) {
 			for (var i in e.files) {
 				var fileSrc = e.files[i];
-				console.log('src',e.files[i]);
+				console.log('src', e.files[i]);
 				setFile(fileSrc);
 				setHtml(fileSrc);
 				console.log("choose photo");
@@ -530,24 +531,63 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		var pm=[];
-		for(var i=0;i<files.length;i++){
-			let image_path=files[i].src;
-			pm.push(InsertToImage(image_path,' ',' ').then().catch(function(err){
-// 				console.log(err);
-// 				alert("上传失败：" + err);
-// 				 wt.close(); 
+		var pm = [];
+		var imageArr=[];
+		for (var i = 0; i < files.length; i++) {
+			let image_path = files[i].src;
+			let image=getBase64Image(files[i]);
+			pm.push(AIPImageClassify(image).then(function(res){
+			//	console.log(JSON.stringify(res));
+				let type=res.result[0].root;
+				let typeArr=type.split("-");
+				let image_main_type;
+				if(typeArr[0]=='非自然图像'||typeArr[0]=='商品')
+					image_main_type=typeArr[1];
+				else
+					image_main_type=typeArr[0];
+				if(typeArr[0]=='公众人物')
+				    image_main_type='人物';
+				let typesArr=new Array();
+				let keyArr=new Array();
+				keyArr.push(res.result[0].keyword);
+				for(j=1;j<res.result_num;j++){
+					let types=res.result[j].root.split("-");
+					keyArr.push(res.result[j].keyword);
+					if(types[0]=='非自然图像'||types[0]=='商品')
+						typesArr.push(types[1]);
+					else
+						typesArr.push(types[0]);
+					if(types[0]=='人物')
+						image_main_type=types[0];
+				}
+				let image_type=typesArr.join("-");
+				let image_keyword=keyArr.join("-");
+				console.log(image_path,image_main_type,image_type,image_keyword);
+				let num=files.length;
+				imageArr.push(image_path);
+				imageArr.push(image_main_type);
+				imageArr.push(image_type);
+				imageArr.push(image_keyword);
+			}).catch(function(err){
+				console.log(JSON.stringify(err));
 			})
 			);
 		}
-		Promise.all(pm).then(function(){
+		Promise.all(pm).then(function() {
+			let num=files.length;
+			InsertToImage(num,imageArr).then().catch(function(err) {
+				reject(err);
+			});
+		}).then(function(){
 			alert("上传成功");
 			plus.webview.currentWebview().close();
 			refreshParent();
-			 wt.close(); 
-		}).catch(function(err){
+			wt.close();
+		}).catch(function(err) {
+			console.log(err);
 			alert("上传失败：" + err);
-			 wt.close();
+			wt.close();
 		});
 	});
+	
 </script>
