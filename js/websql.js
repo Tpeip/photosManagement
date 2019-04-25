@@ -45,7 +45,7 @@ function websqlCreatTable(tableName,params){
  */
 function createImageTable(){
 	var tableName='image';
-	var params="image_id INTEGER PRIMARY KEY AUTOINCREMENT,image_path text NOT NULL,image_main_type text NOT NULL,image_type text NOT NULL,image_keyword text NOT NULL";
+	var params="image_id INTEGER PRIMARY KEY AUTOINCREMENT,image_path text NOT NULL,image_main_type text NOT NULL,image_type text NOT NULL,image_keyword text NOT NULL,image_date text NOT NULL";
 	websqlCreatTable(tableName,params);
 }
 
@@ -99,6 +99,23 @@ function getAllType(){
 	 return pm;
 }
 
+function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        var currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+    }
+
+
 function getTypeOne(image_type){
 	websqlOpenDB();
 	console.log("123");
@@ -119,15 +136,33 @@ function getTypeOne(image_type){
 	 return pm;
 }
 
+function getImageByPath(path){
+	websqlOpenDB();
+	 var selectSQL = 'SELECT * FROM image where image_path=?';
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectSQL,[path],function (ctx,result){
+		         console.log("查询成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
+}
+
 
 function InsertToImage(num,imageArr){
 	websqlOpenDB();
-	var insertImageSQL = 'INSERT INTO image (image_path,image_main_type,image_type,image_keyword) VALUES (?,?,?,?)';
+	var insertImageSQL = 'INSERT INTO image (image_path,image_main_type,image_type,image_keyword,image_date) VALUES (?,?,?,?,?)';
 	for(var i=0;i<num-1;i++){
-		insertImageSQL+=',(?,?,?,?)';
+		insertImageSQL+=',(?,?,?,?,?)';
 	}
-	console.log(insertImageSQL);
-	console.log(imageArr);
+//	console.log(insertImageSQL);
+//	console.log(imageArr);
 	var pm=new Promise(function(resolve,reject){
 		dataBase.transaction(function (ctx) {
 		    ctx.executeSql(insertImageSQL,imageArr,function (ctx,result){

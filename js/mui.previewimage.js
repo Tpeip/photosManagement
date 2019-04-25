@@ -5,14 +5,14 @@
 			'<div class="mui-preview-header">'+
 				'<header id="header-nav" class="mui-bar mui-bar-nav">'+
 				'<div id="back"><a class="mui-icon mui-icon-left-nav mui-pull-left" style="font-size:28px;"></a></div>' +
-				'<a id="menu" class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;" href="#popover"></a>{{header}}' +
+				'<div id="info"><a class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;"></a></div>{{header}}' +
 				'</header>'+
 			'</div>'+
 			'<div class="mui-slider-group"></div>' +
-			'<div id="popover" class="mui-popover" style="height: 250px;">'+
-				'<div class="mui-popover-arrow"></div>'+
-				'<div>我是自定义位置弹出层</div>'+
-			'</div>'+
+// 			'<div id="popover" class="mui-popover" style="height: 250px;">'+
+// 				'<div class="mui-popover-arrow"></div>'+
+// 				'<div>我是自定义位置弹出层</div>'+
+// 			'</div>'+
 			'<div class="mui-preview-footer mui-hidden" style="box-shadow:1px 1px 4px 1px #ccc inset">'+
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
@@ -89,6 +89,7 @@
 			back = document.getElementById('back');
 			del = document.getElementById('delete');
 			forward = document.getElementById('forward');
+			info = document.getElementById('info');
 		}
 
 		this.element = el; //template区域
@@ -100,6 +101,8 @@
 		this.backer = back;
 		this.deleter = del;
 		this.forwarder = forward;
+		this.infoer = info;
+		console.log('info',this.infoer);
 		this.header = this.element.querySelector($.classSelector('.preview-header'));
 		// console.log("header",this.header);
 		this.footer = this.element.querySelector($.classSelector('.preview-footer'));
@@ -183,6 +186,16 @@
 			});
 			this.classList.remove('mui-active');
 		};
+		var laterOpenEvent = function(){
+			mui.openWindow({
+				url: 'html/info.html',
+				show: {
+					autoShow: true,
+					aniShow: 'slide-in-top',
+					duration: 500
+				}
+			});
+		};
 		// 		this.scroller.addEventListener('tap',function(){
 		// 			this.footer.classList.add($.className('hidden'));
 		// 			this.header.classList.add($.className('hidden'));
@@ -206,6 +219,7 @@
                 self.backer.addEventListener('tap', laterCloseEvent);
 				self.deleter.addEventListener('tap',laterDeleteEvent);
 				self.forwarder.addEventListener('tap',laterForwardEvent);
+				self.infoer.addEventListener('tap',laterOpenEvent);
 			}
 		});
 		this.element.addEventListener('slide', function(e) {
@@ -310,7 +324,8 @@
 		var imgEl = itemEl.querySelector('img');
 		//获取照片路径
 		currentPreviewSrc = imgEl.src;
-		// console.log("src", currentPreviewSrc);
+		console.log("src", currentPreviewSrc);
+		localStorage.setItem('path',currentPreviewSrc);
 		this._initImgData(itemData, imgEl);
 		if (isOpening) {
 			var posi = this._getPosition(itemData);

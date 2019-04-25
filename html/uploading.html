@@ -563,11 +563,13 @@
 				let image_type=typesArr.join("-");
 				let image_keyword=keyArr.join("-");
 				console.log(image_path,image_main_type,image_type,image_keyword);
+				let image_date=getNowFormatDate();
 				let num=files.length;
 				imageArr.push(image_path);
 				imageArr.push(image_main_type);
 				imageArr.push(image_type);
 				imageArr.push(image_keyword);
+				imageArr.push(image_date);
 			}).catch(function(err){
 				console.log(JSON.stringify(err));
 			})

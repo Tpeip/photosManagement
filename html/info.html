@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/iconfont.css" rel="stylesheet" />
+		<!-- <link href="../css/app.css" rel="stylesheet" /> -->
+		<style>
+			/* body,header{
+				background-color: #000000;
+			}
+			.mui-bar{
+				background-color: #000000;
+			} */
+			li{
+				list-style: none;
+				width: 370px;
+				height: 50px;
+				margin-top: 6px;
+			}
+			ul{
+				left: -30px;
+				margin-top: 20px;
+			}
+			.iconfont{
+				font-size: 28px;
+				color: #2e84db;
+				/* padding: 0px;
+				margin-right: 20px; */
+			}
+			.biaoqian-btn{
+				height: 30px;
+				vertical-align:middle;
+				text-align: center;
+				/* line-height: 15px; */
+				background-color: rgba(46,132,219,0.6);
+				margin-right: 5px;
+			}
+			/* .content{
+				margin-left: 30px;
+			} */
+			.mui-row{
+				/* background-color: red; */
+				margin-top: 10px;
+				height: 40px;
+				line-height: 40px;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<button type="button" id="close" class="mui-action-back mui-pull-right mui-btn-link">
+				<span class="mui-icon mui-icon-close"></span>
+			</button>
+		</header>
+		<div id="content" class="mui-content">
+			<!-- <div class="mui-row">
+				<div class="mui-media mui-col-xs-3" style="left:45px">
+					<span class="mui-media-object iconfont icon-pic "></span>
+				</div>
+				<div class="mui-media mui-col-xs-9">
+					<label class='mui-tab-label mui-ellipsis'>风景照</label>
+				</div>
+			</div>
+			<div class="mui-row">
+				<div class="mui-media mui-col-xs-3" style="left:45px">
+					<span class="mui-media-object iconfont icon-calendar"></span>
+				</div>
+				<div class="mui-media mui-col-xs-9">
+					<label class='mui-tab-label mui-ellipsis'>2019-04-24</label>
+				</div>
+			</div>
+			<div class="mui-row">
+				<div class="mui-media mui-col-xs-3" style="left:45px">
+					<span class="mui-media-object iconfont icon-tag"></span>
+				</div>
+				<div class="mui-media mui-col-xs-8">
+					<button class="mui-btn biaoqian-btn">自然景象</button>
+					<button class="mui-btn biaoqian-btn">自然景象</button>
+					<button class="mui-btn biaoqian-btn">自然景象</button>
+				</div>
+				<div class="mui-media mui-col-xs-1"></div> -->
+			</div>
+		</div>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/websql.js"></script>
+		<script type="text/javascript">
+			var path = localStorage.getItem('path');
+			mui.plusReady(function(){
+				getImageByPath(path).then(function(result){
+					var type = result.rows.item(0).image_main_type;
+					var date = result.rows.item(0).image_date;
+					var items = result.rows.item(0).image_keyword;
+					var item = items.split('-');
+					tags = '';
+					for(let i=0; i<item.length; i++){
+						tag = '<button class="mui-btn biaoqian-btn">'+item[i]+'</button>';
+						tags = tags + tag;
+					}
+					image_html='<div class="mui-row">'+
+									'<div class="mui-media mui-col-xs-3" style="left:45px">'+
+										'<span class="mui-media-object iconfont icon-pic "></span>'+
+									'</div>'+
+									'<div class="mui-media mui-col-xs-9">'+
+										'<label class="mui-tab-label mui-ellipsis">'+ type +'</label>'+
+									'</div>'+
+								'</div>';
+					date_html='<div class="mui-row">'+
+								'<div class="mui-media mui-col-xs-3" style="left:45px">'+
+									'<span class="mui-media-object iconfont icon-calendar"></span>'+
+								'</div>'+
+								'<div class="mui-media mui-col-xs-9">'+
+									'<label class="mui-tab-label mui-ellipsis">'+ date +'</label>'+
+								'</div>'+
+							  '</div>';
+					photo_html='<div class="mui-row">'+
+									'<div class="mui-media mui-col-xs-3" style="left:45px">'+
+										'<span class="mui-media-object iconfont icon-people"></span>'+
+									'</div>'+
+									'<div class="mui-media mui-col-xs-9">'+ '</div>'+
+								'</div>';
+					tag_html='<div class="mui-row">'+
+								'<div class="mui-media mui-col-xs-3" style="left:45px">'+
+									'<span class="mui-media-object iconfont icon-tag"></span>'+
+								'</div>'+
+								'<div class="mui-media mui-col-xs-8">'+ tags +'</div>'+									
+								'<div class="mui-media mui-col-xs-1"></div>'+
+							  '</div>';
+					if(type == '人物') {
+						html = image_html + date_html + photo_html + tag_html;
+					}else{
+						html = image_html + date_html + tag_html;
+					}
+					jQuery('#content').append(html);
+				});
+			});
+			mui.init();
+		</script>
+	</body>
+
+</html>
