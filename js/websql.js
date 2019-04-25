@@ -15,7 +15,7 @@ var dataBase = null; /*暂存数据库对象*/
  */
 function websqlOpenDB(){
     /*数据库有就打开 没有就创建*/
-    dataBase = window.openDatabase(dbname, version, dbdesc, dbsize,function() {});
+    dataBase = window.openDatabase(dbname, version, dbdesc, dbsize);
     if (dataBase) {
         console.log("数据库创建/打开成功!");
     } else{
@@ -99,6 +99,25 @@ function getAllType(){
 	 return pm;
 }
 
+
+function getTypeOne(image_type){
+	websqlOpenDB();
+//	console.log(image_type);
+	 var selectSQL = 'SELECT image_path FROM image where image_main_type=? ORDER BY image_id DESC';
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectSQL,[image_type],function (ctx,result){
+//		         console.log("查询成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
+}
 function getNowFormatDate() {
         var date = new Date();
         var seperator1 = "-";
@@ -114,27 +133,6 @@ function getNowFormatDate() {
         var currentdate = year + seperator1 + month + seperator1 + strDate;
         return currentdate;
     }
-
-
-function getTypeOne(image_type){
-	websqlOpenDB();
-	console.log("123");
-	console.log(image_type);
-	 var selectSQL = 'SELECT image_path FROM image where image_main_type=? ORDER BY image_id DESC';
-	 var pm=new Promise(function(resolve,reject){
-		 dataBase.transaction(function (ctx) {
-		     ctx.executeSql(selectSQL,[image_type],function (ctx,result){
-		         console.log("查询成功");
-		 		resolve(result);
-		     },
-		     function (tx, error) {
-		         console.log('查询失败: ' + error.message);
-		 		reject(error);
-		     });
-		 });
-	 });
-	 return pm;
-}
 
 function getImageByPath(path){
 	websqlOpenDB();
@@ -177,3 +175,35 @@ function InsertToImage(num,imageArr){
 	});
 	return pm;
 }
+
+
+function createPersonImage(){
+	var tableName='person';
+	var params="personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num text, face_token text,"+
+	" face_rectangle text, age text, gender text, beauty text, ethnicity text";
+	websqlCreatTable(tableName,params);
+}
+
+function InsertToPerson(num,personArr){
+	websqlOpenDB();
+	var insertImageSQL = 'INSERT INTO person (image_path,person_num, face_token, face_rectangle, age, gender, beauty, ethnicity) VALUES (?,?,?,?,?,?,?,?)';
+	for(var i = 0;i < num-1; i++){
+		insertImageSQL += ',(?,?,?,?,?,?,?,?)';
+	}
+	console.log(insertImageSQL);
+	console.log(personArr);
+	var pm=new Promise (function(resolve , reject) {
+		dataBase.transaction(function (ctx) {
+		    ctx.executeSql(insertImageSQL,personArr,function (ctx,result){
+		        console.log("插入成功");
+				resolve(result);
+		    },
+		    function (tx, error) {
+		        console.log('插入失败: ' + error.message);
+				reject(error);
+		    });
+		});
+	});
+	return pm;
+}
+

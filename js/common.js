@@ -1,8 +1,8 @@
 
 /////////填写你的apikey
 
-const APIKEY = 'UsFymJTKweHjYeKKiPZ5Uc6IfK3gDpoZ';
-const APISERET = 'WXQrDuLWLfMcnuVklTWW2k7781rwH9aY';
+const APIKEY = 'cU1UdhpsUhKJ9yhme3KyRAkaDlGVgt0a';
+const APISERET = 'QaDwCfhlBI0SIWvgGCY-vGLOXPcBU1pP';
 
 //////////////////
 
@@ -14,7 +14,7 @@ function navigateTo(page) {
 //判断是否是手机
 function isMobile() {
     const userAgentInfo = navigator.userAgent;
-    const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod']; // iPad
+    const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod', 'YunOS']; // iPad
     let mobile_flag = false;
     // 根据userAgent判断是否是手机
     for (let v = 0; v < mobileAgents.length; v++) {

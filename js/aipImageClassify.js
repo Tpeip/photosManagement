@@ -1,8 +1,8 @@
 const getBaiduToken = function () {
     return new Promise((resolve, reject) => {
         //自行获取APIKey、SecretKey
-        const apiKey = 'fFKC78lFhxAEDAxcoLZe9F7O';
-        const secKey = 'uBHGUU2D4cOphHq53d04jvTNj5r22gRM';
+        const apiKey = 'AVzVKQv9GGeDcn4HG4IycvFf';
+        const secKey = 'a33ymiq1ZacAGqMlZloOBLcXG75txorB';
         const tokenUrl = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secKey}`;
         var params={};
 		this.request(tokenUrl,params,function (res) {
@@ -29,6 +29,21 @@ const getImageClassify = function(tokenUrl, data){
     });
 }
 
+const getDetect = function(tokenUrl, data){
+    return new Promise((resolve, reject) => {
+        const detectUrl = `https://aip.baidubce.com/rest/2.0/face/v3/detect?access_token=${tokenUrl}`;
+		this.request(detectUrl,data,function (res) {
+		//	console.log(JSON.stringify(res));
+                resolve(res);
+            }, function (err) {
+			//	console.log('网络错误，请重试！'+JSON.stringify(err));
+                reject(err);
+            });
+			
+    });
+}
+
+
 function AIPImageClassify(image){
 	return new Promise((resolve,reject) =>{
 		getBaiduToken().then((res) => {
@@ -46,12 +61,33 @@ function AIPImageClassify(image){
 	//		 	console.log(JSON.stringify(err)); 
 				reject(err);
 			 });
+ 		}).catch(function(err){
+ 			console.log(err);;
+			reject(err);
+ 		});
+	});
+}
+
+function AIPImageDetect(image){
+	return new Promise((resolve,reject) =>{
+		getBaiduToken().then((res) => {
+			let token = res.access_token;
+			return token;
+		}).then(function(token){
+			let data = {"image": image,
+			"image_type": "BASE64",
+			"face_field":"ge,beauty,expression,face_shape,gender,glasses,landmark,race,quality,eye_status,emotion,face_type",
+			"max_face_num": "10"};
+			return getDetect(token,data);
+		}).then(function(res){
+			resolve(res);
 		}).catch(function(err){
 			console.log(err);;
 			reject(err)
 		});
 	});
 }
+
 this.request = function (url, dic, success, failed) {//发送POST请求
 
 		ajax({
@@ -131,5 +167,6 @@ this.request = function (url, dic, success, failed) {//发送POST请求
 		var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
 		var dataURL = canvas.toDataURL("image/" + ext);
 		var image=dataURL.replace(/data:image\/.*;base64,/,'');
+	//	console.log(dataURL);
 		return image;
 	}

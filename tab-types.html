@@ -147,10 +147,10 @@
 			mui.plusReady(function() {
 				getAllType().then(function(result){
 					for(let i=0;i<result.rows.length;i++){
-						console.log(JSON.stringify(result.rows.item(i)));
+//						console.log(JSON.stringify(result.rows.item(i)));
 						let image_type=result.rows.item(i).image_main_type;
 						getTypeOne(image_type).then(function(result){
-							console.log(JSON.stringify(result.rows.item(0)));
+//							console.log(JSON.stringify(result.rows.item(0)));
 							var image_path=result.rows.item(0).image_path;
 							var length=result.rows.length;
 							setHtml(image_type,length,image_path);

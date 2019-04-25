@@ -229,6 +229,7 @@
 
 	<body id="photos">
 		 <button onclick="deleteAllImage()">删除</button> 
+		 <!-- <button onclick="deleteAlbum()">删相册</button> -->
 		<div id="image-content" class="mui-content">
 			<!-- <div  class="mui-content-padded"> -->
 				<!-- <div>
@@ -264,11 +265,15 @@
 	<script src="js/mui.min.js"></script>
 	<script src="js/jquery.min.js"></script>
 	<script src="js/mui.zoom.js"></script>
-	<script src="js/mui.previewimage.js"></script>	
+	<script src="js/mui.previewimage.js"></script>
 	<script src="js/websql.js"></script>
+<!-- 	<script src="js/facepp_sdk.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/exif.js"></script> -->
 	<script>
 		var image_template = document.getElementById('image-content');
 		createImageTable();
+		createPersonImage();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
 // 			location.reload();
@@ -283,6 +288,8 @@
 						'" data-preview-src="" data-preview-group="1" /></p>';
 					jQuery('#image-content').append(image);
 				}
+			}).catch(function(err){
+				console.log(err);
 			});
 			
 		});
@@ -304,6 +311,16 @@
 		// 		 * 第二个参数是分组的索引；  
 		// 		 */
 		// 		imgeGroup.open(0, 1);
+// 		function deleteAlbum() {
+// 			var facepp = new FACEPP(APIKEY,APISERET,1);
+// 			var params={'facealbum_token':'1555509744-d3f1d68d-76fb-4972-b443-08de8e9141d3'};
+// 			facepp.deleteAlbum(params,function success(e){
+// 				console.log(e);
+// 			},function failed(err){
+// 				console.log(err);
+// 			})
+// 		}
+			
 	</script>
 
 </html>

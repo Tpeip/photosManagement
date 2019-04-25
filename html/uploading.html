@@ -325,14 +325,19 @@
 <script src="../js/mui.js"></script>
 <script type="text/javascript" src="../js/jquery.min.js"></script>
 <script type="text/javascript" src="../js/exif.js"></script>
-<script type="text/javascript" src="../js/facepp_sdk.js"></script>
 <script type="text/javascript" src="../js/common.js"></script>
 <script src="../js/mui.zoom.js"></script>
 <script type="text/javascript" src="../js/mui.imageViewer.js"></script>
 <script src="../js/mui.previewimage1.js"></script>
+<script type="text/javascript" src="../js/facepp_sdk.js"></script>
 <script>
 	mui.previewImage();
 	var fileArr = [];
+	var imageArr = [];
+	var person = [];
+	var per_num = 0;
+	var pm = [];
+	
 	mui.init({
 		// 		beforeback: function() {
 		// 			//获得列表界面的webview
@@ -410,8 +415,8 @@
 		c.captureImage(function(e) {
 			plus.io.resolveLocalFileSystemURL(e, function(entry) {
 				var imgSrc = entry.toLocalURL() + "?version=" + new Date().getTime(); //拿到图片路径  
-				setFile(imgSrc);
 				setHtml(imgSrc);
+				setFile(imgSrc);
 			}, function(e) {
 				console.log("读取拍照文件错误：" + e.message);
 			});
@@ -428,8 +433,8 @@
 			for (var i in e.files) {
 				var fileSrc = e.files[i];
 				console.log('src', e.files[i]);
-				setFile(fileSrc);
 				setHtml(fileSrc);
+				setFile(fileSrc);
 				console.log("choose photo");
 			}
 		}, function(e) {
@@ -479,8 +484,106 @@
 	function setFile(fileSrc) {
 		var image = new Image();
 		image.src = fileSrc;
-		// console.log('****', image.src);
+// 		 console.log(image.src);
 		fileArr.push(image);
+		getInfo(fileSrc);
+	}
+	
+	function getInfo(fileSrc){
+		let img = new Image();
+		img.src = fileSrc;
+		var facepp = new FACEPP(APIKEY, APISERET, 1);
+		img.onload=function(){
+			let image_base64 = getBase64Image(img);
+			let image_path = fileSrc;
+		//	console.log(image_base64);
+		//	console.log(image_path);
+			pm.push(AIPImageClassify(image_base64).then(function(res) {
+				//	console.log(JSON.stringify(res));
+				let type = res.result[0].root;
+				let typeArr = type.split("-");
+				let image_main_type;
+				if (typeArr[0] == '非自然图像' || typeArr[0] == '商品')
+					image_main_type = typeArr[1];
+				else
+					image_main_type = typeArr[0];
+				if (typeArr[0] == '公众人物')
+					image_main_type = '人物';
+				let typesArr = new Array();
+				let keyArr = new Array();
+				keyArr.push(res.result[0].keyword);
+				for (let j = 1; j < res.result_num; j++) {
+					let types = res.result[j].root.split("-");
+					keyArr.push(res.result[j].keyword);
+					if (types[0] == '非自然图像' || types[0] == '商品')
+						typesArr.push(types[1]);
+					else
+						typesArr.push(types[0]);
+					if (types[0] == '人物')
+						image_main_type = types[0];
+				}
+				let image_type = typesArr.join("-");
+				let image_keyword = keyArr.join("-");
+				let image_date = getNowFormatDate();
+				//console.log(image_path,image_main_type,image_type,image_keyword);imageArr.push(image_path);
+				imageArr.push(image_path);
+				imageArr.push(image_main_type);
+				imageArr.push(image_type);
+				imageArr.push(image_keyword);
+				imageArr.push(image_date);
+				if (image_main_type == '人物') {
+ 					
+// 					return AIPImageDetect(image_base64).then(function(res) {
+// 						let face_num = res.result.face_num;
+// 						//console.log(JSON.stringify(res));
+// 						person.push(image_path);
+// 						person.push(face_num);
+// 					});
+					let image_face=facepp.getFaceBase64Image(img);
+					let params={'image_base64' : image_face,"return_attributes": "gender,age,beauty,ethnicity,emotion"};
+					console.log(image_main_type);
+					return new Promise((resolve , reject) => {
+					facepp.detectFace(params,function success(e){
+						console.log(JSON.stringify(e));
+						let face_num=e.faces.length;
+						for(let k = 0; k < face_num; k++){
+							per_num++;
+							let face_token = e.faces[k].face_token;
+							let rectangle = e.faces[k].face_rectangle.width+"-"+e.faces[k].face_rectangle.top+"-"+e.faces[k].face_rectangle.left+"-"+e.faces[k].face_rectangle.height;
+							let age = e.faces[k].attributes.age.value;
+							let gd = e.faces[k].attributes.gender.value;
+							let gender;
+							let beauty;
+							if(gd == 'Female'){
+								gender = '女性';
+								beauty = e.faces[k].attributes.beauty.female_score;
+							}
+							else{
+								gender = '男性';
+								beauty = e.faces[k].attributes.beauty.male_score;
+							}
+							let ethnicity = e.faces[k].attributes.ethnicity.value;
+							person.push(image_path);
+							person.push(face_num);
+							person.push(face_token);
+							person.push(rectangle);
+							person.push(age);
+							person.push(gender);
+							person.push(beauty);
+							person.push(ethnicity);
+						}
+						resolve(e);
+					},function failed(err){
+						console.log(JSON.stringify(err));
+							reject(err);
+						});
+					});
+				}
+			})
+			);
+		}
+		
+		
 	}
 
 	//删除待上传照片文件
@@ -496,6 +599,12 @@
 			fileArr[i] = fileArr[i + 1];
 		}
 		fileArr.length--;
+		
+		let num = imageArr.indexOf(fileSrc);
+		imageArr.splice(num , 5);
+		let ps = person.indexOf(fileSrc);
+		if(ps != -1)
+			person.splice(ps , 2);
 	}
 
 	//取消上传照片
@@ -531,56 +640,86 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		var pm = [];
-		var imageArr=[];
-		for (var i = 0; i < files.length; i++) {
-			let image_path = files[i].src;
-			let image=getBase64Image(files[i]);
-			pm.push(AIPImageClassify(image).then(function(res){
-			//	console.log(JSON.stringify(res));
-				let type=res.result[0].root;
-				let typeArr=type.split("-");
-				let image_main_type;
-				if(typeArr[0]=='非自然图像'||typeArr[0]=='商品')
-					image_main_type=typeArr[1];
-				else
-					image_main_type=typeArr[0];
-				if(typeArr[0]=='公众人物')
-				    image_main_type='人物';
-				let typesArr=new Array();
-				let keyArr=new Array();
-				keyArr.push(res.result[0].keyword);
-				for(j=1;j<res.result_num;j++){
-					let types=res.result[j].root.split("-");
-					keyArr.push(res.result[j].keyword);
-					if(types[0]=='非自然图像'||types[0]=='商品')
-						typesArr.push(types[1]);
-					else
-						typesArr.push(types[0]);
-					if(types[0]=='人物')
-						image_main_type=types[0];
-				}
-				let image_type=typesArr.join("-");
-				let image_keyword=keyArr.join("-");
-				console.log(image_path,image_main_type,image_type,image_keyword);
-				let image_date=getNowFormatDate();
-				let num=files.length;
-				imageArr.push(image_path);
-				imageArr.push(image_main_type);
-				imageArr.push(image_type);
-				imageArr.push(image_keyword);
-				imageArr.push(image_date);
-			}).catch(function(err){
-				console.log(JSON.stringify(err));
-			})
-			);
-		}
+// 		var pm = [];
+// 		var imageArr = [];
+// 		var facepp = FACEPP(APIKEY, APISERET, 1);
+// 		var person = [];
+// 		var per_num = 0;
+// 		for (let i = 0; i < files.length; i++) {
+// 			let image_path = files[i].src;
+// 			//let image = getBase64Image(files[i]);
+// 			//console.log(image);
+// 			let img = new Image();
+// 			img.src=image_path;
+// 			let image = getBase64Image(img);
+// 			console.log(image);
+// 						pm.push(AIPImageClassify(image).then(function(res){
+// 			//				console.log(JSON.stringify(res));
+// 							let type=res.result[0].root;
+// 							let typeArr=type.split("-");
+// 							let image_main_type;
+// 							if(typeArr[0] == '非自然图像'||typeArr[0] == '商品')
+// 								image_main_type = typeArr[1];
+// 							else
+// 								image_main_type = typeArr[0];
+// 							if(typeArr[0] == '公众人物')
+// 							    image_main_type = '人物';
+// 							let typesArr=new Array();
+// 							let keyArr=new Array();
+// 							keyArr.push(res.result[0].keyword);
+// 							for(let j = 1;j < res.result_num; j++){
+// 								let types = res.result[j].root.split("-");
+// 								keyArr.push(res.result[j].keyword);
+// 								if(types[0] == '非自然图像' || types[0] == '商品')
+// 									typesArr.push(types[1]);
+// 								else
+// 									typesArr.push(types[0]);
+// 								if(types[0] == '人物')
+// 									image_main_type = types[0];
+// 							}
+// 							let image_type = typesArr.join("-");
+// 							let image_keyword = keyArr.join("-");
+// 							let image_date = getNowFormatDate();
+// 							//console.log(image_path,image_main_type,image_type,image_keyword);imageArr.push(image_path);
+// 							imageArr.push(image_path);
+// 							imageArr.push(image_main_type);
+// 							imageArr.push(image_type);
+// 							imageArr.push(image_keyword);
+// 							imageArr.push(image_date);
+// 							
+// 							if(image_main_type == '人物'){
+// 								per_num++;
+// 			 					return AIPImageDetect(image).then(function(res){
+// 			 						let face_num = res.result.face_num;
+// 			//						console.log(JSON.stringify(res));
+// 									person.push(image_path);
+// 									person.push(face_num);
+// 			 					});
+// 			// 					let params={'image_base64' : image};
+// 			// 				//	console.log(image_main_type);
+// 			// 					return new Promise((resolve , reject) => {
+// 			// 						facepp.detectFace(params,function success(e){
+// 			// 							let face_num=e.faces.length;
+// 			// 							person.push(image_path);
+// 			// 							person.push(face_num);
+// 			// 						},function failed(err){
+// 			// 							console.log(err);
+// 			// 							reject(err);
+// 			// 						});
+// 			// 					});
+// 							}
+// 						})
+// 						);
+// 		}
 		Promise.all(pm).then(function() {
-			let num=files.length;
-			InsertToImage(num,imageArr).then().catch(function(err) {
-				reject(err);
-			});
-		}).then(function(){
+			let num = files.length;
+			return InsertToImage(num, imageArr);
+		}).then(function(result) {
+			if (per_num == 0)
+				return result;
+			else
+				return InsertToPerson(per_num, person);
+		}).then(function(result) {
 			alert("上传成功");
 			plus.webview.currentWebview().close();
 			refreshParent();
@@ -590,6 +729,6 @@
 			alert("上传失败：" + err);
 			wt.close();
 		});
+		
 	});
-	
 </script>
