@@ -603,8 +603,11 @@
 		let num = imageArr.indexOf(fileSrc);
 		imageArr.splice(num , 5);
 		let ps = person.indexOf(fileSrc);
-		if(ps != -1)
-			person.splice(ps , 2);
+		if(ps != -1){
+			let nm = person[ps + 1];
+			per_num = per_num - nm;
+			person.splice(ps , nm * 8);
+			}
 	}
 
 	//取消上传照片
@@ -727,6 +730,8 @@
 		}).catch(function(err) {
 			console.log(err);
 			alert("上传失败：" + err);
+			plus.webview.currentWebview().close();
+			refreshParent();
 			wt.close();
 		});
 		
