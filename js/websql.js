@@ -137,9 +137,11 @@ function getNowFormatDate() {
 function getImageByPath(path){
 	websqlOpenDB();
 	 var selectSQL = 'SELECT * FROM image where image_path=?';
+	 console.log(path);
 	 var pm=new Promise(function(resolve,reject){
 		 dataBase.transaction(function (ctx) {
 		     ctx.executeSql(selectSQL,[path],function (ctx,result){
+				 console.log(JSON.stringify(result.rows));
 		         console.log("查询成功");
 		 		resolve(result);
 		     },
@@ -180,8 +182,48 @@ function InsertToImage(num,imageArr){
 function createPersonImage(){
 	var tableName='person';
 	var params="personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num text, face_token text,"+
-	" face_rectangle text, age text, gender text, beauty text, ethnicity text";
+	" face_rectangle text, age text, gender text, beauty text, ethnicity text, face_src text";
 	websqlCreatTable(tableName,params);
+}
+
+function getPersonImage(image_path){
+	websqlOpenDB();
+	 var selectSQL = 'SELECT * FROM person where image_path=?';
+	 console.log(path);
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectSQL,[image_path],function (ctx,result){
+			//	 console.log(JSON.stringify(result.rows));
+		         console.log("查询成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
+}
+
+function getPersonImage(face_token){
+	websqlOpenDB();
+	 var selectSQL = 'SELECT * FROM person where face_token=?';
+	 console.log(path);
+	 var pm=new Promise(function(resolve,reject){
+		 dataBase.transaction(function (ctx) {
+		     ctx.executeSql(selectSQL,[face_token],function (ctx,result){
+			//	 console.log(JSON.stringify(result.rows));
+		         console.log("查询成功");
+		 		resolve(result);
+		     },
+		     function (tx, error) {
+		         console.log('查询失败: ' + error.message);
+		 		reject(error);
+		     });
+		 });
+	 });
+	 return pm;
 }
 
 function InsertToPerson(num,personArr){
@@ -207,3 +249,21 @@ function InsertToPerson(num,personArr){
 	return pm;
 }
 
+function UpdateToPerson(image_path, face_token, face_src){
+	websqlOpenDB();
+	var insertImageSQL = 'UPDATE person SET face_src=? WHERE face_token=? and image_path=?';
+//	console.log(insertImageSQL);
+	var pm=new Promise (function(resolve , reject) {
+		dataBase.transaction(function (ctx) {
+		    ctx.executeSql(insertImageSQL,[face_src, face_token, image_path],function (ctx,result){
+		        console.log("更新成功");
+				resolve(result);
+		    },
+		    function (tx, error) {
+		        console.log('更新失败: ' + error.message);
+				reject(error);
+		    });
+		});
+	});
+	return pm;
+}

@@ -92,6 +92,7 @@
 		<script src="../js/websql.js"></script>
 		<script type="text/javascript">
 			var path = localStorage.getItem('path');
+			console.log(path);
 			mui.plusReady(function(){
 				getImageByPath(path).then(function(result){
 					var type = result.rows.item(0).image_main_type;
