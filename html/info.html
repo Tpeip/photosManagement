@@ -172,21 +172,14 @@
 								'<div class="mui-media mui-col-xs-1"></div>'+
 							  '</div>';
 					if(type == '人物') {
-						console.log('renwusdfskl');
 						var persons_html = '';
 						getPersonImage(path).then(function(e){
-							console.log(path);
-							console.log('%%%%%%%%%%%%%%');
-							var length = e.rows.length;
+							var length = e.rows.item(0).person_num;
 							console.log(length);
 							for(let i =0; i<length; i++){
 								let face_token = e.rows.item(i).face_token;
-								console.log("*************");
-								console.log(face_token);
 								let face_rect = e.rows.item(i).face_rectangle;
 								let face_url = getFaceData(face_rect);
-								console.log("#####3##########");
-								// console.log(face_url);
 								UpdateToPerson(path,face_token,face_url);
 								let age = e.rows.item(i).age.split('.');								
 // 								let gender = e.rows.item(i).gender;
