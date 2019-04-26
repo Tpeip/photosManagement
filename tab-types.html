@@ -94,7 +94,7 @@
 			<div id="" class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">人物</label>
-				<div>
+				<div id="persons">
 					<!-- <p class="image-border" onclick="turnTo()">
 						<img class="images" src="images/shuijiao.jpg" />
 						<label class="label-photo-type">单人照</label><br>
@@ -153,7 +153,7 @@
 //							console.log(JSON.stringify(result.rows.item(0)));
 							var image_path=result.rows.item(0).image_path;
 							var length=result.rows.length;
-							setHtml(image_type,length,image_path);
+							setTypeHtml(image_type,length,image_path);
 						}).catch(function(err){
 					         console.log(err);
 				        })
@@ -161,10 +161,21 @@
 					;
 				}).catch(function(err){
 					console.log(err);
-				})
+				});
+				for(let i=1;i<=3; i++){
+					getPersonNumImage(i).then(function(e){
+						if(e.rows.length != 0){							
+							let path = e.rows.item(0).image_path;
+							let length = e.rows.length;
+							setPersonHtml(path,length,i);
+						}
+					}).catch(function(e){
+						console.log(e);
+					})
+				}
 			});
 
-			function setHtml(type, num,src) {
+			function setTypeHtml(type, num,src) {
 				var str = '';
 			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
 				str = '<p class="image-border" onclick="turnTo(\''+ type +'\')">'+				           
@@ -174,6 +185,27 @@
 					   '</p>';
 			    jQuery("#types").append(str);
 			}
+			
+			function setPersonHtml(src,num,i){
+				let person_num = '';
+				if(i == 1){
+					person_num = '单人照';
+				}else if(i == 2){
+					person_num = '双人照';
+				}else{
+					person_num = '集体照';
+				}
+				var str = '';
+				//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
+					str = '<p class="image-border" onclick="turnTo(\''+ person_num+'\')">'+				           
+						       '<img class="images" src="' + src + '" />'+
+							   '<label class="label-photo-type">' + person_num + '</label>'+'<br>'+
+							   '<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>'+
+						   '</p>';
+				    jQuery("#persons").append(str);
+				
+			}
+			
 // 			function turnTo(type){
 // 				localStorage.setItem('type','');
 // 				localStorage.setItem('type',type);

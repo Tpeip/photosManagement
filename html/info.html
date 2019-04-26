@@ -48,7 +48,18 @@
 				height: 40px;
 				line-height: 40px;
 			}
-			
+			.person-tags{
+				height: 15px;
+				font-size: 16px;
+			}
+			.person-tags > label{
+				color: #000000;
+			}
+			.face{
+				height:45px;
+				width: 45px;
+				border-radius: 45px;
+			}
 		</style>
 	</head>
 
@@ -59,6 +70,8 @@
 			</button>
 		</header>
 		<div id="content" class="mui-content">
+			<img id="img" style="display:none" />
+			<canvas id="can"  style="display:none;width:200px;height:200px"></canvas>
 			<!-- <div class="mui-row">
 				<div class="mui-media mui-col-xs-3" style="left:45px">
 					<span class="mui-media-object iconfont icon-pic "></span>
@@ -77,6 +90,35 @@
 			</div>
 			<div class="mui-row">
 				<div class="mui-media mui-col-xs-3" style="left:45px">
+					<span class="mui-media-object iconfont icon-people"></span>
+				</div>
+				<div class="mui-media mui-col-xs-9">
+					<div class="mui-row">
+						<div class="mui-media mui-col-xs-3">
+							<img class="face" src="../images/12.png">
+						</div>
+						<div class="mui-media mui-col-xs-9"  style="margin-bottom: 12px;">
+							<p class="person-tags">年龄：<label>45</label></p>
+							<p class="person-tags">性别：<label>男性</label></p>
+							<p class="person-tags">颜值：<label>60分</label></p>
+							<p class="person-tags">种族：<label>汉族</label></p>
+						</div>	
+					</div>
+					<div class="mui-row">
+						<div class="mui-media mui-col-xs-3">
+							<img class="face" src="../images/13.png">
+						</div>
+						<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">
+							<p class="person-tags">年龄：<label>45岁</label></p>
+							<p class="person-tags">性别：</p>
+							<p class="person-tags">颜值：</p>
+							<p class="person-tags">种族：</p>
+						</div>	
+					</div>
+				</div>
+			</div>
+			<div class="mui-row">
+				<div class="mui-media mui-col-xs-3" style="left:45px">
 					<span class="mui-media-object iconfont icon-tag"></span>
 				</div>
 				<div class="mui-media mui-col-xs-8">
@@ -84,8 +126,8 @@
 					<button class="mui-btn biaoqian-btn">自然景象</button>
 					<button class="mui-btn biaoqian-btn">自然景象</button>
 				</div>
-				<div class="mui-media mui-col-xs-1"></div> -->
-			</div>
+				<div class="mui-media mui-col-xs-1"></div>
+			</div> -->
 		</div>
 		<script src="../js/mui.js"></script>
 		<script src="../js/jquery.min.js"></script>
@@ -93,6 +135,8 @@
 		<script type="text/javascript">
 			var path = localStorage.getItem('path');
 			console.log(path);
+			var img = document.getElementById('img');
+			img.src = path;
 			mui.plusReady(function(){
 				getImageByPath(path).then(function(result){
 					var type = result.rows.item(0).image_main_type;
@@ -120,12 +164,6 @@
 									'<label class="mui-tab-label mui-ellipsis">'+ date +'</label>'+
 								'</div>'+
 							  '</div>';
-					photo_html='<div class="mui-row">'+
-									'<div class="mui-media mui-col-xs-3" style="left:45px">'+
-										'<span class="mui-media-object iconfont icon-people"></span>'+
-									'</div>'+
-									'<div class="mui-media mui-col-xs-9">'+ '</div>'+
-								'</div>';
 					tag_html='<div class="mui-row">'+
 								'<div class="mui-media mui-col-xs-3" style="left:45px">'+
 									'<span class="mui-media-object iconfont icon-tag"></span>'+
@@ -134,13 +172,75 @@
 								'<div class="mui-media mui-col-xs-1"></div>'+
 							  '</div>';
 					if(type == '人物') {
-						html = image_html + date_html + photo_html + tag_html;
+						console.log('renwusdfskl');
+						var persons_html = '';
+						getPersonImage(path).then(function(e){
+							console.log(path);
+							console.log('%%%%%%%%%%%%%%');
+							var length = e.rows.length;
+							console.log(length);
+							for(let i =0; i<length; i++){
+								let face_token = e.rows.item(i).face_token;
+								console.log("*************");
+								console.log(face_token);
+								let face_rect = e.rows.item(i).face_rectangle;
+								let face_url = getFaceData(face_rect);
+								console.log("#####3##########");
+								// console.log(face_url);
+								UpdateToPerson(path,face_token,face_url);
+								let age = e.rows.item(i).age.split('.');								
+// 								let gender = e.rows.item(i).gender;
+// 								let beauty = e.rows.item(i).beauty;
+// 								let ethnicity = e.rows.item(i).ethnicity;                                
+                                var person_html = '<div class="mui-row">'+
+													   '<div class="mui-media mui-col-xs-3">'+
+														   '<img class="face" src=\"'+ face_url +'\" />'+
+													   '</div>'+
+													   '<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">'+
+														   '<p class="person-tags">年龄：<label>'+ age[0] +'</label></p>'+
+														   '<p class="person-tags">性别：<label>'+ e.rows.item(i).gender +'</label></p>'+
+														   '<p class="person-tags">颜值：<label>'+ e.rows.item(i).beauty +'</label></p>'+
+														   '<p class="person-tags">种族：<label>'+ e.rows.item(i).ethnicity +'</label></p>'+
+														'</div>'+
+												   '</div>';
+								persons_html = persons_html + person_html;
+								console.log('132425');
+								
+							}	
+							photo_html = '<div class="mui-row">'+
+											'<div class="mui-media mui-col-xs-3" style="left:45px">'+
+												'<span class="mui-media-object iconfont icon-people"></span>'+
+											'</div>'+
+											'<div class="mui-media mui-col-xs-9">'+ persons_html + '</div>'+
+										  '</div>';										
+							html = image_html + date_html + photo_html + tag_html;
+							jQuery('#content').append(html);
+						}).catch(function(e){
+							console.log(e);
+						});
+						
 					}else{
 						html = image_html + date_html + tag_html;
+						jQuery('#content').append(html);
 					}
-					jQuery('#content').append(html);
+					
 				});
 			});
+			
+			//获取人脸区域的路径
+			function getFaceData(face_rect){
+				var rects = face_rect.split('-');
+				var faceW = rects[0];
+				var faceY = rects[1];
+				var faceX = rects[2];
+				var faceH = rects[3];
+				let image = document.getElementById('img');
+				let c =document.getElementById('can');
+				var ctx = c.getContext('2d');
+				ctx.drawImage(image,faceX,faceY,faceW,faceH,0,0,300,150);
+				var face_url = c.toDataURL('image/png');
+				return face_url;
+			}
 			mui.init();
 		</script>
 	</body>

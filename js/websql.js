@@ -206,15 +206,24 @@ function getPersonImage(image_path){
 	 return pm;
 }
 
-function getPersonImage(face_token){
+function getPersonNumImage(num){
 	websqlOpenDB();
-	 var selectSQL = 'SELECT * FROM person where face_token=?';
-	 console.log(path);
+	let number;
+	if(num == 1){
+		number = " ='1.0' ";
+	}
+	else if(num == 2){
+		number = " ='2.0' ";
+	}
+	else{
+		number = " <>'1.0' and person_num <> '2.0' ";
+	}
+	 var selectALLSQL = 'SELECT DISTINCT(image_path) FROM person WHERE person_num' +number + 'ORDER BY personImg_id DESC' ;
+	  console.log(selectALLSQL);
 	 var pm=new Promise(function(resolve,reject){
 		 dataBase.transaction(function (ctx) {
-		     ctx.executeSql(selectSQL,[face_token],function (ctx,result){
-			//	 console.log(JSON.stringify(result.rows));
-		         console.log("查询成功");
+		     ctx.executeSql(selectALLSQL,[],function (ctx,result){
+		   //      console.log("查询" +   + "成功");
 		 		resolve(result);
 		     },
 		     function (tx, error) {
@@ -225,6 +234,26 @@ function getPersonImage(face_token){
 	 });
 	 return pm;
 }
+
+// function getFaceImage(face_token){
+// 	websqlOpenDB();
+// 	 var selectSQL = 'SELECT * FROM person where face_token=?';
+// 	 console.log(path);
+// 	 var pm=new Promise(function(resolve,reject){
+// 		 dataBase.transaction(function (ctx) {
+// 		     ctx.executeSql(selectSQL,[face_token],function (ctx,result){
+// 			//	 console.log(JSON.stringify(result.rows));
+// 		         console.log("查询成功");
+// 		 		resolve(result);
+// 		     },
+// 		     function (tx, error) {
+// 		         console.log('查询失败: ' + error.message);
+// 		 		reject(error);
+// 		     });
+// 		 });
+// 	 });
+// 	 return pm;
+// }
 
 function InsertToPerson(num,personArr){
 	websqlOpenDB();
