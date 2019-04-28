@@ -296,3 +296,165 @@ function UpdateToPerson(image_path, face_token, face_src){
 	});
 	return pm;
 }
+
+
+function createFace(){
+	var tableName='face';
+	var params="face_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, image_id text, face_token text,"+
+	" face_rectangle text, group_id text, face_src text";
+	websqlCreatTable(tableName,params);
+}
+
+function getGroup(){
+	websqlOpenDB();
+	var selectSQL = 'SELECT image_path,group_id,face_rectangle FROM face GROUP BY group_id';
+	var pm=new Promise(function(resolve, reject){
+		dataBase.transaction(function (ctx){
+			ctx.executeSql( selectSQL, [], function(ctx, result){
+				console.log("查询成功");
+				resolve(result);
+			},function(tx,err){
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getFaceByGroup(group_id){
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM face WHERE group_id=? ';
+	var pm=new Promise(function(resolve, reject){
+		dataBase.transaction(function (ctx){
+			ctx.executeSql( selectSQL, [group_id], function(ctx, result){
+				console.log("查询成功");
+				resolve(result);
+			},function(tx,err){
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function InsertToFace(num,personArr){
+	websqlOpenDB();
+	var insertFaceSQL = 'INSERT INTO face (image_path,image_id, face_token, face_rectangle) VALUES (?,?,?,?)';
+	for(var i = 0;i < num-1; i++){
+		insertFaceSQL += ',(?,?,?,?)';
+	}
+	console.log(insertFaceSQL);
+	console.log(personArr);
+	var pm=new Promise (function(resolve , reject) {
+		dataBase.transaction(function (ctx) {
+		    ctx.executeSql(insertFaceSQL,personArr,function (ctx,result){
+		        console.log("插入成功");
+				resolve(result);
+		    },
+		    function (tx, error) {
+		        console.log('插入失败: ' + error.message);
+				reject(error);
+		    });
+		});
+	});
+	return pm;
+}
+
+function UpdateToFace(face_token, group_id){
+	websqlOpenDB();
+	var insertImageSQL = 'UPDATE face SET group_id=? WHERE face_token=? ';
+//	console.log(insertImageSQL);
+	var pm=new Promise (function(resolve , reject) {
+		dataBase.transaction(function (ctx) {
+		    ctx.executeSql(insertImageSQL,[group_id, face_token],function (ctx,result){
+		        console.log("更新成功");
+				resolve(result);
+		    },
+		    function (tx, error) {
+		        console.log('更新失败: ' + error.message);
+				reject(error);
+		    });
+		});
+	});
+	return pm;
+}
+
+function createGroupFace(){
+	var tableName='groupface';
+	var params=" group_id text PRIMARY KEY, face_src text, group_info text";
+	websqlCreatTable(tableName,params);
+}
+
+function getGroupFaceById(group_id){
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM groupface WHERE group_id=?';
+	var pm=new Promise(function(resolve, reject){
+		dataBase.transaction(function (ctx){
+			ctx.executeSql( selectSQL, [group_id], function(ctx, result){
+				console.log("查询成功");
+				resolve(result);
+			},function(tx,err){
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getGroupFace(){
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM groupface';
+	var pm=new Promise(function(resolve, reject){
+		dataBase.transaction(function (ctx){
+			ctx.executeSql( selectSQL, [], function(ctx, result){
+				console.log("查询成功");
+				resolve(result);
+			},function(tx,err){
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function InsertToGroupFace(group_id, face_src){
+	websqlOpenDB();
+	var insertFaceSQL = 'INSERT INTO groupface (group_id ,face_src) VALUES (?,?)';
+//	console.log(insertFaceSQL);
+	var pm=new Promise (function(resolve , reject) {
+		dataBase.transaction(function (ctx) {
+		    ctx.executeSql(insertFaceSQL,[group_id, face_src],function (ctx,result){
+		        console.log("插入成功");
+				resolve(result);
+		    },
+		    function (tx, error) {
+		        console.log('插入失败: ' + error.message);
+				reject(error);
+		    });
+		});
+	});
+	return pm;
+}
+
+function UpdateToInfo(group_id, group_info){
+	websqlOpenDB();
+		var insertImageSQL = 'UPDATE groupface SET group_info=? WHERE group_id=? ';
+	//	console.log(insertImageSQL);
+		var pm=new Promise (function(resolve , reject) {
+			dataBase.transaction(function (ctx) {
+			    ctx.executeSql(insertImageSQL,[group_info, group_id],function (ctx,result){
+			        console.log("更新成功");
+					resolve(result);
+			    },
+			    function (tx, error) {
+			        console.log('更新失败: ' + error.message);
+					reject(error);
+			    });
+			});
+		});
+		return pm;
+}

@@ -274,12 +274,39 @@
 		var image_template = document.getElementById('image-content');
 		createImageTable();
 		createPersonImage();
+		createFace();
+		createGroupFace();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
 // 			location.reload();
 // 		});
+		var facealbum_token = localStorage.getItem("facealbum_token");
+			let params={"facealbum_token": facealbum_token};
+			facepp.getAlbumDetail(params,function success(e){
+				let length = e.faces.length;
+				for(let i = 0;i < length; i++){
+					let face_token = e.faces[i].face_token;
+					let group_id = e.faces[i].group_id;
+					if(group_id == '0' || group_id == '-1')
+						group_id = face_token;
+					UpdateToFace(face_token, group_id);	
+				}
+				console.log(JSON.stringify(e));
+			},function failed(err){
+				console.log(err);
+			})
 
 		mui.plusReady(function() {
+			if(localStorage.getItem("facealbum_token")==null){
+				let param={};
+				facepp.createAlbum(param,function success(e){
+					let facealbum_token = e.facealbum_token;
+					localStorage.setItem("facealbum_token", facealbum_token);
+				},function failed(err){
+					console.log(err);
+				});
+			}
+			
 			
 			getAllImage().then(function(result){
 				for (var i=0;i<result.rows.length;i++) {
@@ -291,6 +318,8 @@
 			}).catch(function(err){
 				console.log(err);
 			});
+			
+			
 			
 		});
 		mui.previewImage(function(img) {

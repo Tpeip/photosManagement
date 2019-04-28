@@ -141,7 +141,39 @@
 		<script type="text/javascript" src="js/mui.previewimage.js"></script>
 		<script src="js/websql.js"></script>
 		<script type="text/javascript">
-			mui.init();
+			//mui.init();
+			
+			getGroup().then(function(group_res){
+				let num = group_res.rows.length;
+				for(let i = 0; i < num; i++){
+					let image_path = group_res.rows.item(i).image_path;
+					let group_id = group_res.rows.item(i).group_id;
+					let face_rec = group_res.rows.item(i).face_rectangle;
+					getGroupFaceById(group_id).then(function(res){
+						if( res.rows.length == 0){
+							let face_src='';
+							InsertToGroupFace(group_id, face_src);
+						}
+					}).catch(function(err){
+						console.log(err);
+					})
+				}
+			}).catch(function(err){
+				console.log(err);
+			});
+			
+			
+			for(let i=1;i<=3; i++){
+				getPersonNumImage(i).then(function(e){
+					if(e.rows.length != 0){							
+						let path = e.rows.item(0).image_path;
+						let length = e.rows.length;
+						setPersonHtml(path,length,i);
+					}
+				}).catch(function(e){
+					console.log(e);
+				})
+			}
 			var user = localStorage.getItem('user');
 			console.log('user',user);
 			mui.plusReady(function() {
@@ -162,17 +194,7 @@
 				}).catch(function(err){
 					console.log(err);
 				});
-				for(let i=1;i<=3; i++){
-					getPersonNumImage(i).then(function(e){
-						if(e.rows.length != 0){							
-							let path = e.rows.item(0).image_path;
-							let length = e.rows.length;
-							setPersonHtml(path,length,i);
-						}
-					}).catch(function(e){
-						console.log(e);
-					})
-				}
+				
 			});
 
 			function setTypeHtml(type, num,src) {

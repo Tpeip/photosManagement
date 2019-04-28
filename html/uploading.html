@@ -305,6 +305,10 @@
 	var person = [];
 	var per_num = 0;
 	var pm = [];
+	var face= [];
+	var face_num = 0;
+	var per_path = [];
+	var facepp = new FACEPP(APIKEY, APISERET, 1);
 	
 	mui.init({
 		// 		beforeback: function() {
@@ -460,7 +464,6 @@
 	function getInfo(fileSrc){
 		let img = new Image();
 		img.src = fileSrc;
-		var facepp = new FACEPP(APIKEY, APISERET, 1);
 		img.onload=function(){
 			let image_base64 = getBase64Image(img);
 			let image_path = fileSrc;
@@ -500,7 +503,7 @@
 				imageArr.push(image_keyword);
 				imageArr.push(image_date);
 				if (image_main_type == '人物') {
- 					
+ 					per_path.push(image_path);
 // 					return AIPImageDetect(image_base64).then(function(res) {
 // 						let face_num = res.result.face_num;
 // 						//console.log(JSON.stringify(res));
@@ -682,26 +685,96 @@
 // 						})
 // 						);
 // 		}
-		Promise.all(pm).then(function() {
-			let num = files.length;
-			return InsertToImage(num, imageArr);
-		}).then(function(result) {
-			if (per_num == 0)
-				return result;
-			else
-				return InsertToPerson(per_num, person);
-		}).then(function(result) {
-			alert("上传成功");
-			plus.webview.currentWebview().close();
-			refreshParent();
-			wt.close();
-		}).catch(function(err) {
-			console.log(JSON.stringify(e));
-			alert("上传失败：" + err);
-			plus.webview.currentWebview().close();
-			refreshParent();
-			wt.close();
-		});
+	Promise.all(pm).then(function() {
+		let num = files.length;
+		return InsertToImage(num, imageArr);
+	}).then(function(result) {
+		if (per_num == 0)
+			return result;
+		else
+			return InsertToPerson(per_num, person);
+	}).then(function(result){
+		let len = per_path.length;
+		let proArr = [];
+		for(let i =0;i <len; i++){
+			let perImg = new Image();
+			perImg.src = per_path[i];
+			//perImg.onload =function(){
+				let image_face = facepp.getFaceBase64Image(perImg);
+				let faceablum_token=localStorage.getItem("facealbum_token");
+					console.log(faceablum_token);
+					let addparams={
+						"facealbum_token" : faceablum_token,
+						"image_base64" :image_face
+					};
+					let addPromise = new Promise(function(resolve,reject){
+						facepp.addImage(addparams,function successe(e){
+					//			console.log(JSON.stringify(e));
+								resolve(e);
+						},function failed(err){
+							console.log(JSON.stringify(err));
+							if(err.responseText.error_message == 'NO_FACE_FOUND')
+								return;
+							else
+								reject(err);
+						})
+					});
+	
+					addPromise.then(function(e){
+						let fanm= e.faces.length;
+						let image_id = e.image_id;
+						for(let m= 0;m< fanm;m++){
+							face_num++;
+							let face_token = e.faces[m].face_token;
+							let face_rectangle = e.faces[m].face_rectangle.width+"-"+e.faces[m].face_rectangle.top+"-"+e.faces[m].face_rectangle.left+"-"+e.faces[m].face_rectangle.height;
+							face.push(per_path[i]);
+							face.push(image_id);
+							face.push(face_token);
+							face.push(face_rectangle);
+						}
+					});
+					proArr.push(addPromise);
+					
+			//};
+		}
+		return Promise.all(proArr);
+	}).then(function(result) {
+		if (face_num == 0)
+			return result;
+		else
+			return InsertToFace(face_num, face);
+	}).then(function(result){
+		let facealbum_token = localStorage.getItem("facealbum_token");
+			console.log(facealbum_token);
+			let params={"facealbum_token": facealbum_token
+		//	"operation_type": "entirefacealbum"
+			};
+			return new Promise(function(resolve,reject){
+				facepp.groupFace(params,function success(e){
+					console.log(JSON.stringify(e));
+					let task_id = e.task_id;
+					let par = {"task_id": task_id};
+					facepp.groupFaceTaskQuery(par, function success(e){
+						resolve(e);
+					},function failed(err){
+						reject(err);
+					})
+				},function failed(err){
+					reject(err);
+				});
+			});
+	}).then(function(result) {
+		alert("上传成功");
+		plus.webview.currentWebview().close();
+		refreshParent();
+		wt.close();
+	}).catch(function(err) {
+		console.log(err);
+		alert("上传失败：" + err);
+		plus.webview.currentWebview().close();
+		refreshParent();
+		wt.close();
+	});
 		
 	});
 </script>
