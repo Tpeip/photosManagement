@@ -141,6 +141,7 @@
 		<script type="text/javascript" src="js/mui.previewimage.js"></script>
 		<script src="js/websql.js"></script>
 		<script type="text/javascript">
+<<<<<<< HEAD
 			//mui.init();
 			
 			getGroup().then(function(group_res){
@@ -163,6 +164,9 @@
 			});
 			
 			
+=======
+			// mui.init();			
+>>>>>>> 45f0bdad0a44ecdcbec85299cbb13bcbf4a6ea98
 			for(let i=1;i<=3; i++){
 				getPersonNumImage(i).then(function(e){
 					if(e.rows.length != 0){							
@@ -171,11 +175,17 @@
 						setPersonHtml(path,length,i);
 					}
 				}).catch(function(e){
+<<<<<<< HEAD
 					console.log(e);
 				})
 			}
 			var user = localStorage.getItem('user');
 			console.log('user',user);
+=======
+				        console.log(e);
+				})
+			}
+>>>>>>> 45f0bdad0a44ecdcbec85299cbb13bcbf4a6ea98
 			mui.plusReady(function() {
 				getAllType().then(function(result){
 					for(let i=0;i<result.rows.length;i++){
@@ -190,23 +200,11 @@
 					         console.log(err);
 				        })
 					}
-					;
 				}).catch(function(err){
 					console.log(err);
 				});
 				
 			});
-
-			function setTypeHtml(type, num,src) {
-				var str = '';
-			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
-				str = '<p class="image-border" onclick="turnTo(\''+ type +'\')">'+				           
-					       '<img class="images" src="' + src + '" />'+
-						   '<label class="label-photo-type">' + type + '</label>'+'<br>'+
-						   '<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>'+
-					   '</p>';
-			    jQuery("#types").append(str);
-			}
 			
 			function setPersonHtml(src,num,i){
 				let person_num = '';
@@ -218,15 +216,29 @@
 					person_num = '集体照';
 				}
 				var str = '';
+				var name = 'person-' + person_num;
 				//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
-					str = '<p class="image-border" onclick="turnTo(\''+ person_num+'\')">'+				           
+					str = '<p class="image-border" onclick="turnTo(\''+ name +'\')">'+				           
 						       '<img class="images" src="' + src + '" />'+
 							   '<label class="label-photo-type">' + person_num + '</label>'+'<br>'+
 							   '<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>'+
 						   '</p>';
-				    jQuery("#persons").append(str);
-				
+				    jQuery("#persons").append(str);				
 			}
+
+			function setTypeHtml(type, num,src) {
+				var str = '';
+				var name = 'type-'+type;
+			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
+				str = '<p class="image-border" onclick="turnTo(\''+ name +'\')">'+				           
+					       '<img class="images" src="' + src + '" />'+
+						   '<label class="label-photo-type">' + type + '</label>'+'<br>'+
+						   '<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>'+
+					   '</p>';
+			    jQuery("#types").append(str);
+			}
+			
+			
 			
 // 			function turnTo(type){
 // 				localStorage.setItem('type','');
