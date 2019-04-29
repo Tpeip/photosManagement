@@ -8,11 +8,7 @@
 				'<div id="info"><a class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;"></a></div>{{header}}' +
 				'</header>'+
 			'</div>'+
-			'<div class="mui-slider-group"></div>' +
-// 			'<div id="popover" class="mui-popover" style="height: 250px;">'+
-// 				'<div class="mui-popover-arrow"></div>'+
-// 				'<div>我是自定义位置弹出层</div>'+
-// 			'</div>'+
+			'<div class="mui-slider-group" ></div>' +
 			'<div class="mui-preview-footer mui-hidden" style="box-shadow:1px 1px 4px 1px #ccc inset">'+
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
@@ -45,13 +41,13 @@
 // 					'</ul>'+
 // 				'</div>'+
 			'</div>'+
-			'<div class="mui-preview-loading">'+
+			'<div class="mui-preview-loading" >'+
 				'<span class="mui-spinner mui-spinner-white"></span>'+
 			'</div>'+
 		'</div>';
 	//scroller
 	var itemTemplate =
-		'<div id="slide" class="mui-slider-item mui-zoom-wrapper mui-color {{className}}">' +
+		'<div id="slide" class="mui-slider-item mui-zoom-wrapper mui-color {{className}}" style="background-color:white">' +
 		'<div class="mui-zoom-scroller">' +
 		'<img src="{{src}}" data-preview-lazyload="{{lazyload}}" style="{{style}}" class="mui-zoom" >' +
 		'</div>' +
@@ -188,7 +184,7 @@
 		};
 		var laterOpenEvent = function(){
 			mui.openWindow({
-				url: 'html/info.html',
+				url: 'info.html',
 				show: {
 					autoShow: true,
 					aniShow: 'slide-in-top',
@@ -320,6 +316,16 @@
 	};
 	proto._loadItem = function(index, isOpening) { //TODO 暂时仅支持img
 		var itemEl = this.scroller.querySelector($.classSelector('.slider-item:nth-child(' + (index + 1) + ')'));
+// 		var white = true;
+// 		itemEl.addEventListener('tap',function(){
+// 			if(white){
+// 				this.classList.remove('mui-color');
+// 				white = false;
+// 			}else{
+// 				this.classList.add('mui-color');
+// 				white = true;
+// 			}			
+// 		});
 		var itemData = this.currentGroup[index];
 		var imgEl = itemEl.querySelector('img');
 		//获取照片路径

@@ -178,6 +178,7 @@ define(
             self.env = require('./tool/env');
             
             var shape = require('./shape');
+			
             // 内置图形注册
             require('./shape/circle');
             require('./shape/ellipse');

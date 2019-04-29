@@ -470,7 +470,7 @@
 		//	console.log(image_base64);
 		//	console.log(image_path);
 			pm.push(AIPImageClassify(image_base64).then(function(res) {
-					console.log(JSON.stringify(res));
+				//	console.log(JSON.stringify(res));
 				let type = res.result[0].root;
 				let typeArr = type.split("-");
 				let image_main_type;

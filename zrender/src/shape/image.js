@@ -87,6 +87,7 @@ define(
 
         ZImage.prototype = {
             brush : function(ctx, e, isHighlight, refresh) {
+				// console.log(ctx);
                 var style = e.style || {};
 
                 if (isHighlight) {
@@ -100,10 +101,12 @@ define(
 
                 if (typeof(image) === 'string') {
                     var src = image;
+					// console.log(src);
                     if (_cache[src]) {
                         image = _cache[src];
                     }
                     else {
+						console.log(123435);
                         image = new Image();//document.createElement('image');
                         image.onload = function(){
                             image.onload = null;
@@ -119,6 +122,7 @@ define(
                         _cache[ src ] = image;
 
                         image.src = src;
+						// console.log(image.src);
                     }
                 }
                 if (image) {
@@ -174,6 +178,7 @@ define(
                     style.height = height;
                     e.style.width = width;
                     e.style.height = height;
+					
 
 
                     if (style.text) {

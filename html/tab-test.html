@@ -1,0 +1,376 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id="demo1" style="height:600px;border:1px solid #ccc;padding:1px;"></div>
+		</div>
+
+		<script src="../js/mui.js"></script>
+
+		<script src="../js/esl.js"></script>
+		<script type="text/javascript">
+			var src = localStorage.getItem('data');
+			mui.init();
+			require.config({
+				packages: [{
+					name: 'echarts',
+					location: '../echarts/src',
+					main: 'echarts'
+				}, {
+					name: 'zrender',
+					location: '../zrender/src',
+					main: 'zrender'
+				}]
+			});
+			var option = {
+				title: {
+					text: '人物关系：乔布斯',
+					subtext: '数据来自人立方',
+					x: 'right',
+					y: 'bottom'
+				},
+				tooltip: {
+					trigger: 'item',
+					formatter: '{a} : {b}'
+				},
+				legend: {
+					x: 'left',
+					selected: {
+						'朋友': true,
+						'家人': true
+					},
+					data: ['家人', '朋友']
+				},
+				isShowScrollBar: false,
+				series: [{
+					type: 'kforce',
+					// symbol: 'image:'+src,
+					categories: [{
+							name: '人物',
+							itemStyle: {
+								normal: {
+									color: 'gray'
+								}
+							}
+						},
+						{
+							name: '家人',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '朋友',
+							itemStyle: {
+								normal: {
+									color: '#87cdfa'
+								}
+							}
+						}
+					],
+					itemStyle: {
+						normal: {
+							label: {
+								show: true,
+								textStyle: {
+									color: '#000000'
+								}
+							},
+							nodeStyle: {
+								brushType: 'both',
+								strokeColor: 'rgba(255,215,0,0.4)',
+								lineWidth: 2
+							}
+						},
+						emphasis: {
+							linkStyle: {
+								strokeColor: '#5182AB'
+							}
+						}
+					},
+					minRadius: 15,
+					maxRadius: 25,
+					density: 0.8,
+					attractiveness: 0.8,
+					nodes: [{
+							category: 0,
+							name: '',
+							value: 10,
+							shapeType: 'image',
+							onclick: function(params) {
+								alert(params.target.style.text);
+								params.target.style.text = "雷布斯";
+							},
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 80,
+									height: 80,
+									image: src,
+									shadowBlur:30,  // 默认为0，阴影模糊度，大于0有效
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							category: 1,
+							name: '丽萨-乔布斯',
+							value: 2,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#ff7f50'
+								}
+							}
+						},
+						{
+							category: 1,
+							name: '保罗-乔布斯',
+							value: 3,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#ff7f50'
+								}
+							}
+						},
+						{
+							category: 1,
+							name: '克拉拉-乔布斯',
+							value: 3,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#ff7f50'
+								}
+							}
+						},
+						{
+							category: 1,
+							name: '劳伦-鲍威尔',
+							value: 7,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#ff7f50'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '史蒂夫-沃兹尼艾克',
+							value: 5,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '奥巴马',
+							value: 8,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '比尔-盖茨',
+							value: 9,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '乔纳森-艾夫',
+							value: 4,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '蒂姆-库克',
+							value: 4,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						},
+						{
+							category: 2,
+							name: '龙-韦恩',
+							value: 1,
+							shapeType: 'image',
+							itemStyle: {
+								normal: {
+									x:-30,
+									y:-30,
+									width: 50,
+									height: 50,
+									image: src,
+									shadowBlur:40,
+									shadowColor: '#87cdfa'
+								}
+							}
+						}
+					],
+					links: [{
+							source: 1,
+							target: 0,
+							weight: 1,
+							onclick: function(params) {
+								alert(params.target.style.text);
+							},
+							itemStyle: {
+								normal: {
+									lineWidth: 10,
+									text: '丽萨-乔布斯',
+									textColor: '#030303',
+									textFont: 'bold 15px verdana',
+									textPosition: 'inside'
+								}
+							}
+						},
+						{
+							source: 2,
+							target: 0,
+							weight: 2
+						},
+						{
+							source: 3,
+							target: 0,
+							weight: 1
+						},
+						{
+							source: 4,
+							target: 0,
+							weight: 2
+						},
+						{
+							source: 5,
+							target: 0,
+							weight: 3
+						},
+						{
+							source: 6,
+							target: 0,
+							weight: 6
+						},
+						{
+							source: 7,
+							target: 0,
+							weight: 6
+						},
+						{
+							source: 8,
+							target: 0,
+							weight: 1
+						},
+						{
+							source: 9,
+							target: 0,
+							weight: 1
+						},
+						{
+							source: 10,
+							target: 0,
+							weight: 1
+						}
+
+					]
+				}]
+			};
+			require(
+				[
+					'echarts',
+					'echarts/chart/kforce',
+				],
+				function(ec) {
+					var myChart = ec.init(document.getElementById('demo1'));
+					myChart.setOption(option);
+				}
+			)
+		</script>
+	</body>
+
+</html>

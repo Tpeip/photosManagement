@@ -1,0 +1,407 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/iconfont.css" rel="stylesheet" />
+		<link href="../css/mui.picker.css" rel="stylesheet" />
+		<link href="../css/mui.poppicker.css" rel="stylesheet" />
+		<style>
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			
+			.mui-preview-header,
+			.mui-preview-footer {
+				position: absolute;
+				width: 100%;
+				left: 0;
+				z-index: 10;
+			}
+			
+			.mui-preview-header {
+				height: 44px;
+				top: 0;
+			}
+			
+			.mui-preview-footer {
+				height: 50px;
+				bottom: 0px;
+			}
+			
+			.mui-preview-header .mui-preview-indicator {
+				display: block;
+				line-height: 25px;
+				color: #fff;
+				text-align: center;
+				margin: 15px auto 4;
+				width: 70px;
+				background-color: rgba(0, 0, 0, 0.4);
+				border-radius: 12px;
+				font-size: 16px;
+			}
+			
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+			
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+			
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+			
+				100% {
+					opacity: 0;
+				}
+			}
+			
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+			
+				100% {
+					opacity: 0;
+				}
+			}
+			.mui-content{
+				margin-top:30px;
+			}
+			.img-face{
+				width: 120px;
+				height: 120px;
+				border-radius: 10px;
+			}
+			.label-person{
+				margin-top: 35px;
+			}
+			.label-person > a{
+				font-size: 28px;
+			}
+			.label-person > p{
+				font-size: 16px;
+				margin-top: 5px;
+			}
+			.iconfont{
+				font-size: 24px;
+			}
+			.mui-content-padded{
+				margin: 0;
+				margin-left: 2px;
+				padding: 0;
+			}
+			.mui-ellipsis{
+				margin: 20px 0 10px 20px;
+				padding-bottom: 8px;
+				font-size: 16px;
+			}
+			.image-border {
+				width: 49.4%;
+				height: 180px;
+				display: inline-block;
+				margin-right: 2px;
+				margin-top: -8px;
+				/* margin: 0px;
+				margin-right: -3px;
+				margin-top: -3px;
+				padding: 0px; */
+			}			
+			.images {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			.mui-color{
+				background-color: white;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a  class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		</header>
+		<div class="mui-content">
+			<div id="top" class="mui-row">
+				<!-- <div  class="mui-media mui-col-xs-5" style="left:20px;">
+					<img class="img-face" src="  images/14.jpg" />
+				</div>
+				<div class="mui-media mui-col-xs-7">
+					<div class="label-person">
+						<a id="showPerson" onclick="chooseText()">这是谁&nbsp;<span class="iconfont icon-write"></span></a>
+						<p>16张照片</p>
+					</div>
+				</div> -->
+			</div>
+			<div id="bottom" class="mui-content-padded">
+				<!-- <p class="mui-ellipsis">相关照片</p>
+				<p class="image-border">
+					<img class="images" src="  images/people.jpg" data-preview-src="" data-preview-group="1" />
+				</p>
+				<p class="image-border">
+					<img class="images" src="  images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
+				</p>
+				<p class="image-border">
+					<img class="images" src="  images/people.jpg" data-preview-src="" data-preview-group="1" />
+				</p>
+				<p class="image-border">
+					<img class="images" src="  images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
+				</p>
+				<p class="image-border">
+					<img class="images" src="  images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
+				</p>
+				<p class="image-border">
+					<img class="images" src="  images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
+				</p> -->
+			</div>
+
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/mui.picker.js"></script>
+		<script src="../js/mui.poppicker.js"></script>
+		<script src="../js/mui.zoom.js"></script>
+		<script type="text/javascript" src="../js/mui.imageViewer.js"></script>
+		<script src="../js/mui.previewimage.js"></script>
+		<script src="../js/websql.js"></script>
+		<script type="text/javascript">
+			mui.init({
+				beforeback: function() {
+					//获得父页面的webview
+					var list = plus.webview.currentWebview().opener();
+					//触发父页面的自定义事件(refresh),从而进行刷新
+					mui.fire(list, 'refresh');
+					//返回true,继续页面关闭逻辑
+					return true;
+				}
+			});
+			mui.previewImage(function(img) {
+				plus.webview.currentWebview().setStyle({
+					top: '0px',
+					bottom: '0px'
+				})
+			}, function(img) {
+				plus.webview.currentWebview().setStyle({
+					top: '0px',
+					bottom: '0px'
+				});
+			});
+			var group_id = localStorage.getItem('id');
+			var personPicker = new mui.PopPicker();
+			personPicker.setData([{
+				value: '我自己',
+				text: '我自己'
+			}, {
+				value: '爸爸',
+				text: '爸爸'
+			}, {
+				value: '妈妈',
+				text: '妈妈'
+			}, {
+				value: '爱人',
+				text: '爱人'
+			}, {
+				value: '朋友',
+				text: '朋友'
+			}, {
+				value: '同事',
+				text: '同事'
+			}, {
+				value: '同学',
+				text: '同学'
+			}, {
+				value: '孩子',
+				text: '孩子'
+			}, {
+				value: '亲人',
+				text: '亲人'
+			}, {
+				value: '其他',
+				text: '其他'
+			}]);
+
+			mui.plusReady(function() {
+				getFace();
+				getImages();
+			})
+
+			function getFace() {
+				getGroupFaceById(group_id).then(function(e) {
+					var face_src = e.rows.item(0).face_src;
+					var person_text = e.rows.item(0).group_info;
+					var image_num = e.rows.item(0).image_num;
+					if (person_text == null) {
+						person_text = '这是谁';
+					}
+					setTopHtml(face_src, person_text, image_num);
+				}).catch(function(e) {
+					console.log(e);
+				});
+			}
+
+			function getImages() {
+				getFaceByGroup(group_id).then(function(e) {
+					var bottom_html = '<p class="mui-ellipsis">相关照片</p>';
+					for (let i = 0; i < e.rows.length; i++) {
+						var image_path = e.rows.item(i).image_path;
+						var html = '<p class="image-border">' +
+							'<img class="images" src="' + image_path + '" data-preview-src="" data-preview-group="1" />' +
+							'</p>';
+						bottom_html += html;
+					}
+					jQuery('#bottom').append(bottom_html);
+				})
+			}
+
+			function setTopHtml(face_src, person_text, image_num) {
+				var html = '<div  class="mui-media mui-col-xs-5" style="left:20px;">' +
+					'<img class="img-face" src="' + face_src + '" />' +
+					'</div>' +
+					'<div class="mui-media mui-col-xs-7">' +
+					'<div class="label-person">' +
+					'<a id="showPerson" onclick="chooseText()">' + person_text + '&nbsp;<span class="iconfont icon-write"></span></a>' +
+					'<p>' + image_num + '张照片</p>' +
+					'</div>' +
+					'</div>';
+				jQuery('#top').append(html);
+			}
+
+			function chooseText() {
+				personPicker.show(function(items) {
+					var group_info = items[0].value;
+					UpdateToInfo(group_id, group_info);
+					console.log(JSON.stringify(items[0]));
+					showPerson.innerHTML = items[0].value;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				});
+			}
+
+			// 				document.getElementById('back').addEventListener('tap',function(){
+			// 					plus.webview.currentWebview().close();
+			// 					mui.openWindow({
+			// 						url: 'persons.html'
+			// 					})
+			// 				})
+		</script>
+	</body>
+
+</html>

@@ -167,6 +167,20 @@ this.request = function (url, dic, success, failed) {//发送POST请求
 		var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
 		var dataURL = canvas.toDataURL("image/" + ext);
 		var image=dataURL.replace(/data:image\/.*;base64,/,'');
-	//	console.log(dataURL);
 		return image;
+	//	console.log(dataURL);
+		// return dataURL;
+	}
+	function getBase64URL(img) {
+		var canvas = document.createElement("canvas");
+		canvas.width = img.width;
+		canvas.height = img.height;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(img, 0, 0, img.width, img.height);
+		var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+		var dataURL = canvas.toDataURL("image/" + ext);
+// 		var image=dataURL.replace(/data:image\/.*;base64,/,'');
+// 		return image;
+	//	console.log(dataURL);
+		return dataURL;
 	}

@@ -7,8 +7,8 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<!--标准mui.css-->
-		<link rel="stylesheet" href="css/mui.min.css">
-		<link rel="stylesheet" type="text/css" href="css/icons-extra.css" />
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="../css/icons-extra.css" />
 		<!--App自定义的css-->
 		<style type="text/css">
 			.mui-preview-image.mui-fullscreen {
@@ -228,8 +228,8 @@
 	</head>
 
 	<body id="photos">
-		 <button onclick="deleteAllImage()">删除</button> 
-		 <!-- <button onclick="deleteAlbum()">删相册</button> -->
+		<img id="img" style="display:none" />
+		<canvas id="can" style="display:none;width:200px;height:200px"></canvas>
 		<div id="image-content" class="mui-content">
 			<!-- <div  class="mui-content-padded"> -->
 				<!-- <div>
@@ -240,13 +240,16 @@
 				</div> -->
 				
 				<!-- <p class="image-border">
-					<img class="images" src="images/11.jpg" data-preview-src="" data-preview-group="1" >
+					<img class="images" src="images/14.jpg" data-preview-src="" data-preview-group="1" >
 				</p>
 				
 				<p class="image-border">
-					<img class="images" src="images/people.jpg" data-preview-src="" data-preview-group="1" />
+					<img id="people" class="images" src="images/14.jpg" data-preview-src="" data-preview-group="1" />
 				</p>
 				<p class="image-border">
+					<img class="images" src="images/shuijiao.jpg" data-preview-src="" data-preview-group="1" >
+				</p> -->
+				<!--  --<p class="image-border">
 					<img class="images" src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
 				</p>
 				<p class="image-border">
@@ -258,45 +261,46 @@
 				</p>
 				<p class="image-border">
 					<img class="images" src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
-				</p> -->
+				</p>>
 			<!-- </div> -->
 		</div>
 	</body>
-	<script src="js/mui.min.js"></script>
-	<script src="js/jquery.min.js"></script>
-	<script src="js/mui.zoom.js"></script>
-	<script src="js/mui.previewimage.js"></script>
-	<script src="js/websql.js"></script>
-<!-- 	<script src="js/facepp_sdk.js"></script>
-	<script src="js/common.js"></script>
-	<script src="js/exif.js"></script> -->
+	<script src="../js/mui.min.js"></script>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/mui.zoom.js"></script>
+	<script src="../js/mui.previewimage.js"></script>
+	<script src="../js/websql.js"></script>
+	<script src="../js/facepp_sdk.js"></script>
+	<script src="../js/common.js"></script>
+	<script src="../js/exif.js"></script>
+	<script src="../js/aipImageClassify.js"></script>
 	<script>
+// 		let people = new Image();
+// 		people.src = document.getElementById('people').src;
+// 		console.log(people.src);
+// 		let data64 = getBase64URL(people);
+// 		// console.log(data64);
+// 		localStorage.setItem('data',data64);
+		
 		var image_template = document.getElementById('image-content');
+		var facepp = new FACEPP(APIKEY, APISERET, 1);
 		createImageTable();
 		createPersonImage();
 		createFace();
 		createGroupFace();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
-// 			location.reload();
+// 			location.reload();;
 // 		});
-		var facealbum_token = localStorage.getItem("facealbum_token");
-			let params={"facealbum_token": facealbum_token};
-			facepp.getAlbumDetail(params,function success(e){
-				let length = e.faces.length;
-				for(let i = 0;i < length; i++){
-					let face_token = e.faces[i].face_token;
-					let group_id = e.faces[i].group_id;
-					if(group_id == '0' || group_id == '-1')
-						group_id = face_token;
-					UpdateToFace(face_token, group_id);	
-				}
-				console.log(JSON.stringify(e));
-			},function failed(err){
-				console.log(err);
-			})
 
-		mui.plusReady(function() {
+        mui.plusReady(function() {
+			CreateAlbum();
+			setHtml();
+			UpdateGroup();
+			// getPersonGroup();
+		});
+		//创建相册
+		function CreateAlbum(){
 			if(localStorage.getItem("facealbum_token")==null){
 				let param={};
 				facepp.createAlbum(param,function success(e){
@@ -306,22 +310,102 @@
 					console.log(err);
 				});
 			}
-			
-			
-			getAllImage().then(function(result){
-				for (var i=0;i<result.rows.length;i++) {
-					// console.log(data[i].image_name);
-					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +
-						'" data-preview-src="" data-preview-group="1" /></p>';
-					jQuery('#image-content').append(image);
+		}
+		
+		//更新照片分组
+		function UpdateGroup(){
+			var facealbum_token = localStorage.getItem("facealbum_token");
+			console.log(facealbum_token);
+				let params={"facealbum_token": facealbum_token};
+				var promise = new Promise(function(resolve,reject){
+					facepp.getAlbumDetail(params,function success(e){
+						console.log(JSON.stringify(e));
+						let length = e.faces.length;
+						for(let i = 0;i < length; i++){
+							let face_token = e.faces[i].face_token;
+							let group_id = e.faces[i].group_id;
+							if(group_id == '0' || group_id == '-1')
+								group_id = face_token;
+							UpdateToFace(face_token, group_id);	
+						}
+					    resolve();
+					},function failed(err){
+						console.log(err);
+						reject(err);
+					})
+				});
+				promise.then(function(){
+					getPersonGroup();
+				}).then(function(){
+					updateGroupFace();
+				}).catch(function(err){
+					console.log(err);
+				})
+				
+		}
+		
+		//获取每个组的人脸,并存入数据库
+		function getPersonGroup() {
+			getGroup().then(function(group_res) {
+				let num = group_res.rows.length;
+				console.log(num);
+				console.log(group_res.rows.item)
+				for (let i = 0; i < num; i++) {
+					let image_path = group_res.rows.item(i).image_path;
+					let group_id = group_res.rows.item(i).group_id;
+					let face_rec = group_res.rows.item(i).face_rectangle;
+					let image_num = group_res.rows.item(i).image_num;
+					console.log(group_id);
+					getGroupFaceById(group_id).then(function(res) {
+						console.log(res.rows.length);
+						if (res.rows.length == 0) {
+							let face_src = getFaceData(image_path, face_rec);
+							InsertToGroupFace(group_id, face_src, image_num);
+						}
+						UpdateImageNum(group_id, image_num);
+					}).catch(function(err) {
+						console.log(err);
+					})
 				}
-			}).catch(function(err){
+			}).catch(function(err) {
 				console.log(err);
 			});
-			
-			
-			
-		});
+			console.log(123242534);
+		}
+		
+		//获取人脸区域的路径
+		function getFaceData(image_path, face_rect) {
+			var rects = face_rect.split('-');
+			var faceW = rects[0];
+			var faceY = rects[1];
+			var faceX = rects[2];
+			var faceH = rects[3];
+			let image = document.getElementById('img');
+			image.src = image_path;
+			let c = document.getElementById('can');
+			var ctx = c.getContext('2d');
+			ctx.drawImage(image, faceX, faceY, faceW, faceH, 0, 0, 300, 150);
+			var face_url = c.toDataURL('image/png');
+			return face_url;
+		}
+		function updateGroupFace() {
+			getGroupFace().then(function(e) {
+				for (let i = 0; i < e.rows.length; i++) {
+					let group_id = e.rows.item(i).group_id;
+					getFaceByGroup(group_id).then(function(res) {
+						let length = res.rows.length;
+						if (length == 0) {
+							DeleteGroup(group_id);
+						}
+					}).catch(function(error) {
+						console.log(error);
+					})
+				}
+			}).catch(function(error) {
+				console.log(error);
+			})
+		}
+		
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({
 				top: '0px',
@@ -333,22 +417,20 @@
 				bottom: '51px'
 			});
 		});
-		//进入页面后自动预览
-		// 		var imgeGroup = mui.previewImage();
-		// 		/**  
-		// 		 * 第一个参数是分组中图片的索引，从0开始；  
-		// 		 * 第二个参数是分组的索引；  
-		// 		 */
-		// 		imgeGroup.open(0, 1);
-// 		function deleteAlbum() {
-// 			var facepp = new FACEPP(APIKEY,APISERET,1);
-// 			var params={'facealbum_token':'1555509744-d3f1d68d-76fb-4972-b443-08de8e9141d3'};
-// 			facepp.deleteAlbum(params,function success(e){
-// 				console.log(e);
-// 			},function failed(err){
-// 				console.log(err);
-// 			})
-// 		}
+		
+		
+		function setHtml(){
+			getAllImage().then(function(result){
+				for (var i=0;i<result.rows.length;i++) {
+					// console.log(data[i].image_name);
+					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +
+						'" data-preview-src="" data-preview-group="1" /></p>';
+					jQuery('#image-content').append(image);
+				}
+			}).catch(function(err){
+				console.log(err);
+			});
+		}
 			
 	</script>
 

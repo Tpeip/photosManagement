@@ -1,0 +1,381 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			img {
+				height: 70px;
+				width: 70px;
+				border-radius: 70px;
+				margin-right: 3px;
+			}
+
+			#slider {
+				height: 70px;
+			}
+
+			.mui-content-padded {
+				margin-top: 20px;
+			}
+
+			.label-font {
+				font-size: 14px;
+				color: #6D6D72;
+			}
+
+			.icon-style {
+				font-size: 18px;
+				color: #0062CC;
+				font-weight: bolder;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mui-content">
+			<img id="img" style="display:none" />
+			<canvas id="can" style="display:none;width:200px;height:200px"></canvas>
+			<div class="mui-content-padded">
+				<div id="slider" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div id="img-faces" class="mui-scroll">
+						<!-- <img src="images/12.png" onclick="turnTo()" />
+						<img src="images/13.png" />
+						<img src="images/14.jpg" />
+						<img src="images/15.jpg" />
+						<img src="images/12.png" />
+						<img src="images/13.png" />
+						<img src="images/14.jpg" />
+						<img src="images/15.jpg" />
+						<img id="more" src="images/more.png" /> -->
+					</div>
+				</div>
+			</div>
+			<div class="mui-content-padded">
+				<label class="mui-icon mui-icon-paperplane icon-style"></label>
+				<label class="mui-tab-label label-font">人脉关系图</label>
+				<div id="demo1" style="height:500px;border-top:1px solid #ccc;margin-top:15px"></div>
+			</div>
+		</div>
+		
+	</body>
+	<script src="../js/mui.min.js"></script>
+			<script src="../js/jquery.min.js"></script>
+			<script src="../js/esl.js"></script>
+			<script src="../js/websql.js"></script>
+			<script type="text/javascript">
+				// 			mui.init();
+				// 			mui('#slider').scroll({
+				// 				indicators: true
+				// 			});
+	
+				mui.plusReady(function() {
+	//				getPersonGroup();
+					// updateGroupFace();
+					setFaceHtml();
+				})			
+	
+				
+	
+				//显示人物分组
+				function setFaceHtml() {
+					var html = '';
+					getGroupFace().then(function(e) {
+						console.log(e.rows.length);
+						console.log(e.rows.item(0));
+						var length = e.rows.length;
+						if (e.rows.length > 7) {
+							length = 7;
+						}
+						for (let i = 0; i < length; i++) {
+							let face_url = e.rows.item(i).face_src;
+							let group_id = e.rows.item(i).group_id;
+							console.log(group_id);
+							// console.log(face_url);
+							var face_html = '<img src="' + face_url + '" onclick="turnTo(\'' + group_id + '\')" />'
+							html += face_html;
+						}
+						html = html + '<img id="more" src="../images/more.png"  onclick="showPersons()"/>';
+						jQuery('#img-faces').append(html);
+					}).catch(function(e) {
+						console.log(e);
+					});
+	
+				}
+	
+				
+	
+				function turnTo(group_id) {
+					localStorage.setItem('id', group_id);
+					mui.openWindow({
+						url: 'person-images.html',
+						show: {
+							autoShow: true,
+							aniShow: 'slide-in-right',
+							duration: 300
+						}
+					});
+				}
+	
+				function showPersons() {
+					mui.openWindow({
+						url: 'persons.html',
+						show: {
+							autoShow: true,
+							aniShow: 'slide-in-right',
+							duration: 300
+						}
+					});
+				}
+				require.config({
+					packages: [{
+						name: 'echarts',
+						location: '../echarts/src',
+						main: 'echarts'
+					}, {
+						name: 'zrender',
+						location: '../zrender/src',
+						main: 'zrender'
+					}]
+				});
+				var option = {
+					title: {
+						text: '人物关系：乔布斯',
+						subtext: '数据来自人立方',
+						x: 'right',
+						y: 'bottom'
+					},
+					tooltip: {
+						trigger: 'item',
+						formatter: '{a} : {b}'
+					},
+					legend: {
+						x: 'left',
+						selected: {
+							'朋友': true,
+							'家人': true
+						},
+						data: ['家人', '朋友']
+					},
+					isShowScrollBar: false,
+					series: [{
+						type: 'kforce',
+						// symbol: 'image:'+src,
+						categories: [{
+								name: '人物',
+								itemStyle: {
+									normal: {
+										color: 'gray'
+									}
+								}
+							},
+							{
+								name: '家人',
+								itemStyle: {
+									normal: {
+										color: '#ff7f50'
+									}
+								}
+							},
+							{
+								name: '朋友',
+								itemStyle: {
+									normal: {
+										color: '#87cdfa'
+									}
+								}
+							}
+						],
+						itemStyle: {
+							normal: {
+								label: {
+									show: true,
+									textStyle: {
+										color: '#000000'
+									}
+								},
+								nodeStyle: {
+									brushType: 'both',
+									strokeColor: 'rgba(255,215,0,0.4)',
+									lineWidth: 2
+								}
+							},
+							emphasis: {
+								linkStyle: {
+									strokeColor: '#5182AB'
+								}
+							}
+						},
+						minRadius: 15,
+						maxRadius: 25,
+						density: 0.8,
+						attractiveness: 0.8,
+						nodes: [{
+								category: 0,
+								name: '乔布斯',
+								value: 1,
+								shapeType: 'rectangle',
+								onclick: function(params) {
+									alert(params.target.style.text);
+									params.target.style.text = "雷布斯";
+								},
+								itemStyle: {
+									normal: {
+										width: 100,
+										height: 80,
+	
+									}
+								}
+							},
+							{
+								category: 1,
+								name: '丽萨-乔布斯',
+								value: 2,
+								shapeType: 'ellipse',
+								itemStyle: {
+									normal: {
+										a: 40,
+										b: 20
+									}
+								}
+							},
+							{
+								category: 1,
+								name: '保罗-乔布斯',
+								value: 1
+							},
+							{
+								category: 1,
+								name: '克拉拉-乔布斯',
+								value: 1
+							},
+							{
+								category: 1,
+								name: '劳伦-鲍威尔',
+								value: 1
+							},
+							{
+								category: 2,
+								name: '史蒂夫-沃兹尼艾克',
+								value: 1
+							},
+							{
+								category: 2,
+								name: '奥巴马',
+								value: 1,
+								shapeType: 'rectangle'
+							},
+							{
+								category: 2,
+								name: '比尔-盖茨',
+								value: 1,
+								symbol: 'rectangle'
+							},
+							{
+								category: 2,
+								name: '乔纳森-艾夫',
+								value: 1
+							},
+							{
+								category: 2,
+								name: '蒂姆-库克',
+								value: 1
+							},
+							{
+								category: 2,
+								name: '龙-韦恩',
+								value: 1
+							},
+							{
+								category: 1,
+								name: 'tpp',
+								value: 7,
+								
+							}
+						],
+						links: [{
+								source: 1,
+								target: 0,
+								weight: 1,
+								onclick: function(params) {
+									alert(params.target.style.text);
+								},
+								itemStyle: {
+									normal: {
+										lineWidth: 10,
+										text: '丽萨-乔布斯',
+										textColor: '#030303',
+										textFont: 'bold 15px verdana',
+										textPosition: 'inside'
+									}
+								}
+							},
+							{
+								source: 2,
+								target: 0,
+								weight: 2
+							},
+							{
+								source: 3,
+								target: 0,
+								weight: 1
+							},
+							{
+								source: 4,
+								target: 0,
+								weight: 2
+							},
+							{
+								source: 5,
+								target: 0,
+								weight: 3
+							},
+							{
+								source: 6,
+								target: 0,
+								weight: 6
+							},
+							{
+								source: 7,
+								target: 0,
+								weight: 6
+							},
+							{
+								source: 8,
+								target: 0,
+								weight: 1
+							},
+							{
+								source: 9,
+								target: 0,
+								weight: 1
+							},
+							{
+								source: 10,
+								target: 0,
+								weight: 1
+							},
+							{
+								source: 11,
+								target: 6,
+								weight: 1
+							}
+	
+						]
+					}]
+				};
+				require(
+					[
+						'echarts',
+						'echarts/chart/kforce',
+					],
+					function(ec) {
+						var myChart = ec.init(document.getElementById('demo1'));
+						myChart.setOption(option);
+					}
+				)
+			</script>
+</html>
