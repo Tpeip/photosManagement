@@ -345,6 +345,7 @@
 		plus.webview.currentWebview().close();
 	}
 
+	//选择照片
 	function chooseImage() {
 		if (mui.os.plus) {
 			var buttonTit = [{
@@ -360,14 +361,6 @@
 				switch (b.index) {
 					case 0:
 						plus.webview.currentWebview().close();
-						// 					    mui.openWindow({
-						// 							url: 'main.html',
-						// 							show: {
-						// 								autoShow: true,
-						// 								aniShow: 'slide-in-right',
-						// 								duration: 0
-						// 							}
-						// 						});
 						break;
 					case 1:
 						getImage(); /*拍照*/
@@ -381,7 +374,8 @@
 			})
 		}
 	}
-	// 拍照获取图片  
+	
+	//拍照获取图片  
 	function getImage() {
 		var c = plus.camera.getCamera();
 		c.captureImage(function(e) {
@@ -398,7 +392,8 @@
 			filename: "_doc/camera/"
 		})
 	}
-	// 从相册中选择图片   
+	
+	//从相册中选择图片   
 	function galleryImg() {
 		// 从相册中选择图片  
 		plus.gallery.pick(function(e) {
@@ -421,8 +416,8 @@
 			}
 		});
 	}
-
-
+	
+	//显示待上传照片
 	function setHtml(path) {
 		console.log(path);
 		var str = '';
@@ -436,7 +431,8 @@
 			'</li>';
 		jQuery("#imgs").append(str);
 	}
-
+	
+	//删除照片
 	function delHtml(id) {
 		var child = document.getElementById(id);
 		var parent = child.parentNode;
@@ -449,10 +445,9 @@
 				document.getElementById('delete').style.color = '#6D6D72';
 			}
 		});
-
-
 	}
-
+	
+	
 	function setFile(fileSrc) {
 		var image = new Image();
 		image.src = fileSrc;
@@ -552,9 +547,7 @@
 				}
 			})
 			);
-		}
-		
-		
+		}		
 	}
 
 	//删除待上传照片文件

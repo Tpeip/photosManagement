@@ -185,14 +185,14 @@ function createPersonImage() {
 	var tableName = 'person';
 	var params =
 		"personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num integer, face_token text," +
-		" face_rectangle text, age text, gender text, beauty text, ethnicity text, face_src text";
+		" face_rectangle text, age integer, gender text, beauty text, ethnicity text, face_src text";
 	websqlCreatTable(tableName, params);
 }
 
 function getPersonImage(image_path) {
 	websqlOpenDB();
 	var selectSQL = 'SELECT * FROM person where image_path=?';
-	console.log(path);
+	// console.log(path);
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [image_path], function(ctx, result) {
@@ -413,7 +413,7 @@ function getGroupFaceById(group_id) {
 
 function getGroupFace() {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM groupface';
+	var selectSQL = 'SELECT * FROM groupface ORDER BY image_num DESC';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [], function(ctx, result) {

@@ -70,8 +70,8 @@
 			</button>
 		</header>
 		<div id="content" class="mui-content">
-			<img id="img" style="display:none" />
-			<canvas id="can"  style="display:none;width:200px;height:200px"></canvas>
+			<!-- <img id="img" style="display:none" />
+			<canvas id="can"  style="display:none;width:200px;height:200px"></canvas> -->
 			<!-- <div class="mui-row">
 				<div class="mui-media mui-col-xs-3" style="left:45px">
 					<span class="mui-media-object iconfont icon-pic "></span>
@@ -133,10 +133,11 @@
 		<script src="../js/jquery.min.js"></script>
 		<script src="../js/websql.js"></script>
 		<script type="text/javascript">
+			mui.init();
 			var path = localStorage.getItem('path');
 			console.log(path);
-			var img = document.getElementById('img');
-			img.src = path;
+// 			var img = document.getElementById('img');
+// 			img.src = path;
 			mui.plusReady(function(){
 				getImageByPath(path).then(function(result){
 					var type = result.rows.item(0).image_main_type;
@@ -178,22 +179,23 @@
 							console.log(length);
 							for(let i =0; i<length; i++){
 								let face_token = e.rows.item(i).face_token;
-								let face_rect = e.rows.item(i).face_rectangle;
-								let face_url = getFaceData(face_rect);
-								UpdateToPerson(path,face_token,face_url);
-								let age = e.rows.item(i).age.split('.');								
-// 								let gender = e.rows.item(i).gender;
-// 								let beauty = e.rows.item(i).beauty;
-// 								let ethnicity = e.rows.item(i).ethnicity;                                
+								let face_src = e.rows.item(i).face_src;
+								// let face_rect = e.rows.item(i).face_rectangle;
+								// let face_url = getFaceData(face_rect);
+								// UpdateToPerson(path,face_token,face_url);
+								let age = e.rows.item(i).age;								
+								let gender = e.rows.item(i).gender;
+								let beauty = e.rows.item(i).beauty;
+								let ethnicity = e.rows.item(i).ethnicity;                                
                                 var person_html = '<div class="mui-row">'+
 													   '<div class="mui-media mui-col-xs-3">'+
-														   '<img class="face" src=\"'+ face_url +'\" />'+
+														   '<img class="face" src=\"'+ face_src +'\" />'+
 													   '</div>'+
 													   '<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">'+
-														   '<p class="person-tags">年龄：<label>'+ age[0] +'</label></p>'+
-														   '<p class="person-tags">性别：<label>'+ e.rows.item(i).gender +'</label></p>'+
-														   '<p class="person-tags">颜值：<label>'+ e.rows.item(i).beauty +'</label></p>'+
-														   '<p class="person-tags">种族：<label>'+ e.rows.item(i).ethnicity +'</label></p>'+
+														   '<p class="person-tags">年龄：<label>'+ age +'</label></p>'+
+														   '<p class="person-tags">性别：<label>'+ gender +'</label></p>'+
+														   '<p class="person-tags">颜值：<label>'+ beauty +'</label></p>'+
+														   '<p class="person-tags">种族：<label>'+ ethnicity +'</label></p>'+
 														'</div>'+
 												   '</div>';
 								persons_html = persons_html + person_html;
@@ -221,20 +223,20 @@
 			});
 			
 			//获取人脸区域的路径
-			function getFaceData(face_rect){
-				var rects = face_rect.split('-');
-				var faceW = rects[0];
-				var faceY = rects[1];
-				var faceX = rects[2];
-				var faceH = rects[3];
-				let image = document.getElementById('img');
-				let c =document.getElementById('can');
-				var ctx = c.getContext('2d');
-				ctx.drawImage(image,faceX,faceY,faceW,faceH,0,0,300,150);
-				var face_url = c.toDataURL('image/png');
-				return face_url;
-			}
-			mui.init();
+// 			function getFaceData(face_rect){
+// 				var rects = face_rect.split('-');
+// 				var faceW = rects[0];
+// 				var faceY = rects[1];
+// 				var faceX = rects[2];
+// 				var faceH = rects[3];
+// 				let image = document.getElementById('img');
+// 				let c =document.getElementById('can');
+// 				var ctx = c.getContext('2d');
+// 				ctx.drawImage(image,faceX,faceY,faceW,faceH,0,0,300,150);
+// 				var face_url = c.toDataURL('image/png');
+// 				return face_url;
+// 			}
+			
 		</script>
 	</body>
 

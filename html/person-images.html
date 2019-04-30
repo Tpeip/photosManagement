@@ -304,51 +304,20 @@
 					bottom: '0px'
 				});
 			});
-			var group_id = localStorage.getItem('id');
-			var personPicker = new mui.PopPicker();
-			personPicker.setData([{
-				value: '我自己',
-				text: '我自己'
-			}, {
-				value: '爸爸',
-				text: '爸爸'
-			}, {
-				value: '妈妈',
-				text: '妈妈'
-			}, {
-				value: '爱人',
-				text: '爱人'
-			}, {
-				value: '朋友',
-				text: '朋友'
-			}, {
-				value: '同事',
-				text: '同事'
-			}, {
-				value: '同学',
-				text: '同学'
-			}, {
-				value: '孩子',
-				text: '孩子'
-			}, {
-				value: '亲人',
-				text: '亲人'
-			}, {
-				value: '其他',
-				text: '其他'
-			}]);
+			var group_id = localStorage.getItem('id');            
 
 			mui.plusReady(function() {
 				getFace();
 				getImages();
 			})
-
+			
+			//获取当前页面的人脸
 			function getFace() {
 				getGroupFaceById(group_id).then(function(e) {
 					var face_src = e.rows.item(0).face_src;
 					var person_text = e.rows.item(0).group_info;
 					var image_num = e.rows.item(0).image_num;
-					if (person_text == null) {
+					if (person_text == null || person_text == '') {
 						person_text = '这是谁';
 					}
 					setTopHtml(face_src, person_text, image_num);
@@ -357,6 +326,7 @@
 				});
 			}
 
+			//获取该人物的所有照片并显示
 			function getImages() {
 				getFaceByGroup(group_id).then(function(e) {
 					var bottom_html = '<p class="mui-ellipsis">相关照片</p>';
@@ -370,37 +340,37 @@
 					jQuery('#bottom').append(bottom_html);
 				})
 			}
-
+			
+			//显示顶部人脸及文字
 			function setTopHtml(face_src, person_text, image_num) {
 				var html = '<div  class="mui-media mui-col-xs-5" style="left:20px;">' +
 					'<img class="img-face" src="' + face_src + '" />' +
 					'</div>' +
 					'<div class="mui-media mui-col-xs-7">' +
 					'<div class="label-person">' +
-					'<a id="showPerson" onclick="chooseText()">' + person_text + '&nbsp;<span class="iconfont icon-write"></span></a>' +
+					'<a id="showPerson" onclick="chooseText(\''+ person_text +'\')">' + person_text + '&nbsp;<span class="iconfont icon-write"></span></a>' +
 					'<p>' + image_num + '张照片</p>' +
 					'</div>' +
 					'</div>';
 				jQuery('#top').append(html);
 			}
 
-			function chooseText() {
-				personPicker.show(function(items) {
-					var group_info = items[0].value;
-					UpdateToInfo(group_id, group_info);
-					console.log(JSON.stringify(items[0]));
-					showPerson.innerHTML = items[0].value;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				});
+			//修改人物姓名
+			function chooseText(person_text) {
+				// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
+				var btnArray = ['取消', '确定'];
+				mui.prompt('  ', '请输入姓名', '这是谁？', btnArray, function(e) {
+					if (e.index == 1) {
+                        if(e.value == null || e.value == ''){
+							showPerson.innerHTML == person_text;
+						}else{
+							var group_info = e.value;
+							showPerson.innerHTML = e.value + '&nbsp;<span class="iconfont icon-write"></span>';
+							UpdateToInfo(group_id, group_info);	
+						}											
+					}
+				},'div');
 			}
-
-			// 				document.getElementById('back').addEventListener('tap',function(){
-			// 					plus.webview.currentWebview().close();
-			// 					mui.openWindow({
-			// 						url: 'persons.html'
-			// 					})
-			// 				})
 		</script>
 	</body>
 

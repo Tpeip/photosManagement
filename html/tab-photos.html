@@ -297,6 +297,7 @@
 			CreateAlbum();
 			setHtml();
 			UpdateGroup();
+			getPersonFace();
 			// getPersonGroup();
 		});
 		//创建相册
@@ -388,6 +389,8 @@
 			var face_url = c.toDataURL('image/png');
 			return face_url;
 		}
+		
+		//上传新照片后更新人物的分组
 		function updateGroupFace() {
 			getGroupFace().then(function(e) {
 				for (let i = 0; i < e.rows.length; i++) {
@@ -418,7 +421,7 @@
 			});
 		});
 		
-		
+		//显示照片
 		function setHtml(){
 			getAllImage().then(function(result){
 				for (var i=0;i<result.rows.length;i++) {
@@ -430,6 +433,33 @@
 			}).catch(function(err){
 				console.log(err);
 			});
+		}
+		
+		//查询人物照片获取人脸路径添加到person表中
+		function getPersonFace(){
+			console.log(111111111111111111);
+			let image_type = '人物';
+			getTypeOne(image_type).then(function(res){
+				for(let i=0; i<res.rows.length; i++){
+					let path = res.rows.item(i).image_path;
+					getPersonImage(path).then(function(e){
+						let src = path;
+						for(let j=0; j<e.rows.length; j++){
+							let face_token = e.rows.item(j).face_token;	
+							let src = e.rows.item(j).face_src;
+							if(src == null || src == ''){
+								let face_rect = e.rows.item(j).face_rectangle;
+								let face_src = getFaceData(path, face_rect);
+								UpdateToPerson(path,face_token,face_src);
+							}							
+						}
+					}).catch(function(e){
+						console.log(e);
+					})
+				}
+			}).catch(function(err){
+				console.log(err);
+			})
 		}
 			
 	</script>

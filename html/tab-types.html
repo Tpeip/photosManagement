@@ -108,9 +108,9 @@
 	<script type="text/javascript" src="../js/mui.previewimage.js"></script>
 	<script src="../js/websql.js"></script>
 	<script type="text/javascript">
-		//mui.init();	
-					getPersonType();
-					getImageType();
+		mui.init();	
+		getPersonType();
+		getImageType();
 		mui.plusReady(function() {
 			// getPersonType();
 			
@@ -150,7 +150,8 @@
 				})
 			}
 		}
-	
+		
+		//显示人物照片类型
 		function setPersonHtml(src, num, i) {
 			let person_num = '';
 			if (i == 1) {
@@ -170,11 +171,11 @@
 				'</p>';
 			jQuery("#persons").append(str);
 		}
-	
+		
+		//显示所有照片类型
 		function setTypeHtml(type, num, src) {
 			var str = '';
 			var name = 'type-' + type;
-			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
 			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
 				'<img class="images" src="' + src + '" />' +
 				'<label class="label-photo-type">' + type + '</label>' + '<br>' +
@@ -182,21 +183,8 @@
 				'</p>';
 			jQuery("#types").append(str);
 		}
-	
-	
-	
-		// 			function turnTo(type){
-		// 				localStorage.setItem('type','');
-		// 				localStorage.setItem('type',type);
-		// 				mui.openWindow({
-		// 					url: 'tab-types-photo.html',					
-		// 					show: {
-		// 						autoShow: true,
-		// 						aniShow: 'slide-in-right',
-		// 						duration: 200
-		// 					}
-		// 				});
-		// 			}
+		
+		//查看每个类型的所有照片
 		function turnTo(type) {
 			localStorage.setItem("type", type);
 			console.log(type);
