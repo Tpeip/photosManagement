@@ -462,8 +462,6 @@
 		img.onload=function(){
 			let image_base64 = getBase64Image(img);
 			let image_path = fileSrc;
-		//	console.log(image_base64);
-		//	console.log(image_path);
 			pm.push(AIPImageClassify(image_base64).then(function(res) {
 					console.log(JSON.stringify(res));
 				let type = res.result[0].root;
@@ -499,23 +497,21 @@
 				imageArr.push(image_date);
 				if (image_main_type == '人物') {
  					per_path.push(image_path);
-// 					return AIPImageDetect(image_base64).then(function(res) {
-// 						let face_num = res.result.face_num;
-// 						//console.log(JSON.stringify(res));
-// 						person.push(image_path);
-// 						person.push(face_num);
-// 					});
+					
 					let image_face=facepp.getFaceBase64Image(img);
 					let params={'image_base64' : image_face,"return_attributes": "gender,age,beauty,ethnicity,emotion"};
 					console.log(image_main_type);
 					return new Promise((resolve , reject) => {
 					facepp.detectFace(params,function success(e){
-						console.log(JSON.stringify(e));
+						// console.log(JSON.stringify(e));
 						let face_num=e.faces.length;
 						for(let k = 0; k < face_num; k++){
 							per_num++;
 							let face_token = e.faces[k].face_token;
-							let rectangle = e.faces[k].face_rectangle.width+"-"+e.faces[k].face_rectangle.top+"-"+e.faces[k].face_rectangle.left+"-"+e.faces[k].face_rectangle.height;
+							let width = e.faces[k].face_rectangle.width;
+							let top = e.faces[k].face_rectangle.top;
+							let left = e.faces[k].face_rectangle.left;
+							let height = e.faces[k].face_rectangle.height;
 							let age = e.faces[k].attributes.age.value;
 							let gd = e.faces[k].attributes.gender.value;
 							let gender;
@@ -532,11 +528,25 @@
 							person.push(image_path);
 							person.push(face_num);
 							person.push(face_token);
-							person.push(rectangle);
+							person.push(width);
+							person.push(top);
+							person.push(left);
+							person.push(height);
 							person.push(age);
 							person.push(gender);
 							person.push(beauty);
 							person.push(ethnicity);
+							
+							console.log("----------");
+							console.log(width);
+							console.log(top);
+							console.log(left);
+							console.log(height);
+							console.log("----------");
+							
+							// console.log(rectangle);
+							// console.log(face_token);
+							
 						}
 						resolve(e);
 					},function failed(err){
@@ -570,7 +580,7 @@
 		if(ps != -1){
 			let nm = person[ps + 1];
 			per_num = per_num - nm;
-			person.splice(ps , nm * 8);
+			person.splice(ps , nm * 11);
 			}
 	}
 
@@ -597,7 +607,6 @@
 							refreshParent();
 							break;
 						}
-
 				}
 			});
 		}
@@ -607,92 +616,21 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-// 		var pm = [];
-// 		var imageArr = [];
-// 		var facepp = FACEPP(APIKEY, APISERET, 1);
-// 		var person = [];
-// 		var per_num = 0;
-// 		for (let i = 0; i < files.length; i++) {
-// 			let image_path = files[i].src;
-// 			//let image = getBase64Image(files[i]);
-// 			//console.log(image);
-// 			let img = new Image();
-// 			img.src=image_path;
-// 			let image = getBase64Image(img);
-// 			console.log(image);
-// 						pm.push(AIPImageClassify(image).then(function(res){
-// 			//				console.log(JSON.stringify(res));
-// 							let type=res.result[0].root;
-// 							let typeArr=type.split("-");
-// 							let image_main_type;
-// 							if(typeArr[0] == '非自然图像'||typeArr[0] == '商品')
-// 								image_main_type = typeArr[1];
-// 							else
-// 								image_main_type = typeArr[0];
-// 							if(typeArr[0] == '公众人物')
-// 							    image_main_type = '人物';
-// 							let typesArr=new Array();
-// 							let keyArr=new Array();
-// 							keyArr.push(res.result[0].keyword);
-// 							for(let j = 1;j < res.result_num; j++){
-// 								let types = res.result[j].root.split("-");
-// 								keyArr.push(res.result[j].keyword);
-// 								if(types[0] == '非自然图像' || types[0] == '商品')
-// 									typesArr.push(types[1]);
-// 								else
-// 									typesArr.push(types[0]);
-// 								if(types[0] == '人物')
-// 									image_main_type = types[0];
-// 							}
-// 							let image_type = typesArr.join("-");
-// 							let image_keyword = keyArr.join("-");
-// 							let image_date = getNowFormatDate();
-// 							//console.log(image_path,image_main_type,image_type,image_keyword);imageArr.push(image_path);
-// 							imageArr.push(image_path);
-// 							imageArr.push(image_main_type);
-// 							imageArr.push(image_type);
-// 							imageArr.push(image_keyword);
-// 							imageArr.push(image_date);
-// 							
-// 							if(image_main_type == '人物'){
-// 								per_num++;
-// 			 					return AIPImageDetect(image).then(function(res){
-// 			 						let face_num = res.result.face_num;
-// 			//						console.log(JSON.stringify(res));
-// 									person.push(image_path);
-// 									person.push(face_num);
-// 			 					});
-// 			// 					let params={'image_base64' : image};
-// 			// 				//	console.log(image_main_type);
-// 			// 					return new Promise((resolve , reject) => {
-// 			// 						facepp.detectFace(params,function success(e){
-// 			// 							let face_num=e.faces.length;
-// 			// 							person.push(image_path);
-// 			// 							person.push(face_num);
-// 			// 						},function failed(err){
-// 			// 							console.log(err);
-// 			// 							reject(err);
-// 			// 						});
-// 			// 					});
-// 							}
-// 						})
-// 						);
-// 		}
-	Promise.all(pm).then(function() {
-		let num = files.length;
-		return InsertToImage(num, imageArr);
-	}).then(function(result) {
-		if (per_num == 0)
-			return result;
-		else
-			return InsertToPerson(per_num, person);
-	}).then(function(result){
-		let len = per_path.length;
-		let proArr = [];
-		for(let i =0;i <len; i++){
-			let perImg = new Image();
-			perImg.src = per_path[i];
-			//perImg.onload =function(){
+		Promise.all(pm).then(function() {
+			let num = files.length;
+			return InsertToImage(num, imageArr);
+		}).then(function(result) {
+			if (per_num == 0)
+				return result;
+			else
+				return InsertToPerson(per_num, person);
+		}).then(function(result){
+			let len = per_path.length;
+			let proArr = [];
+			for(let i =0;i <len; i++){
+				let perImg = new Image();
+				perImg.src = per_path[i];
+
 				let image_face = facepp.getFaceBase64Image(perImg);
 				let faceablum_token=localStorage.getItem("facealbum_token");
 					console.log(faceablum_token);
@@ -702,7 +640,7 @@
 					};
 					let addPromise = new Promise(function(resolve,reject){
 						facepp.addImage(addparams,function successe(e){
-					//			console.log(JSON.stringify(e));
+								// console.log(JSON.stringify(e));
 								resolve(e);
 						},function failed(err){
 							console.log(JSON.stringify(err));
@@ -714,60 +652,95 @@
 					});
 	
 					addPromise.then(function(e){
-						let fanm= e.faces.length;
-						let image_id = e.image_id;
-						for(let m= 0;m< fanm;m++){
-							face_num++;
+
+						for(let m= 0;m< e.faces.length; m++){
+						//	face_num++;
 							let face_token = e.faces[m].face_token;
-							let face_rectangle = e.faces[m].face_rectangle.width+"-"+e.faces[m].face_rectangle.top+"-"+e.faces[m].face_rectangle.left+"-"+e.faces[m].face_rectangle.height;
-							face.push(per_path[i]);
-							face.push(image_id);
-							face.push(face_token);
-							face.push(face_rectangle);
+							let width = e.faces[m].face_rectangle.width;
+							let top = e.faces[m].face_rectangle.top;
+							let left = e.faces[m].face_rectangle.left;
+							let height = e.faces[m].face_rectangle.height;
+							console.log("----------");
+							console.log(width);
+							console.log(top);
+							console.log(left);
+							console.log(height);
+							console.log("----------");
+							// face.push(per_path[i]);
+							// face.push(face_token);
+							// face.push(face_rectangle);
+							getPersonImage(per_path).then(function(res){
+								console.log(123456789);
+								let length = res.rows.length;
+								let wt = 0, tp = 0, lf = 0, ht = 0;
+								for(let j = 0;j <length;j++){
+									console.log("99999999999999999999999999");
+									let face_width = res.rows.item(j).width;
+									let face_top = res.rows.item(j).top;
+									let face_left = res.rows.item(j).left;
+									let face_height = res.rows.item(j).height;
+									if(face_width - width >= -2 && face_width - width <= 2)
+										wt = face_width;
+									else continue;
+									if(face_top - top >= -2 && face_top - top <= 2)
+										tp = face_top;
+									else continue;
+									if(face_left - left >= -2 && face_left - left <= 2)
+										lf = face_left;
+									else continue;
+									if(face_height - height >= -2 && face_height - height <= 2)
+										ht = face_height;
+									else continue;
+								}
+								UpdateToFaceToken(per_path, face_token, wt, tp, lf, ht);
+							}).catch(function(err){
+								console.log(err);
+							})
+							// console.log(face_rectangle);
+							// console.log(face_token);
 						}
 					});
 					proArr.push(addPromise);
-					
-			//};
-		}
-		return Promise.all(proArr);
-	}).then(function(result) {
-		if (face_num == 0)
-			return result;
-		else
-			return InsertToFace(face_num, face);
-	}).then(function(result){
-		let facealbum_token = localStorage.getItem("facealbum_token");
-			console.log(facealbum_token);
-			let params={"facealbum_token": facealbum_token
-		//	"operation_type": "entirefacealbum"
-			};
-			return new Promise(function(resolve,reject){
-				facepp.groupFace(params,function success(e){
-					console.log(JSON.stringify(e));
-					let task_id = e.task_id;
-					let par = {"task_id": task_id};
-					facepp.groupFaceTaskQuery(par, function success(e){
-						resolve(e);
+				
+			}
+			return Promise.all(proArr);
+		// }).then(function(result) {
+		// 	if (face_num == 0)
+		// 		return result;
+		// 	else
+		// 		return InsertToFace(face_num, face);
+		}).then(function(result){
+			let facealbum_token = localStorage.getItem("facealbum_token");
+				console.log(facealbum_token);
+				let params={"facealbum_token": facealbum_token
+			//	"operation_type": "entirefacealbum"
+				};
+				return new Promise(function(resolve,reject){
+					facepp.groupFace(params,function success(e){
+						console.log(JSON.stringify(e));
+						let task_id = e.task_id;
+						let par = {"task_id": task_id};
+						facepp.groupFaceTaskQuery(par, function success(e){
+							resolve(e);
+						},function failed(err){
+							reject(err);
+						})
 					},function failed(err){
 						reject(err);
-					})
-				},function failed(err){
-					reject(err);
+					});
 				});
-			});
-	}).then(function(result) {
-		alert("上传成功");
-		plus.webview.currentWebview().close();
-		refreshParent();
-		wt.close();
-	}).catch(function(err) {
-		console.log(err);
-		alert("上传失败：" + err);
-		plus.webview.currentWebview().close();
-		refreshParent();
-		wt.close();
-	});
-		
+		}).then(function(result) {
+			alert("上传成功");
+			plus.webview.currentWebview().close();
+			refreshParent();
+			wt.close();
+		}).catch(function(err) {
+			console.log(err);
+			alert("上传失败：" + err);
+			plus.webview.currentWebview().close();
+			refreshParent();
+			wt.close();
+		});
+			
 	});
 </script>

@@ -84,8 +84,8 @@
 		function setFaceHtml() {
 			var html = '';
 			getGroupFace().then(function(e) {
-				console.log(e.rows.length);
-				console.log(e.rows.item(0));
+				// console.log(e.rows.length);
+				// console.log(e.rows.item(0));
 				var length = e.rows.length;
 				// 						if (e.rows.length > 7) {
 				// 							length = 7;
@@ -93,7 +93,7 @@
 				for (let i = 0; i < length; i++) {
 					let face_url = e.rows.item(i).face_src;
 					let group_id = e.rows.item(i).group_id;
-					console.log(group_id);
+					// console.log(group_id);
 					// console.log(face_url);
 					var face_html = '<img src="' + face_url + '" onclick="turnTo(\'' + group_id + '\')" />'
 					html += face_html;

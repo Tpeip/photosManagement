@@ -180,13 +180,29 @@ function InsertToImage(num, imageArr) {
 	return pm;
 }
 
-
 function createPersonImage() {
 	var tableName = 'person';
 	var params =
-		"personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num integer, face_token text," +
-		" face_rectangle text, age integer, gender text, beauty text, ethnicity text, face_src text";
+		"personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num INTEGER, face_token text," +
+		" width INTEGER, top INTEGER, left INTEGER, height INTEGER, age INTEGER, gender text, beauty text, ethnicity text, face_src text, group_id text";
 	websqlCreatTable(tableName, params);
+}
+
+function getGroup() {
+	websqlOpenDB();
+	var selectSQL = 'SELECT image_path, group_id, width, top, left, height, face_src, COUNT(*) image_num FROM person GROUP BY group_id';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [], function(ctx, result) {
+				console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
 }
 
 function getPersonImage(image_path) {
@@ -222,9 +238,9 @@ function getPersonNumImage(num) {
 	var selectALLSQL = 'SELECT DISTINCT(image_path) FROM person WHERE person_num' + number + 'ORDER BY personImg_id DESC';
 	console.log(selectALLSQL);
 	var pm = new Promise(function(resolve, reject) {
-		console.log(2453647568);
+		// console.log(2453647568);
 		dataBase.transaction(function(ctx) {
-			console.log(123445646547);
+			// console.log(123445646547);
 			ctx.executeSql(selectALLSQL, [], function(ctx, result) {
 					     console.log("查询" +   + "成功");
 					resolve(result);
@@ -238,35 +254,33 @@ function getPersonNumImage(num) {
 	return pm;
 }
 
-// function getFaceImage(face_token){
-// 	websqlOpenDB();
-// 	 var selectSQL = 'SELECT * FROM person where face_token=?';
-// 	 console.log(path);
-// 	 var pm=new Promise(function(resolve,reject){
-// 		 dataBase.transaction(function (ctx) {
-// 		     ctx.executeSql(selectSQL,[face_token],function (ctx,result){
-// 			//	 console.log(JSON.stringify(result.rows));
-// 		         console.log("查询成功");
-// 		 		resolve(result);
-// 		     },
-// 		     function (tx, error) {
-// 		         console.log('查询失败: ' + error.message);
-// 		 		reject(error);
-// 		     });
-// 		 });
-// 	 });
-// 	 return pm;
-// }
+function getFaceByGroup(group_id) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM person WHERE group_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [group_id], function(ctx, result) {
+				console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
 
 function InsertToPerson(num, personArr) {
 	websqlOpenDB();
 	var insertImageSQL =
-		'INSERT INTO person (image_path,person_num, face_token, face_rectangle, age, gender, beauty, ethnicity) VALUES (?,?,?,?,?,?,?,?)';
+		'INSERT INTO person (image_path,person_num, face_token, width, top, left, height, age, gender, beauty, ethnicity) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
 	for (var i = 0; i < num - 1; i++) {
-		insertImageSQL += ',(?,?,?,?,?,?,?,?)';
+		insertImageSQL += ',(?,?,?,?,?,?,?,?,?,?,?)';
 	}
-	console.log(insertImageSQL);
-	console.log(personArr);
+	// console.log(insertImageSQL);
+	// console.log(personArr);
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(insertImageSQL, personArr, function(ctx, result) {
@@ -301,80 +315,15 @@ function UpdateToPerson(image_path, face_token, face_src) {
 	return pm;
 }
 
-
-function createFace() {
-	var tableName = 'face';
-	var params = "face_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, image_id text, face_token text," +
-		" face_rectangle text, group_id text, face_src text";
-	websqlCreatTable(tableName, params);
-}
-
-function getGroup() {
-	websqlOpenDB();
-	var selectSQL = 'SELECT image_path,group_id,face_rectangle,COUNT(*) image_num FROM face GROUP BY group_id';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [], function(ctx, result) {
-				console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-function getFaceByGroup(group_id) {
-	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM face WHERE group_id=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [group_id], function(ctx, result) {
-				console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-function InsertToFace(num, personArr) {
-	websqlOpenDB();
-	var insertFaceSQL = 'INSERT INTO face (image_path,image_id, face_token, face_rectangle) VALUES (?,?,?,?)';
-	for (var i = 0; i < num - 1; i++) {
-		insertFaceSQL += ',(?,?,?,?)';
-	}
-	console.log(insertFaceSQL);
-	console.log(personArr);
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertFaceSQL, personArr, function(ctx, result) {
-					console.log("插入成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('插入失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
 function UpdateToFace(face_token, group_id) {
 	websqlOpenDB();
-	console.log(face_token);
-	console.log(group_id);
-	var insertImageSQL = 'UPDATE face SET group_id=? WHERE face_token=? ';
+	// console.log(face_token);
+	// console.log(group_id);
+	var updateSQL = 'UPDATE person SET group_id=? WHERE face_token=? ';
 	//	console.log(insertImageSQL);
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertImageSQL, [group_id, face_token], function(ctx, result) {
+			ctx.executeSql(updateSQL, [group_id, face_token], function(ctx, result) {
 					console.log("更新成功");
 					resolve(result);
 				},
@@ -387,6 +336,32 @@ function UpdateToFace(face_token, group_id) {
 	return pm;
 }
 
+function UpdateToFaceToken(image_path, face_token, width, top, left, height) {
+	console.log(face_token);
+	console.log("*******");
+	console.log(width);
+	console.log(top);
+	console.log(left);
+	console.log(height);
+	console.log("*****");
+	websqlOpenDB();
+	var updateSQL = 'UPDATE person SET face_token=? WHERE image_path=? and width=? and top=? and left=? and height=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [face_token, image_path, width, top, left, height], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
 function createGroupFace() {
 	var tableName = 'groupface';
 	var params = " group_id text PRIMARY KEY NOT NULL, face_src text, group_info text, image_num integer";
@@ -394,7 +369,6 @@ function createGroupFace() {
 }
 
 function getGroupFaceById(group_id) {
-	console.log(758934906);
 	websqlOpenDB();
 	var selectSQL = 'SELECT * FROM groupface WHERE group_id=?';
 	var pm = new Promise(function(resolve, reject) {
@@ -502,3 +476,97 @@ function DeleteGroup(group_id) {
 	});
 	return pm;
 }
+
+function createRelation() {
+	var tableName = 'relation';
+	var params = " person_core text PRIMARY KEY NUT NULL, person_main text PRIMARY KEY NOT NULL, person_relation text, person_intimacy text";
+	websqlCreatTable(tableName, params);
+}
+
+function getRelatedPerson(person_core) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM relation where person_core=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [person_core], function(ctx, result) {
+				console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+
+function InsertToRelation(person_core, person_main, person_relation, person_intimacy) {
+	websqlOpenDB();
+	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy) VALUES (?,?,?,?)';
+	//	console.log(insertFaceSQL);
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy], function(ctx, result) {
+					console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
+function UpdatePersonRelation(person_core, person_main, person_relation) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE relation SET person_relation=? WHERE person_core=? and person_main=? ';
+	var person_relation1=person_relation;
+	if(person_relation == '父母'){
+		person_relation1 = '孩子';
+	}
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [person_relation, person_core, person_main], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+			ctx.executeSql(updateSQL, [person_relation1, person_main, person_core], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function UpdatePersonIntimacy(person_core, person_main, person_intimacy) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE relation SET person_intimacy=? WHERE person_core=? and person_main=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [person_intimacy, person_core, person_main], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+

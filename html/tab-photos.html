@@ -286,7 +286,7 @@
 		var facepp = new FACEPP(APIKEY, APISERET, 1);
 		createImageTable();
 		createPersonImage();
-		createFace();
+		// createFace();
 		createGroupFace();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
@@ -297,8 +297,8 @@
 			CreateAlbum();
 			setHtml();
 			UpdateGroup();
-			getPersonFace();
-			// getPersonGroup();
+			//getPersonFace();
+		    // getPersonGroup();
 		});
 		//创建相册
 		function CreateAlbum(){
@@ -316,7 +316,7 @@
 		//更新照片分组
 		function UpdateGroup(){
 			var facealbum_token = localStorage.getItem("facealbum_token");
-			console.log(facealbum_token);
+			// console.log(facealbum_token);
 				let params={"facealbum_token": facealbum_token};
 				var promise = new Promise(function(resolve,reject){
 					facepp.getAlbumDetail(params,function success(e){
@@ -336,6 +336,8 @@
 					})
 				});
 				promise.then(function(){
+					getPersonFace();
+				}).then(function(){
 					getPersonGroup();
 				}).then(function(){
 					updateGroupFace();
@@ -349,18 +351,21 @@
 		function getPersonGroup() {
 			getGroup().then(function(group_res) {
 				let num = group_res.rows.length;
-				console.log(num);
-				console.log(group_res.rows.item)
 				for (let i = 0; i < num; i++) {
 					let image_path = group_res.rows.item(i).image_path;
 					let group_id = group_res.rows.item(i).group_id;
-					let face_rec = group_res.rows.item(i).face_rectangle;
+					let width = group_res.rows.item(i).width;
+					let top = group_res.rows.item(i).top;
+					let left = group_res.rows.item(i).left;
+					let height = group_res.rows.item(i).height;
 					let image_num = group_res.rows.item(i).image_num;
-					console.log(group_id);
+					//let face_src = group_res.rows.item(i).face_src;
+					// console.log(face_src);
+					// console.log(group_id);
 					getGroupFaceById(group_id).then(function(res) {
-						console.log(res.rows.length);
+						// console.log(res.rows.length);
 						if (res.rows.length == 0) {
-							let face_src = getFaceData(image_path, face_rec);
+							 let face_src = getFaceData(image_path, width, top, left, height);
 							InsertToGroupFace(group_id, face_src, image_num);
 						}
 						UpdateImageNum(group_id, image_num);
@@ -371,16 +376,15 @@
 			}).catch(function(err) {
 				console.log(err);
 			});
-			console.log(123242534);
 		}
 		
 		//获取人脸区域的路径
-		function getFaceData(image_path, face_rect) {
-			var rects = face_rect.split('-');
-			var faceW = rects[0];
-			var faceY = rects[1];
-			var faceX = rects[2];
-			var faceH = rects[3];
+		function getFaceData(image_path, width, top, left, height) {
+		//	var rects = face_rect.split('-');
+			var faceW = width;
+			var faceY = top;
+			var faceX = left;
+			var faceH = height;
 			let image = document.getElementById('img');
 			image.src = image_path;
 			let c = document.getElementById('can');
@@ -437,7 +441,6 @@
 		
 		//查询人物照片获取人脸路径添加到person表中
 		function getPersonFace(){
-			console.log(111111111111111111);
 			let image_type = '人物';
 			getTypeOne(image_type).then(function(res){
 				for(let i=0; i<res.rows.length; i++){
@@ -448,9 +451,19 @@
 							let face_token = e.rows.item(j).face_token;	
 							let src = e.rows.item(j).face_src;
 							if(src == null || src == ''){
-								let face_rect = e.rows.item(j).face_rectangle;
-								let face_src = getFaceData(path, face_rect);
+								let width =e.rows.item(j).width;
+								let top = e.rows.item(j).top;
+								let left = e.rows.item(j).left;
+								let height = e.rows.item(j).height;
+								let face_src = getFaceData(path, width, top, left, height);
 								UpdateToPerson(path,face_token,face_src);
+								// var image_face=face_src.replace(/data:image\/.*;base64,/,'');
+								// let params={'image_base64' : image_face,"return_attributes": "gender,age,beauty,ethnicity,emotion"};
+								// facepp.detectFace(params, function success(e){
+								// 	console.log(JSON.stringify(e));
+								// },function failed(err){
+								// 	console.log(JSON.stringify(err));
+								// })
 							}							
 						}
 					}).catch(function(e){
