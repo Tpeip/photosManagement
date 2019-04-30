@@ -98,7 +98,6 @@
 		this.deleter = del;
 		this.forwarder = forward;
 		this.infoer = info;
-		console.log('info',this.infoer);
 		this.header = this.element.querySelector($.classSelector('.preview-header'));
 		// console.log("header",this.header);
 		this.footer = this.element.querySelector($.classSelector('.preview-footer'));

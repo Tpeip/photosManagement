@@ -71,6 +71,7 @@
 		// 			mui('#slider').scroll({
 		// 				indicators: true
 		// 			});
+		var relations = ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人'];
 
 		mui.plusReady(function() {
 			//				getPersonGroup();
@@ -110,15 +111,15 @@
 
 		function turnTo(group_id) {
 			// localStorage.setItem('id', group_id);
-// 			mui.openWindow({
-// 				url: 'person-images.html',
-// 				show: {
-// 					autoShow: true,
-// 					aniShow: 'slide-in-right',
-// 					duration: 300
-// 				}
-// 			});
-           personRelation(group_id);
+			// 			mui.openWindow({
+			// 				url: 'person-images.html',
+			// 				show: {
+			// 					autoShow: true,
+			// 					aniShow: 'slide-in-right',
+			// 					duration: 300
+			// 				}
+			// 			});
+			getPersonRelation(group_id);
 		}
 
 		function showPersons() {
@@ -132,8 +133,313 @@
 			});
 		}
 
-		function personRelation(group_id) {
+		function getPersonRelation(group_id) {
 			localStorage.setItem('id', group_id);
+			getPersonIntimacy(group_id);
+			// 			handleCorePerson(group_id);
+			relationGraph(group_id);
+		}
+
+		function getPersonIntimacy(group_id) {
+			var promiseArr = [];
+			let persons_intimacy = {};
+			getFaceByGroup(group_id).then(function(e) {
+				var image_num = e.rows.length;
+				for (let i = 0; i < e.rows.length; i++) {
+					let image_path = e.rows.item(i).image_path;
+					promiseArr.push(
+						getPersonImage(image_path).then(function(res) {
+							for (let j = 0; j < res.rows.length; j++) {
+								let id = res.rows.item(j).group_id;
+								if (id != group_id) {
+									if (persons_intimacy != null) {
+										if (persons_intimacy.hasOwnProperty(id)) {
+											persons_intimacy[id] = persons_intimacy[id] + 1;
+										} else {
+											persons_intimacy[id] = 1;
+											// persons_intimacy.id.value = 1;
+										}
+									} else {
+										persons_intimacy[id] = 1;
+									}
+								}
+							}
+						}).catch(function(error) {
+							console.log(error);
+						}))
+				}
+				Promise.all(promiseArr).then(function() {
+					// console.log(JSON.stringify(persons_intimacy));
+					for (let id in persons_intimacy) {
+						persons_intimacy['' + id + ''] = parseInt(persons_intimacy['' + id + ''] / image_num * 100);
+						// console.log(persons_intimacy[''+ id +'']);
+					}
+					// console.log(JSON.stringify(persons_intimacy));
+					handleCorePerson(persons_intimacy, group_id);
+				})
+			}).catch(function(err) {
+				console.log(err);
+			})
+		}
+
+		function handleCorePerson(persons_intimacy, group_id) {
+			getFaceByGroup(group_id).then(function(e) {
+				var image_num = e.rows.length;
+				for (let i = 0; i < e.rows.length; i++) {
+					let image_path = e.rows.item(i).image_path;
+					handleOneImage(persons_intimacy, image_path, group_id);
+				}
+			}).catch(function(err) {
+				console.log(err);
+			})
+		}
+
+		function handleOneImage(persons_intimacy, image_path, group_id) {
+			getPersonImage(image_path).then(function(res) {
+				let person_core;
+				let persons_main = [];
+				for (let j = 0; j < res.rows.length; j++) {
+					let person_core_id = res.rows.item(j).group_id;
+					if (person_core_id == group_id) {
+						person_core = {
+							'group_id': person_core_id,
+							'age': res.rows.item(j).age,
+							'gender': res.rows.item(j).gender
+						}
+					} else {
+						person_main = {
+							'age': res.rows.item(j).age,
+							'gender': res.rows.item(j).gender,
+							'group_id': person_core_id,
+							'face_src': res.rows.item(j).face_src
+						}
+						persons_main.push(person_main);
+					}
+				}
+				for (let i = 0; i < persons_main.length; i++) {
+					let persons_num = persons_main.length;
+					let id = persons_main[i].group_id;
+					getOneRelation(person_core.group_id, id).then(function(e) {
+						if (e.rows.length == 0) {
+							// if(persons_num == 1){
+							if (persons_main[i].gender != person_core.gender) {
+								if (person_core.age > 20) {
+									if (Math.abs(persons_main[i].age - person_core.age) <= 10) {
+										if (persons_intimacy[id] >= 60) {
+											InsertToRelation(person_core.group_id, id, relations[8], persons_intimacy[id]);
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
+											person_core.age) < 22) {
+										if (persons_intimacy[id] >= 50) {
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else {
+										if (persons_intimacy[id] >= 60) {
+											if (person_core.age > persons_main[i].age) {
+												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id]);
+											} else {
+												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+											}
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									}
+								} else {
+									if (Math.abs(persons_main[i].age - person_core.age) <= 3) {
+										if (persons_intimacy[id] >= 20) {
+											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else if (Math.abs(persons_main[i].age - person_core.age) >= 23) {
+										if (persons_intimacy[id] >= 60) {
+											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+										} else if (persons_intimacy[id] >= 50 && persons_intimacy[id] < 60) {
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else {
+										InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+									}
+								}
+							} else {
+								if (person_core.age > 20) {
+									if (Math.abs(persons_main[i].age - person_core.age) <= 10) {
+										if (persons_intimacy[id] >= 40) {
+											if (person_core.gender == '男') {
+												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id]);
+											} else {
+												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id]);
+											}
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 40) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
+											person_core.age) < 22) {
+										if (persons_intimacy[id] >= 50) {
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else {
+										if (persons_intimacy[id] >= 60) {
+											if (person_core.age > persons_main[i].age) {
+												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id]);
+											} else {
+												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+											}
+										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									}
+								} else {
+									if (Math.abs(persons_main[i].age - person_core.age) <= 3) {
+										if (persons_intimacy[id] >= 20) {
+											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else if (Math.abs(persons_main[i].age - person_core.age) >= 23) {
+										if (persons_intimacy[id] >= 60) {
+											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+										} else if (persons_intimacy[id] >= 50 && persons_intimacy[id] < 60) {
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									} else {
+										if (persons_intimacy[id] >= 40) {
+											if (person_core.gender == '男') {
+												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id]);
+											} else {
+												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id]);
+											}
+										} else {
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										}
+									}
+								}
+							}
+							// }
+						}
+
+					}).catch(function(err) {
+						console.log(err);
+					})
+
+					// 					let person_main = persons_main[i];
+					// 					let age_diff = person_core.age - person_main
+				}
+
+			}).catch(function(error) {
+				console.log(error);
+			})
+		}
+
+		function relationGraph(group_id) {
+			var faceArr = [];
+			var linkArr = [];
+			var promiseArr = [];
+			getGroupFaceById(group_id).then(function(e) {
+				let core_face_src = e.rows.item(0).face_src;
+				var core_person = {
+					category: 0,
+					name: '',
+					value: 10,
+					shapeType: 'image',
+					onclick: function(params) {
+						localStorage.setItem('id', group_id);
+						mui.openWindow({
+							url: 'person-images.html'
+						})
+					},
+					itemStyle: {
+						normal: {
+							x: -30,
+							y: -30,
+							width: 80,
+							height: 80,
+							image: core_face_src,
+							shadowBlur: 30, // 默认为0，阴影模糊度，大于0有效
+							shadowColor: 'red'
+						}
+					}
+				};
+				faceArr.push(core_person);
+			}).then(function() {
+				getRelatedPerson(group_id).then(function(e) {
+					for (let i = 0; i < e.rows.length; i++) {
+						let person_main = e.rows.item(i).person_main;
+						let person_relation = e.rows.item(i).person_relation;
+						promiseArr.push(
+							getGroupFaceById(person_main).then(function(res) {
+								let main_face_src = res.rows.item(0).face_src;
+								let main_face_info = res.rows.item(0).group_info;
+								let k = relations.indexOf(person_relation) + 1;
+								let j = i+1;
+								var main_person = {
+									category: k,
+									name: main_face_info,
+									value: 3,
+									shapeType: 'image',
+									itemStyle: {
+										normal: {
+											x: -30,
+											y: -30,
+											width: 50,
+											height: 50,
+											image: main_face_src,
+											shadowBlur: 40,
+											shadowColor: '#ff7f50'
+										}
+									}
+								};
+								var main_link = {
+									source: j,
+									target: 0,
+									weight: 2
+								}
+								faceArr.push(main_person);
+								linkArr.push(main_link);
+								// console.log(faceArr.length);
+								// console.log(JSON.stringify(faceArr));
+							}).catch(function(err) {
+								console.log(err);
+							})
+						)
+					}
+					Promise.all(promiseArr).then(function() {
+						drawGraph(faceArr, linkArr);
+						// console.log(JSON.stringify(faceArr));
+					})
+				});
+
+			}).catch(function(err) {
+				console.log(err);
+			})
+
+
+
+		}
+
+		function drawGraph(faceArr, linkArr) {
 			require.config({
 				packages: [{
 					name: 'echarts',
@@ -145,6 +451,7 @@
 					main: 'zrender'
 				}]
 			});
+
 			var option = {
 				title: {
 					text: '人物关系：乔布斯',
@@ -160,9 +467,16 @@
 					x: 'left',
 					selected: {
 						'朋友': true,
-						'家人': true
+						'同学': true,
+						'同事': true,
+						'兄弟': true,
+						'姐妹': true,
+						'家人': true,
+						'父母': true,
+						'孩子': true,
+						'爱人': true
 					},
-					data: ['家人', '朋友']
+					data: ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人']
 				},
 				isShowScrollBar: false,
 				series: [{
@@ -177,6 +491,46 @@
 							}
 						},
 						{
+							name: '朋友',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '同学',
+							itemStyle: {
+								normal: {
+									color: '#87cdfa'
+								}
+							}
+						},
+						{
+							name: '同事',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '兄弟',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '姐妹',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
 							name: '家人',
 							itemStyle: {
 								normal: {
@@ -185,10 +539,26 @@
 							}
 						},
 						{
-							name: '朋友',
+							name: '父母',
 							itemStyle: {
 								normal: {
-									color: '#87cdfa'
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '孩子',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
+								}
+							}
+						},
+						{
+							name: '爱人',
+							itemStyle: {
+								normal: {
+									color: '#ff7f50'
 								}
 							}
 						}
@@ -217,176 +587,8 @@
 					maxRadius: 25,
 					density: 0.8,
 					attractiveness: 0.8,
-					nodes: [{
-							category: 0,
-							name: '乔布斯',
-							value: 1,
-							shapeType: 'rectangle',
-							onclick: function(params) {
-								// alert(params.target.style.text);
-								mui.openWindow({
-									url: 'person-images.html'
-								});
-								// params.target.style.text = "雷布斯";
-							},
-							itemStyle: {
-								normal: {
-									width: 100,
-									height: 80,
-
-								}
-							}
-						},
-						{
-							category: 1,
-							name: '丽萨-乔布斯',
-							value: 2,
-							shapeType: 'ellipse',
-							itemStyle: {
-								normal: {
-									a: 40,
-									b: 20
-								}
-							}
-						},
-						{
-							category: 1,
-							name: '保罗-乔布斯',
-							value: 1
-						},
-						{
-							category: 1,
-							name: '克拉拉-乔布斯',
-							value: 1
-						},
-						{
-							category: 1,
-							name: '劳伦-鲍威尔',
-							value: 1
-						},
-						{
-							category: 2,
-							name: '史蒂夫-沃兹尼艾克',
-							value: 1
-						},
-						{
-							category: 2,
-							name: '奥巴马',
-							value: 1,
-							shapeType: 'rectangle'
-						},
-						{
-							category: 2,
-							name: '比尔-盖茨',
-							value: 1,
-							symbol: 'rectangle'
-						},
-						{
-							category: 2,
-							name: '乔纳森-艾夫',
-							value: 1
-						},
-						{
-							category: 2,
-							name: '蒂姆-库克',
-							value: 1
-						},
-						{
-							category: 2,
-							name: '龙-韦恩',
-							value: 1
-						},
-						{
-							category: 1,
-							name: 'tpp',
-							value: 7,
-
-						}
-					],
-					links: [{
-							source: 1,
-							target: 0,
-							weight: 1,
-							onclick: function(params) {
-								alert(params.target.style.text);
-							},
-							itemStyle: {
-								normal: {
-									lineWidth: 10,
-									text: '丽萨-乔布斯',
-									textColor: '#030303',
-									textFont: 'bold 15px verdana',
-									textPosition: 'inside'
-								}
-							}
-						},
-						{
-							source: 2,
-							target: 0,
-							weight: 2
-						},
-						{
-							source: 3,
-							target: 0,
-							weight: 1
-						},
-						{
-							source: 4,
-							target: 0,
-							weight: 2
-						},
-						{
-							source: 5,
-							target: 0,
-							weight: 3
-						},
-						{
-							source: 6,
-							target: 0,
-							weight: 6
-						},
-						{
-							source: 7,
-							target: 0,
-							weight: 6
-						},
-						{
-							source: 8,
-							target: 0,
-							weight: 1
-						},
-						{
-							source: 9,
-							target: 0,
-							weight: 1
-						},
-						{
-							source: 10,
-							target: 0,
-							weight: 1
-						},
-						{
-							source: 11,
-							target: 6,
-							weight: 1
-						},
-						// 							{
-						// 								source: 2,
-						// 								target: 3,
-						// 								weight: 10
-						// 							},
-						// 							{
-						// 								source: 2,
-						// 								target: 4,
-						// 								weight: 10
-						// 							},
-						// 							{
-						// 								source: 3,
-						// 								target: 4,
-						// 								weight: 10
-						// 							}
-
-					]
+					nodes: faceArr,
+					links: linkArr
 				}]
 			};
 			require(

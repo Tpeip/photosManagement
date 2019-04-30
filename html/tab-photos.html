@@ -288,6 +288,7 @@
 		createPersonImage();
 		// createFace();
 		createGroupFace();
+		createRelation();
 // 		window.addEventListener('refresh', function(event) {
 // 			//通过event.detail可获得传递过来的参数内容
 // 			location.reload();;
@@ -320,7 +321,7 @@
 				let params={"facealbum_token": facealbum_token};
 				var promise = new Promise(function(resolve,reject){
 					facepp.getAlbumDetail(params,function success(e){
-						console.log(JSON.stringify(e));
+						// console.log(JSON.stringify(e));
 						let length = e.faces.length;
 						for(let i = 0;i < length; i++){
 							let face_token = e.faces[i].face_token;
