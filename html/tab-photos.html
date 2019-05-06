@@ -404,6 +404,7 @@
 						let length = res.rows.length;
 						if (length == 0) {
 							DeleteGroup(group_id);
+							DeleteRelation(group_id);
 						}
 					}).catch(function(error) {
 						console.log(error);
