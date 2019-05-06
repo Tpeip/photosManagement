@@ -150,11 +150,46 @@
 				switch(index){
 					case 0:
 						break;
-					case 1:
-					    break;
+					case 1:{
+						var image_path = localStorage.getItem('path');
+						deleteImage(image_path);
+						 break;
+					}
+					   
 				}
 			});
 			this.classList.remove('mui-active');
+		};
+		var deleteImage = function(image_path){
+			getImageByPath(image_path).then(function(imageRes){
+				let image_type = imageRes.rows.item(0).image_main_type;
+				deleteOneImage(image_path);
+				if(image_type == '人物'){
+					getPersonImage(image_path).then(function(personRes){
+						deleteOnePerson(image_path);
+						let length = personRes.rows.length;
+						for(let i = 0;i < length; i++){
+							let group_id = personRes.rows.item(i).group_id;
+							let face_src = personRes.rows.item(i).face_src;
+							getGroupFaceById(group_id).then(function(groupRes){
+								let image_num = groupRes.rows.item(0).image_num;
+								let group_face_src = groupRes.rows.item(0).face_src;
+								if(image_num == 1){
+									DeleteGroup(group_id);
+									DeleteRelation(group_id);
+								}else{
+									if(face_src == group_face_src){
+										getFaceByGroup(group_id).then(function(res){
+											let new_face_src = res.rows.item(0).face_src;
+											UpdateGroupFaceSrc(group_id, new_face_src);
+										})
+									}
+								}
+							})
+						}
+					})
+				}
+			})
 		};
 		var laterForwardEvent = function(){
 			var buttonAry = [

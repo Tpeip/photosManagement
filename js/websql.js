@@ -48,21 +48,6 @@ function createImageTable() {
 	websqlCreatTable(tableName, params);
 }
 
-/**
- * image中删除数据
- */
-function deleteAllImage() {
-	var deleteTableSQL = 'DELETE FROM image';
-	localStorage.removeItem('image');
-	dataBase.transaction(function(ctx, result) {
-		ctx.executeSql(deleteTableSQL, [], function(ctx, result) {
-			// console.log("删除表数据成功 ");
-		}, function(tx, error) {
-			console.log('删除表数据失败:' + error.message);
-		});
-	});
-}
-
 function getAllImage() {
 	websqlOpenDB();
 	var selectALLSQL = 'SELECT * FROM image ORDER BY image_id DESC';
@@ -180,6 +165,37 @@ function InsertToImage(num, imageArr) {
 	return pm;
 }
 
+function deleteOneImage(image_path) {
+	var deleteSQL = 'DELETE FROM image where image_path=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx, result) {
+			ctx.executeSql(deleteSQL, [image_path], function(ctx, result) {
+				// console.log("删除表数据成功 ");
+			}, function(tx, error) {
+				console.log('删除表数据失败:' + error.message);
+			});
+		});
+	});
+	return pm;
+}
+
+/**
+ * image中删除数据
+ */
+function deleteAllImage() {
+	var deleteSQL = 'DELETE FROM image';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx, result) {
+			ctx.executeSql(deleteSQL, [], function(ctx, result) {
+				// console.log("删除表数据成功 ");
+			}, function(tx, error) {
+				console.log('删除表数据失败:' + error.message);
+			});
+		});
+	});
+	return pm;
+}
+
 function createPersonImage() {
 	var tableName = 'person';
 	var params =
@@ -256,7 +272,7 @@ function getPersonNumImage(num) {
 
 function getFaceByGroup(group_id) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM person WHERE group_id=? ';
+	var selectSQL = 'SELECT * FROM person WHERE group_id=? ORDER BY personImg_id DESC';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [group_id], function(ctx, result) {
@@ -354,6 +370,20 @@ function UpdateToFaceToken(image_path, face_token, width, top, left, height) {
 	return pm;
 }
 
+function deleteOnePerson(image_path) {
+	var deleteSQL = 'DELETE FROM person where image_path=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx, result) {
+			ctx.executeSql(deleteSQL, [image_path], function(ctx, result) {
+				// console.log("删除表数据成功 ");
+			}, function(tx, error) {
+				console.log('删除表数据失败:' + error.message);
+			});
+		});
+	});
+	return pm;
+}
+
 
 function createGroupFace() {
 	var tableName = 'groupface';
@@ -431,6 +461,24 @@ function UpdateToInfo(group_id, group_info) {
 	return pm;
 }
 
+function UpdateGroupFaceSrc(group_id, face_src) {
+	websqlOpenDB();
+	var insertSQL = 'UPDATE groupface SET face_src=? WHERE group_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, [face_src, group_id], function(ctx, result) {
+					// console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
 function UpdateImageNum(group_id, image_num) {
 	websqlOpenDB();
 	var updateSQL = 'UPDATE groupface SET image_num=? WHERE group_id=? ';
@@ -451,10 +499,10 @@ function UpdateImageNum(group_id, image_num) {
 
 function DeleteGroup(group_id) {
 	websqlOpenDB();
-	var insertImageSQL = 'DELETE FROM groupface WHERE group_id=? ';
+	var deleteSQL = 'DELETE FROM groupface WHERE group_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertImageSQL, [group_id], function(ctx, result) {
+			ctx.executeSql(deleteSQL, [group_id], function(ctx, result) {
 					// console.log("删除成功");
 					resolve(result);
 				},
@@ -576,4 +624,21 @@ function UpdatePersonIntimacy(person_core, person_main, person_intimacy) {
 	return pm;
 }
 
+function DeleteRelation(group_id) {
+	websqlOpenDB();
+	var deleteSQL = 'DELETE FROM relation WHERE person_core=? or person_main=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteSQL, [group_id, group_id], function(ctx, result) {
+					// console.log("删除成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('删除失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
 
