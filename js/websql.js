@@ -282,7 +282,7 @@ function InsertToPerson(num, personArr) {
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(insertImageSQL, personArr, function(ctx, result) {
-					// console.log("插入成功");
+					 console.log("插入成功");
 					resolve(result);
 				},
 				function(tx, error) {
@@ -331,12 +331,12 @@ function UpdateToFace(face_token, group_id) {
 }
 
 function UpdateToFaceToken(image_path, face_token, width, top, left, height) {
-	console.log("*********");
-	console.log(width);
-	console.log(top);
-	console.log(left);
-	console.log(height);
-	console.log("*********");
+	// console.log("*********");
+	// console.log(width);
+	// console.log(top);
+	// console.log(left);
+	// console.log(height);
+	// console.log("*********");
 	websqlOpenDB();
 	var updateSQL = 'UPDATE person SET face_token=? WHERE image_path=? and width=? and top=? and left=? and height=? ';
 	var pm = new Promise(function(resolve, reject) {
@@ -538,7 +538,8 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(updateSQL, [person_relation, person_core, person_main], function(ctx, result) {
 					console.log("更新成功");
-					resolve(result);
+					// resolve(result);
+					return ;
 				},
 				function(tx, error) {
 					console.log('更新失败: ' + error.message);
