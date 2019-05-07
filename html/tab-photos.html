@@ -274,6 +274,8 @@
 	<script src="../js/common.js"></script>
 	<script src="../js/exif.js"></script>
 	<script src="../js/aipImageClassify.js"></script>
+	<!-- <script src='../js/mui.view.js'></script>
+	<script src='../js/feedback.js'></script> -->
 	<script>
 // 		let people = new Image();
 // 		people.src = document.getElementById('people').src;
@@ -293,13 +295,23 @@
 // 			//通过event.detail可获得传递过来的参数内容
 // 			location.reload();;
 // 		});
-
+		var shares = {};
         mui.plusReady(function() {
 			CreateAlbum();
 			setHtml();
 			UpdateGroup();
 			//getPersonFace();
 		    // getPersonGroup();
+			plus.share.getServices(function(s) {
+				if (s && s.length > 0) {
+					for (var i = 0; i < s.length; i++) {
+						var t = s[i];
+						shares[t.id] = t;
+					}
+				}
+			}, function() {
+				console.log("获取分享服务列表失败");
+			});
 		});
 		//创建相册
 		function CreateAlbum(){
@@ -413,7 +425,7 @@
 			}).catch(function(error) {
 				console.log(error);
 			})
-		}
+		};
 		
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({

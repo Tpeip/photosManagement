@@ -202,30 +202,68 @@
 			})
 		};
 		var laterForwardEvent = function(){
-			var buttonAry = [
-				{
-					title: '分享',
-				},
-				{
-					title: '打印'
-				}
-				];
+				var ids = [{
+					id: "weixin",
+					ex: "WXSceneSession"
+				}, {
+					id: "weixin",
+					ex: "WXSceneTimeline"
+				}, {
+					id: "qq"
+				}, {
+					id: "sinaweibo"
+				}],
+				bts = [{
+					title: "发送给微信好友"
+				}, {
+					title: "分享到微信朋友圈"
+				}, {
+					title: "分享到QQ"
+				}, {
+					title: "分享到新浪微博"
+				}];
 			plus.nativeUI.actionSheet({
-				cancel: '取消',
-				buttons: buttonAry
-			},function(event){
-				var index = event.index;
-				switch(index){
-					case 0:
-						break;
-					case 1:
-					    break;
-					case 2:
-						break;
+				cancel: "取消",
+				buttons: bts
+			}, function(e) {
+				var i = e.index;
+				if (i > 0) {
+					var s_id = ids[i - 1].id;
+					var share = shares[s_id];
+					if (share) {
+						if (share.authenticated) {
+							shareMessage(share, ids[i - 1].ex);
+						} else {
+							share.authorize(function() {
+								shareMessage(share, ids[i - 1].ex);
+							}, function(e) {
+								console.log("认证授权失败：" + e.code + " - " + e.message);
+							});
+						}
+					} else {
+						mui.toast("无法获取分享服务，请检查manifest.json中分享插件参数配置，并重新打包")
+					}
 				}
 			});
-			this.classList.remove('mui-active');
 		};
+		
+		var shareMessage = function (share, ex) {
+			var path = localStorage.getItem('path');
+			var msg = {
+				content: "图片分享",
+				pictures: [],
+				extra: {
+					scene: ex
+				}
+			};
+			msg.pictures.push(path);
+			share.send(msg, function() {
+				console.log("分享到\"" + share.description + "\"成功！ ");
+			}, function(e) {
+				console.log("分享到\"" + share.description + "\"失败: " + e.code + " - " + e.message);
+			});
+		}
+		
 		var laterOpenEvent = function(){
 			mui.openWindow({
 				url: 'info.html',
