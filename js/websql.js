@@ -582,7 +582,7 @@ function InsertToRelation(person_core, person_main, person_relation, person_inti
 function UpdatePersonRelation(person_core, person_main, person_relation) {
 	websqlOpenDB();
 	var updateSQL = 'UPDATE relation SET person_relation=? WHERE person_core=? and person_main=? ';
-	var person_relation1=person_relation;
+	var person_relation1 = person_relation;
 	if(person_relation == '父母'){
 		person_relation1 = '孩子';
 	}
@@ -591,7 +591,7 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 			ctx.executeSql(updateSQL, [person_relation, person_core, person_main], function(ctx, result) {
 					console.log("更新成功");
 					// resolve(result);
-					return ;
+					//return ;
 				},
 				function(tx, error) {
 					console.log('更新失败: ' + error.message);
