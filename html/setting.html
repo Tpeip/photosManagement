@@ -499,7 +499,7 @@
 		mui.init();
 		mui.plusReady(function() {
 			var name = localStorage.getItem("user");
-			console.log('name',name);
+			// console.log('name',name);
 			var el = document.getElementById('user').innerHTML;
 			document.getElementById('user').innerHTML = el.replace(/name/g, name);
 
@@ -513,7 +513,7 @@
 
 
 		document.querySelector('.mui-action-back').addEventListener('tap', function(e) {
-			console.log('是否执行操作');
+			// console.log('是否执行操作');
 			plus.webview.currentWebview().close();
 			e.preventDefault();
 			e.stopPropagation();

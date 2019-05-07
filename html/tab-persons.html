@@ -24,12 +24,12 @@
 			}
 
 			.label-font {
-				font-size: 14px;
+				font-size: 16px;
 				color: #6D6D72;
 			}
 
 			.icon-style {
-				font-size: 18px;
+				font-size: 20px;
 				color: #0062CC;
 				font-weight: bolder;
 			}
@@ -57,7 +57,8 @@
 			<div class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">人脉关系图</label>
-				<div id="demo1" style="height:500px;border-top:1px solid #ccc;margin-top:15px"></div>
+				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">修改</a>
+				<div id="demo1" style="height:500px;border-top:1px solid #ccc;margin-top:10px"></div>
 			</div>
 		</div>
 
@@ -77,6 +78,21 @@
 			//				getPersonGroup();
 			// updateGroupFace();
 			setFaceHtml();
+		})
+		
+		var flag = 0;
+		localStorage.setItem('mod',flag);
+		document.getElementById('modify').addEventListener('tap',function(){
+			if(flag == 0){
+				document.getElementById('modify').innerHTML = '取消修改';
+				flag = 1;
+				localStorage.setItem('mod',flag);
+			}
+			else{
+				document.getElementById('modify').innerHTML = '修改';
+				flag = 0;
+				localStorage.setItem('mod',flag);
+			}
 		})
 
 
@@ -140,6 +156,7 @@
 			relationGraph(group_id);
 		}
 
+        //通过照片数量的比例获取亲密度
 		function getPersonIntimacy(group_id) {
 			var promiseArr = [];
 			let persons_intimacy = {};
@@ -182,6 +199,7 @@
 			})
 		}
 
+		//处理核心人物所有照片中的人脉关系
 		function handleCorePerson(persons_intimacy, group_id) {
 			getFaceByGroup(group_id).then(function(e) {
 				var image_num = e.rows.length;
@@ -194,6 +212,7 @@
 			})
 		}
 
+		//获取一张照片中核心人物与相关人物间的关系
 		function handleOneImage(persons_intimacy, image_path, group_id) {
 			getPersonImage(image_path).then(function(res) {
 				let person_core;
@@ -233,7 +252,7 @@
 											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
 										}
 									} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
-											person_core.age) < 22) {
+											person_core.age) <=25 ) {
 										if (persons_intimacy[id] >= 50) {
 											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
@@ -352,7 +371,8 @@
 				console.log(error);
 			})
 		}
-
+		
+		//绘制显示核心人物的人脉关系图
 		function relationGraph(group_id) {
 			var faceArr = [];
 			var linkArr = [];
@@ -377,8 +397,8 @@
 							width: 80,
 							height: 80,
 							image: core_face_src,
-							shadowBlur: 30, // 默认为0，阴影模糊度，大于0有效
-							shadowColor: 'red'
+// 							shadowBlur: 30, // 默认为0，阴影模糊度，大于0有效
+// 							shadowColor: 'red'
 						}
 					}
 				};
@@ -399,6 +419,12 @@
 									name: main_face_info,
 									value: 3,
 									shapeType: 'image',
+									onclick: function(params) {	
+										var mod = localStorage.getItem('mod');
+										if(mod == 1){
+											modifyRelation(group_id, person_main, person_relation);
+										}									
+									},
 									itemStyle: {
 										normal: {
 											x: -30,
@@ -406,22 +432,20 @@
 											width: 50,
 											height: 50,
 											image: main_face_src,
-											shadowBlur: 40,
-											shadowColor: '#ff7f50'
 										}
 									}
 								};
 								var main_link = {
 									source: j,
 									target: 0,
-									weight: 2
+									weight: j
 								}
 								faceArr.push(main_person);
 								linkArr.push(main_link);
 								// console.log(faceArr.length);
 								// console.log(JSON.stringify(faceArr));
 							}).catch(function(err) {
-								console.log(err);
+								console.log(JSON.stringify(err));
 							})
 						)
 					}
@@ -434,9 +458,6 @@
 			}).catch(function(err) {
 				console.log(err);
 			})
-
-
-
 		}
 
 		function drawGraph(faceArr, linkArr) {
@@ -453,12 +474,12 @@
 			});
 
 			var option = {
-				title: {
-					text: '人物关系：乔布斯',
-					subtext: '数据来自人立方',
-					x: 'right',
-					y: 'bottom'
-				},
+// 				title: {
+// 					text: '人物关系：乔布斯',
+// 					subtext: '数据来自人立方',
+// 					x: 'right',
+// 					y: 'bottom'
+// 				},
 				tooltip: {
 					trigger: 'item',
 					formatter: '{a} : {b}'
@@ -481,12 +502,12 @@
 				isShowScrollBar: false,
 				series: [{
 					type: 'kforce',
-					// symbol: 'image:'+src,
 					categories: [{
 							name: '人物',
 							itemStyle: {
 								normal: {
-									color: 'gray'
+									shadowBlur: 40,
+									shadowColor: 'black'
 								}
 							}
 						},
@@ -494,7 +515,9 @@
 							name: '朋友',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									// shadowColor: '#007fff'
+									shadowColor: '#e65c00'
 								}
 							}
 						},
@@ -502,7 +525,8 @@
 							name: '同学',
 							itemStyle: {
 								normal: {
-									color: '#87cdfa'
+									shadowBlur: 40,
+									shadowColor: '#66e0ff'
 								}
 							}
 						},
@@ -510,7 +534,8 @@
 							name: '同事',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 40,
+									shadowColor: '#ff80df'
 								}
 							}
 						},
@@ -518,7 +543,8 @@
 							name: '兄弟',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									shadowColor: '#80ff80'
 								}
 							}
 						},
@@ -526,7 +552,8 @@
 							name: '姐妹',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									shadowColor: '#4d94ff'
 								}
 							}
 						},
@@ -534,7 +561,8 @@
 							name: '家人',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 40,
+									shadowColor: '#ff80aa'
 								}
 							}
 						},
@@ -542,7 +570,8 @@
 							name: '父母',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									shadowColor: '#cc00cc'
 								}
 							}
 						},
@@ -550,7 +579,8 @@
 							name: '孩子',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									shadowColor: '#ff1a1a'
 								}
 							}
 						},
@@ -558,7 +588,8 @@
 							name: '爱人',
 							itemStyle: {
 								normal: {
-									color: '#ff7f50'
+									shadowBlur: 20,
+									shadowColor: '#ffd633'
 								}
 							}
 						}
@@ -566,7 +597,7 @@
 					itemStyle: {
 						normal: {
 							label: {
-								show: true,
+								show: false,    //不显示名字
 								textStyle: {
 									color: '#000000'
 								}
@@ -579,7 +610,8 @@
 						},
 						emphasis: {
 							linkStyle: {
-								strokeColor: '#5182AB'
+								type: 'curve',
+								// strokeColor: '#5182AB'
 							}
 						}
 					},
@@ -587,6 +619,7 @@
 					maxRadius: 25,
 					density: 0.8,
 					attractiveness: 0.8,
+					roam: 'move',
 					nodes: faceArr,
 					links: linkArr
 				}]
@@ -601,6 +634,32 @@
 					myChart.setOption(option);
 				}
 			)
+		}
+		
+		//修改人物间关系
+		function modifyRelation(group_id, person_main, person_relation) {
+			// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
+			var btnArray = ['取消', '确定'];
+			mui.prompt('', '请输入关系', '关系：'+person_relation, btnArray, function(e) {
+				if (e.index == 1) {
+					var relation = '';
+		            if(e.value == null || e.value == ''){
+						relation = person_relation;
+					}else{
+						relation = e.value;
+						var index = relations.indexOf(relation);
+						if(index >= 0){
+							relationGraph(group_id);
+							UpdatePersonRelation(group_id, person_main, relation);
+						}
+						else{
+							mui.toast('关系输入不正确');
+							modifyRelation(group_id, person_main, person_relation);
+						}
+						
+					}											
+				}
+			},'div');
 		}
 	</script>
 </html>

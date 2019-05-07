@@ -12,13 +12,26 @@
 		<div class="mui-content">
 			<div id="demo1" style="height:600px;border:1px solid #ccc;padding:1px;"></div>
 		</div>
+		<button id="del">删除相册</button>
+		
 
 		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/facepp_sdk.js"></script>
+		<script src="../js/common.js"></script>
+		<script src="../js/exif.js"></script>
 
 		<script src="../js/esl.js"></script>
 		<script type="text/javascript">
-			var src = localStorage.getItem('data');
-			mui.init();
+			var facepp = new FACEPP(APIKEY, APISERET, 1);
+			document.getElementById('del').addEventListener('tap',function(){
+				let param = {"facealbum_token": "1556891705-dd8d8940-2dc9-450e-8f57-ffdd1c0114e1"};
+				facepp.deleteAlbum(param,function success(e){
+					console.log(e);
+				},function failed(err){
+					console.log(err);
+				});
+			});
 			require.config({
 				packages: [{
 					name: 'echarts',
@@ -39,25 +52,46 @@
 				},
 				tooltip: {
 					trigger: 'item',
-					formatter: '{a} : {b}'
+					formatter: '{a}  {b}'
+				},
+				toolbox: {
+					show: true,
+					feature: {
+						restore: {
+							show: true
+						},
+						magicType: {
+							show: true,
+							type: ['force', 'chord']
+						},
+						saveAsImage: {
+							show: true
+						}
+					}
 				},
 				legend: {
 					x: 'left',
 					selected: {
 						'朋友': true,
-						'家人': true
+						'同学': true,
+						'同事': true,
+						'兄弟': true,
+						'姐妹': true,
+						'家人': true,
+						'父母': true,
+						'孩子': true,
+						'爱人': true
 					},
-					data: ['家人', '朋友']
+					data: ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人']
 				},
 				isShowScrollBar: false,
 				series: [{
 					type: 'kforce',
-					// symbol: 'image:'+src,
 					categories: [{
 							name: '人物',
 							itemStyle: {
 								normal: {
-									color: 'gray'
+									// color: '#ff7f50'
 								}
 							}
 						},
@@ -104,22 +138,17 @@
 					attractiveness: 0.8,
 					nodes: [{
 							category: 0,
-							name: '',
+							name: '乔布斯',
 							value: 10,
-							shapeType: 'image',
+							shapeType: 'rectangle',
 							onclick: function(params) {
 								alert(params.target.style.text);
 								params.target.style.text = "雷布斯";
 							},
 							itemStyle: {
 								normal: {
-									x:-30,
-									y:-30,
-									width: 80,
-									height: 80,
-									image: src,
-									shadowBlur:30,  // 默认为0，阴影模糊度，大于0有效
-									shadowColor: 'red'
+									width: 100,
+									height: 80
 								}
 							}
 						},
@@ -127,172 +156,60 @@
 							category: 1,
 							name: '丽萨-乔布斯',
 							value: 2,
-							shapeType: 'image',
+							shapeType: 'ellipse',
 							itemStyle: {
 								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#ff7f50'
+									a: 40,
+									b: 20
 								}
 							}
 						},
 						{
 							category: 1,
 							name: '保罗-乔布斯',
-							value: 3,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#ff7f50'
-								}
-							}
+							value: 3
 						},
 						{
 							category: 1,
 							name: '克拉拉-乔布斯',
-							value: 3,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#ff7f50'
-								}
-							}
+							value: 3
 						},
 						{
 							category: 1,
 							name: '劳伦-鲍威尔',
-							value: 7,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#ff7f50'
-								}
-							}
+							value: 7
 						},
 						{
 							category: 2,
 							name: '史蒂夫-沃兹尼艾克',
-							value: 5,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
+							value: 5
 						},
 						{
 							category: 2,
 							name: '奥巴马',
 							value: 8,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
+							shapeType: 'rectangle'
 						},
 						{
 							category: 2,
 							name: '比尔-盖茨',
-							value: 9,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
+							value: 9
 						},
 						{
 							category: 2,
 							name: '乔纳森-艾夫',
-							value: 4,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
+							value: 4
 						},
 						{
 							category: 2,
 							name: '蒂姆-库克',
-							value: 4,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
+							value: 4
 						},
 						{
 							category: 2,
 							name: '龙-韦恩',
-							value: 1,
-							shapeType: 'image',
-							itemStyle: {
-								normal: {
-									x:-30,
-									y:-30,
-									width: 50,
-									height: 50,
-									image: src,
-									shadowBlur:40,
-									shadowColor: '#87cdfa'
-								}
-							}
-						}
+							value: 1
+						},
 					],
 					links: [{
 							source: 1,

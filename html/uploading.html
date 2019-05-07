@@ -720,24 +720,18 @@
 			mui.alert(' ', '上传成功', btnArray, function(e) {
 				//console.log(e.index);
 				if(e.index == 0){
-					refreshParent();
-					
-				}
-				
+					refreshParent();					
+				}				
 			},'div');
 		}).catch(function(err) {
-			console.log(err);
 			wt.close();
 			var btnArray = ['确定'];
 			mui.alert(' ', '上传失败', btnArray, function(e) {
 				//console.log(e.index);
 				if(e.index == 0){
-					refreshParent();
-					
-				}
-				
+					refreshParent();					
+				}				
 			},'div');
 		});
-
 	});
 </script>

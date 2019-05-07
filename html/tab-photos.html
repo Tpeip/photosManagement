@@ -366,7 +366,7 @@
 					getGroupFaceById(group_id).then(function(res) {
 						// console.log(res.rows.length);
 						if (res.rows.length == 0) {
-							 let face_src = getFaceData(image_path, width, top, left, height);
+							let face_src = getFaceData(image_path, width, top, left, height);
 							InsertToGroupFace(group_id, face_src, image_num);
 						}
 						UpdateImageNum(group_id, image_num);
@@ -429,7 +429,9 @@
 		
 		//显示照片
 		function setHtml(){
+			jQuery('#image-content').empty();
 			getAllImage().then(function(result){
+				console.log(result.rows.length);
 				for (var i=0;i<result.rows.length;i++) {
 					// console.log(data[i].image_name);
 					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +

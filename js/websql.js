@@ -171,8 +171,10 @@ function deleteOneImage(image_path) {
 		dataBase.transaction(function(ctx, result) {
 			ctx.executeSql(deleteSQL, [image_path], function(ctx, result) {
 				// console.log("删除表数据成功 ");
+				resolve(result);
 			}, function(tx, error) {
 				console.log('删除表数据失败:' + error.message);
+				reject(error);
 			});
 		});
 	});
@@ -188,8 +190,10 @@ function deleteAllImage() {
 		dataBase.transaction(function(ctx, result) {
 			ctx.executeSql(deleteSQL, [], function(ctx, result) {
 				// console.log("删除表数据成功 ");
+				resolve(result);
 			}, function(tx, error) {
 				console.log('删除表数据失败:' + error.message);
+				reject(error);
 			});
 		});
 	});

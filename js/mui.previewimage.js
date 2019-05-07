@@ -1,3 +1,4 @@
+// document.write("<script language=javascript src='websql.js'></script>");
 (function($, window) {
 
 	var template =
@@ -90,8 +91,6 @@
 
 		this.element = el; //template区域
 		this.scroller = this.element.querySelector($.classSelector('.slider-group'));
-// 		this.scrollers = this.element.querySelector($.classSelector('.slider-item'));
-// 		console.log(scrollers);
 		this.indicator = this.element.querySelector($.classSelector('.preview-indicator'));
 		this.loader = this.element.querySelector($.classSelector('.preview-loading'));
 		this.backer = back;
@@ -149,11 +148,20 @@
 				var index = event.index;
 				switch(index){
 					case 0:
+					    
 						break;
 					case 1:{
 						var image_path = localStorage.getItem('path');
+						// self.openByGroup(0,1);
 						deleteImage(image_path);
-						 break;
+						self.close();												
+						
+						// self.open(this);
+						// var list = plus.webview.currentWebview().opener();
+						//触发列表界面的自定义事件（refresh）,从而进行数据刷新
+						// mui.fire(list, 'refresh');
+						// plus.webview.currentWebview().close();
+						break;
 					}
 					   
 				}
@@ -163,7 +171,9 @@
 		var deleteImage = function(image_path){
 			getImageByPath(image_path).then(function(imageRes){
 				let image_type = imageRes.rows.item(0).image_main_type;
-				deleteOneImage(image_path);
+				deleteOneImage(image_path).then(function(){
+					setHtml();
+				});
 				if(image_type == '人物'){
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
@@ -260,6 +270,7 @@
 				}
 			}
 			var slideNumber = e.detail.slideNumber;
+			// console.log(slideNumber);
 			self.lastIndex = slideNumber;
 			self.indicator && (self.indicator.innerText = (slideNumber + 1) + '/' + self.currentGroup.length);
 			self._loadItem(slideNumber);
@@ -279,6 +290,7 @@
 			imgs = document.querySelectorAll("img[data-preview-src]");
 		}
 		if (imgs.length) {
+			// console.log(imgs.length);
 			for (var i = 0, len = imgs.length; i < len; i++) {
 				this.addImage(imgs[i]);
 			}
@@ -349,6 +361,8 @@
 		img.removeEventListener('webkitTransitionEnd', this._imgTransitionEnd.bind(this));
 	};
 	proto._loadItem = function(index, isOpening) { //TODO 暂时仅支持img
+// 	    console.log(index);
+// 		console.log(isOpening);
 		var itemEl = this.scroller.querySelector($.classSelector('.slider-item:nth-child(' + (index + 1) + ')'));
 // 		var white = true;
 // 		itemEl.addEventListener('tap',function(){
@@ -364,7 +378,7 @@
 		var imgEl = itemEl.querySelector('img');
 		//获取照片路径
 		currentPreviewSrc = imgEl.src;
-		console.log("src", currentPreviewSrc);
+		// console.log(currentPreviewSrc);
 		localStorage.setItem('path',currentPreviewSrc);
 		this._initImgData(itemData, imgEl);
 		if (isOpening) {
@@ -530,10 +544,14 @@
 		this._loadItem(currentIndex, true);
 	};
 	proto.openByGroup = function(index, group) {
+// 		console.log(index);
+// 		console.log(group);
 		index = Math.min(Math.max(0, index), this.groups[group].length - 1);
 		this.refresh(index, this.groups[group]);
 	};
 	proto.open = function(index, group) {
+// 		console.log(index);
+// 		console.log(group);
 		if (this.isShown()) {
 			return;
 		}
@@ -544,6 +562,8 @@
 			this.openByGroup(index, group);
 		} else {
 			group = index.getAttribute('data-preview-group');
+// 			console.log(group);
+// 			console.log(index);
 			group = group || defaultGroupName;
 			this.addImages(group, index); //刷新当前group
 			this.openByGroup(this.groups[group].indexOf(index.__mui_img_data), group);

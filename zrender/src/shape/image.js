@@ -106,7 +106,6 @@ define(
                         image = _cache[src];
                     }
                     else {
-//						console.log(123435);
                         image = new Image();//document.createElement('image');
                         image.onload = function(){
                             image.onload = null;
