@@ -13,14 +13,14 @@
 			'<div class="mui-preview-footer mui-hidden" style="box-shadow:1px 1px 4px 1px #ccc inset">'+
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
-						'<a id="delete" class="mui-tab-item" style="text-align:center;vertical-align:middle;">'+
+						'<a id="delete" class="mui-tab-item" style="color:black;text-align:center;vertical-align:middle;">'+
 							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a id="forward" class="mui-tab-item">'+
-							'<span class="mui-icon mui-icon-redo" style="font-size:32px;margin-bottom:14px;"></span>'+
+							'<span class="mui-icon mui-icon-redo" style="color:black;font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 					'</nav>'+'{{footer}}'+
 				'</div>'+
