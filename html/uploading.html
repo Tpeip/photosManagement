@@ -538,16 +538,6 @@
 								person.push(beauty);
 								person.push(ethnicity);
 
-								// console.log("----------");
-								// console.log(width);
-								// console.log(top);
-								// console.log(left);
-								// console.log(height);
-								// console.log("----------");
-
-								// console.log(rectangle);
-								// console.log(face_token);
-
 							}
 							resolve(e);
 						}, function failed(err) {
@@ -725,16 +715,28 @@
 				});
 			});
 		}).then(function(result) {
-			alert("上传成功");
-			plus.webview.currentWebview().close();
-			refreshParent();
 			wt.close();
+			var btnArray = ['确定'];
+			mui.alert(' ', '上传成功', btnArray, function(e) {
+				//console.log(e.index);
+				if(e.index == 0){
+					refreshParent();
+					
+				}
+				
+			},'div');
 		}).catch(function(err) {
 			console.log(err);
-			alert("上传失败：" + err);
-			plus.webview.currentWebview().close();
-			refreshParent();
 			wt.close();
+			var btnArray = ['确定'];
+			mui.alert(' ', '上传失败', btnArray, function(e) {
+				//console.log(e.index);
+				if(e.index == 0){
+					refreshParent();
+					
+				}
+				
+			},'div');
 		});
 
 	});
