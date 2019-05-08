@@ -111,9 +111,8 @@
 		mui.init();	
 		getPersonType();
 		getImageType();
-		mui.plusReady(function() {
-			// getPersonType();
-			
+		window.addEventListener('fresh', function(event) {
+			location.reload();
 		});
 	
 	    //获取所有照片的类型

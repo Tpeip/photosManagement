@@ -237,7 +237,7 @@
 
 	<body>
 		<header class="mui-bar mui-bar-nav">
-			<a  class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		</header>
 		<div class="mui-content">
 			<div id="top" class="mui-row">
@@ -276,23 +276,28 @@
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script src="../js/jquery.min.js"></script>
-		<script src="../js/mui.picker.js"></script>
-		<script src="../js/mui.poppicker.js"></script>
 		<script src="../js/mui.zoom.js"></script>
 		<script type="text/javascript" src="../js/mui.imageViewer.js"></script>
-		<script src="../js/mui.previewimage.js"></script>
+		<script src="../js/mui.previewimage3.js"></script>
 		<script src="../js/websql.js"></script>
+		<script src="../js/person.js"></script>
 		<script type="text/javascript">
 			mui.init({
 				beforeback: function() {
 					//获得父页面的webview
-					var list = plus.webview.currentWebview().opener();
+					var listpage = plus.webview.currentWebview().opener();
 					//触发父页面的自定义事件(refresh),从而进行刷新
-					mui.fire(list, 'refresh');
+					mui.fire(listpage, 'refresh');
+// 					var list = plus.webview.currentWebview().opener();
+// 					mui.fire(list, 'fresh');
 					//返回true,继续页面关闭逻辑
 					return true;
 				}
 			});
+// 			mui.init();
+// 			document.getElementById('backing').addEventListener('tap', function() {
+// 				plus.webview.currentWebview().close();				
+// 			});
 			mui.previewImage(function(img) {
 				plus.webview.currentWebview().setStyle({
 					top: '0px',
@@ -313,6 +318,7 @@
 			
 			//获取当前页面的人脸
 			function getFace() {
+				var group_id = localStorage.getItem('id');
 				getGroupFaceById(group_id).then(function(e) {
 					var face_src = e.rows.item(0).face_src;
 					var person_text = e.rows.item(0).group_info;
@@ -322,12 +328,14 @@
 					}
 					setTopHtml(face_src, person_text, image_num);
 				}).catch(function(e) {
-					console.log(e);
+					console.log(JSON.stringify(e));
 				});
 			}
 
 			//获取该人物的所有照片并显示
 			function getImages() {
+				var group_id = localStorage.getItem('id');
+				jQuery('#bottom').empty();
 				getFaceByGroup(group_id).then(function(e) {
 					var bottom_html = '<p class="mui-ellipsis">相关照片</p>';
 					for (let i = 0; i < e.rows.length; i++) {
@@ -343,6 +351,7 @@
 			
 			//显示顶部人脸及文字
 			function setTopHtml(face_src, person_text, image_num) {
+				jQuery('#top').empty();
 				var html = '<div  class="mui-media mui-col-xs-5" style="left:20px;">' +
 					'<img class="img-face" src="' + face_src + '" />' +
 					'</div>' +

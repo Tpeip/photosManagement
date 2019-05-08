@@ -273,15 +273,9 @@
 	<script src="../js/facepp_sdk.js"></script>
 	<script src="../js/common.js"></script>
 	<script src="../js/exif.js"></script>
+	<script src="../js/person.js"></script>
 	<script src="../js/aipImageClassify.js"></script>
 	<script>
-// 		let people = new Image();
-// 		people.src = document.getElementById('people').src;
-// 		console.log(people.src);
-// 		let data64 = getBase64URL(people);
-// 		// console.log(data64);
-// 		localStorage.setItem('data',data64);
-		
 		var image_template = document.getElementById('image-content');
 		var facepp = new FACEPP(APIKEY, APISERET, 1);
 		createImageTable();
@@ -310,120 +304,7 @@
 			}, function() {
 				console.log("获取分享服务列表失败");
 			});
-		});
-		//创建相册
-		function CreateAlbum(){
-			if(localStorage.getItem("facealbum_token")==null){
-				let param={};
-				facepp.createAlbum(param,function success(e){
-					let facealbum_token = e.facealbum_token;
-					localStorage.setItem("facealbum_token", facealbum_token);
-				},function failed(err){
-					console.log(err);
-				});
-			}
-		}
-		
-		//更新照片分组
-		function UpdateGroup(){
-			var facealbum_token = localStorage.getItem("facealbum_token");
-			// console.log(facealbum_token);
-				let params={"facealbum_token": facealbum_token};
-				var promise = new Promise(function(resolve,reject){
-					facepp.getAlbumDetail(params,function success(e){
-						// console.log(JSON.stringify(e));
-						let length = e.faces.length;
-						for(let i = 0;i < length; i++){
-							let face_token = e.faces[i].face_token;
-							let group_id = e.faces[i].group_id;
-							if(group_id == '0' || group_id == '-1')
-								group_id = face_token;
-							UpdateToFace(face_token, group_id);	
-						}
-					    resolve();
-					},function failed(err){
-						console.log(err);
-						reject(err);
-					})
-				});
-				promise.then(function(){
-					getPersonFace();
-				}).then(function(){
-					getPersonGroup();
-				}).then(function(){
-					updateGroupFace();
-				}).catch(function(err){
-					console.log(err);
-				})
-				
-		}
-		
-		//获取每个组的人脸,并存入数据库
-		function getPersonGroup() {
-			getGroup().then(function(group_res) {
-				let num = group_res.rows.length;
-				for (let i = 0; i < num; i++) {
-					let image_path = group_res.rows.item(i).image_path;
-					let group_id = group_res.rows.item(i).group_id;
-					let width = group_res.rows.item(i).width;
-					let top = group_res.rows.item(i).top;
-					let left = group_res.rows.item(i).left;
-					let height = group_res.rows.item(i).height;
-					let image_num = group_res.rows.item(i).image_num;
-					//let face_src = group_res.rows.item(i).face_src;
-					// console.log(face_src);
-					// console.log(group_id);
-					getGroupFaceById(group_id).then(function(res) {
-						// console.log(res.rows.length);
-						if (res.rows.length == 0) {
-							let face_src = getFaceData(image_path, width, top, left, height);
-							InsertToGroupFace(group_id, face_src, image_num);
-						}
-						UpdateImageNum(group_id, image_num);
-					}).catch(function(err) {
-						console.log(err);
-					})
-				}
-			}).catch(function(err) {
-				console.log(err);
-			});
-		}
-		
-		//获取人脸区域的路径
-		function getFaceData(image_path, width, top, left, height) {
-		//	var rects = face_rect.split('-');
-			var faceW = width;
-			var faceY = top;
-			var faceX = left;
-			var faceH = height;
-			let image = document.getElementById('img');
-			image.src = image_path;
-			let c = document.getElementById('can');
-			var ctx = c.getContext('2d');
-			ctx.drawImage(image, faceX, faceY, faceW, faceH, 0, 0, 300, 150);
-			var face_url = c.toDataURL('image/png');
-			return face_url;
-		}
-		
-		//上传新照片后更新人物的分组
-		function updateGroupFace() {
-			getGroupFace().then(function(e) {
-				for (let i = 0; i < e.rows.length; i++) {
-					let group_id = e.rows.item(i).group_id;
-					getFaceByGroup(group_id).then(function(res) {
-						let length = res.rows.length;
-						if (length == 0) {
-							DeleteGroup(group_id);
-							DeleteRelation(group_id);
-						}
-					}).catch(function(error) {
-						console.log(error);
-					})
-				}
-			}).catch(function(error) {
-				console.log(error);
-			})
-		};
+		});		
 		
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({
@@ -441,7 +322,6 @@
 		function setHtml(){
 			jQuery('#image-content').empty();
 			getAllImage().then(function(result){
-				console.log(result.rows.length);
 				for (var i=0;i<result.rows.length;i++) {
 					// console.log(data[i].image_name);
 					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +
@@ -451,44 +331,7 @@
 			}).catch(function(err){
 				console.log(err);
 			});
-		}
-		
-		//查询人物照片获取人脸路径添加到person表中
-		function getPersonFace(){
-			let image_type = '人物';
-			getTypeOne(image_type).then(function(res){
-				for(let i=0; i<res.rows.length; i++){
-					let path = res.rows.item(i).image_path;
-					getPersonImage(path).then(function(e){
-						let src = path;
-						for(let j=0; j<e.rows.length; j++){
-							let face_token = e.rows.item(j).face_token;	
-							let src = e.rows.item(j).face_src;
-							if(src == null || src == ''){
-								let width =e.rows.item(j).width;
-								let top = e.rows.item(j).top;
-								let left = e.rows.item(j).left;
-								let height = e.rows.item(j).height;
-								let face_src = getFaceData(path, width, top, left, height);
-								UpdateToPerson(path,face_token,face_src);
-								// var image_face=face_src.replace(/data:image\/.*;base64,/,'');
-								// let params={'image_base64' : image_face,"return_attributes": "gender,age,beauty,ethnicity,emotion"};
-								// facepp.detectFace(params, function success(e){
-								// 	console.log(JSON.stringify(e));
-								// },function failed(err){
-								// 	console.log(JSON.stringify(err));
-								// })
-							}							
-						}
-					}).catch(function(e){
-						console.log(e);
-					})
-				}
-			}).catch(function(err){
-				console.log(err);
-			})
-		}
-			
+		}			
 	</script>
 
 </html>

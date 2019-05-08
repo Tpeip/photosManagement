@@ -222,17 +222,26 @@
 	<script src="../js/mui.min.js"></script>
 	<script src="../js/jquery.min.js"></script>
 	<script src="../js/mui.zoom.js"></script>
-	<script src="../js/mui.previewimage.js"></script>
+	<script src="../js/mui.previewimage2.js"></script>
 	<script src="../js/websql.js"></script>
+	<script src="../js/person.js"></script>
 	<script type="text/javascript">
 		mui.init({
 			swipeBack: true
-		});
+		});	
 		var type = localStorage.getItem('type');
 		var types = type.split('-');
 
 		mui.plusReady(function() {
 			replaceHeader();
+			setPhotoHtml();
+		});
+		
+		function setPhotoHtml(){
+			console.log(12343556);
+			var type = localStorage.getItem('type');
+			var types = type.split('-');
+			jQuery('#image-content').empty();
 			if (types[0] == 'type') {
 				getTypeOne(types[1]).then(function(result) {
 					for (let i = 0; i < result.rows.length; i++) {
@@ -264,7 +273,7 @@
 					console.log(err);
 				})
 			}
-		});
+		}
 		// mui.previewImage();
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({
@@ -284,6 +293,7 @@
 		}
 		document.getElementById('backing').addEventListener('tap', function() {
 			plus.webview.currentWebview().close();
+			
 		});
 	</script>
 

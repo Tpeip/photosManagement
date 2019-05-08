@@ -171,9 +171,12 @@
 		var deleteImage = function(image_path){
 			getImageByPath(image_path).then(function(imageRes){
 				let image_type = imageRes.rows.item(0).image_main_type;
-				deleteOneImage(image_path).then(function(){					
-					setHtml();	
-					getPersonGroup();
+				deleteOneImage(image_path).then(function(){							
+					getPersonGroup();					
+					getImages();
+					getFace();
+// 					var list = plus.webview.currentWebview().opener();
+// 					mui.fire(list, 'refresh');
 				});
 				if(image_type == '人物'){
 					getPersonImage(image_path).then(function(personRes){

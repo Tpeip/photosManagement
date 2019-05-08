@@ -732,14 +732,23 @@
 			},'div');
 		}).catch(function(err) {
 			console.log(JSON.stringify(err));
+			var length = fileArr.length;
 			wt.close();
 			var btnArray = ['确定'];
-			mui.alert(' ', '上传失败', btnArray, function(e) {
-				//console.log(e.index);
-				if(e.index == 0){
-					refreshParent();					
-				}				
-			},'div');
+			if(length ==0){
+				mui.alert(' ', '请选择照片', btnArray, function(e){
+					if(e.index == 0){
+						chooseImage();
+					}					
+				}, 'div');
+			}else{
+				mui.alert(' ', '上传失败', btnArray, function(e) {
+					//console.log(e.index);
+					if(e.index == 0){
+						refreshParent();					
+					}				
+				},'div');
+			}			
 		});
 	});
 </script>

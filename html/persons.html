@@ -90,15 +90,25 @@
 		<script src="../js/jquery.min.js"></script>
 		<script src="../js/websql.js"></script>
 		<script type="text/javascript">
-			mui.init();
+			mui.init({
+				beforeback: function() {
+					//获得父页面的webview
+					var listpage = plus.webview.currentWebview().opener();
+					//触发父页面的自定义事件(refresh),从而进行刷新
+					mui.fire(listpage, 'refresh');
+					//返回true,继续页面关闭逻辑
+					return true;
+				}
+			});
 			window.addEventListener('refresh', function(e) { //执行刷新
-				location.reload();
+				setHtml();
 			});
 			mui.plusReady(function() {
 				setHtml();
 			})
 
 			function setHtml() {
+				jQuery('#content').empty();
 				var html = '';
 				getGroupFace().then(function(e) {
 // 					console.log(e.rows.length);

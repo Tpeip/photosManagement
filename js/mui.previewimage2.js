@@ -1,3 +1,4 @@
+// document.write("<script language=javascript src='websql.js'></script>");
 (function($, window) {
 
 	var template =
@@ -5,25 +6,21 @@
 			'<div class="mui-preview-header">'+
 				'<header id="header-nav" class="mui-bar mui-bar-nav">'+
 				'<div id="back"><a class="mui-icon mui-icon-left-nav mui-pull-left" style="font-size:28px;"></a></div>' +
-				'<a id="menu" class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;font-weight:bold;" href="#popover"></a>{{header}}' +
+				'<div id="info"><a class="mui-icon mui-icon-info mui-pull-right" style="font-size:28px;"></a></div>{{header}}' +
 				'</header>'+
 			'</div>'+
-			'<div class="mui-slider-group"></div>' +
-			'<div id="popover" class="mui-popover" style="height: 250px;">'+
-				'<div class="mui-popover-arrow"></div>'+
-				'<div>我是自定义位置弹出层</div>'+
-			'</div>'+
+			'<div class="mui-slider-group" ></div>' +
 			'<div class="mui-preview-footer mui-hidden" style="box-shadow:1px 1px 4px 1px #ccc inset">'+
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
-						'<a id="delete" class="mui-tab-item" style="text-align:center;vertical-align:middle;">'+
-							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;font-weight:bolder;"></span>'+
+						'<a id="delete" class="mui-tab-item" style="color:black;text-align:center;vertical-align:middle;">'+
+							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a class="mui-tab-item" href=""></a>'+
 						'<a id="forward" class="mui-tab-item">'+
-							'<span class="mui-icon mui-icon-redo" style="font-size:32px;margin-bottom:14px;font-weight:bolder;"></span>'+
+							'<span class="mui-icon mui-icon-redo" style="color:black;font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
 					'</nav>'+'{{footer}}'+
 				'</div>'+
@@ -45,13 +42,13 @@
 // 					'</ul>'+
 // 				'</div>'+
 			'</div>'+
-			'<div class="mui-preview-loading">'+
+			'<div class="mui-preview-loading" >'+
 				'<span class="mui-spinner mui-spinner-white"></span>'+
 			'</div>'+
 		'</div>';
 	//scroller
 	var itemTemplate =
-		'<div id="slide" class="mui-slider-item mui-zoom-wrapper mui-color {{className}}">' +
+		'<div id="slide" class="mui-slider-item mui-zoom-wrapper mui-color {{className}}" style="background-color:white">' +
 		'<div class="mui-zoom-scroller">' +
 		'<img src="{{src}}" data-preview-lazyload="{{lazyload}}" style="{{style}}" class="mui-zoom" >' +
 		'</div>' +
@@ -89,17 +86,17 @@
 			back = document.getElementById('back');
 			del = document.getElementById('delete');
 			forward = document.getElementById('forward');
+			info = document.getElementById('info');
 		}
 
 		this.element = el; //template区域
 		this.scroller = this.element.querySelector($.classSelector('.slider-group'));
-// 		this.scrollers = this.element.querySelector($.classSelector('.slider-item'));
-// 		console.log(scrollers);
 		this.indicator = this.element.querySelector($.classSelector('.preview-indicator'));
 		this.loader = this.element.querySelector($.classSelector('.preview-loading'));
 		this.backer = back;
 		this.deleter = del;
 		this.forwarder = forward;
+		this.infoer = info;
 		this.header = this.element.querySelector($.classSelector('.preview-header'));
 		// console.log("header",this.header);
 		this.footer = this.element.querySelector($.classSelector('.preview-footer'));
@@ -151,37 +148,134 @@
 				var index = event.index;
 				switch(index){
 					case 0:
+					    
 						break;
-					case 1:
-					    break;
+					case 1:{
+						var image_path = localStorage.getItem('path');
+						// self.openByGroup(0,1);
+						deleteImage(image_path);
+						self.close();												
+						
+						// self.open(this);
+						// var list = plus.webview.currentWebview().opener();
+						//触发列表界面的自定义事件（refresh）,从而进行数据刷新
+						// mui.fire(list, 'refresh');
+						// plus.webview.currentWebview().close();
+						break;
+					}
+					   
 				}
 			});
 			this.classList.remove('mui-active');
 		};
-		var laterForwardEvent = function(){
-			var buttonAry = [
-				{
-					title: '分享',
-				},
-				{
-					title: '打印'
+		var deleteImage = function(image_path){
+			getImageByPath(image_path).then(function(imageRes){
+				let image_type = imageRes.rows.item(0).image_main_type;
+				deleteOneImage(image_path).then(function(){							
+					getPersonGroup();
+					setPhotoHtml();
+					var list = plus.webview.currentWebview().opener();
+					mui.fire(list, 'refresh');
+				});
+				if(image_type == '人物'){
+					getPersonImage(image_path).then(function(personRes){
+						deleteOnePerson(image_path);
+						let length = personRes.rows.length;
+						for(let i = 0;i < length; i++){
+							let group_id = personRes.rows.item(i).group_id;
+							let face_src = personRes.rows.item(i).face_src;
+							getGroupFaceById(group_id).then(function(groupRes){
+								let image_num = groupRes.rows.item(0).image_num;
+								let group_face_src = groupRes.rows.item(0).face_src;
+								if(image_num == 1){
+									DeleteGroup(group_id);
+									DeleteRelation(group_id);
+								}else{
+									if(face_src == group_face_src){
+										getFaceByGroup(group_id).then(function(res){
+											let new_face_src = res.rows.item(0).face_src;
+											UpdateGroupFaceSrc(group_id, new_face_src);
+										})
+									}
+								}
+							})
+						}
+					})
 				}
-				];
+			})
+		};
+		var laterForwardEvent = function(){
+				var ids = [{
+					id: "weixin",
+					ex: "WXSceneSession"
+				}, {
+					id: "weixin",
+					ex: "WXSceneTimeline"
+				}, {
+					id: "qq"
+				}, {
+					id: "sinaweibo"
+				}],
+				bts = [{
+					title: "发送给微信好友"
+				}, {
+					title: "分享到微信朋友圈"
+				}, {
+					title: "分享到QQ"
+				}, {
+					title: "分享到新浪微博"
+				}];
 			plus.nativeUI.actionSheet({
-				cancel: '取消',
-				buttons: buttonAry
-			},function(event){
-				var index = event.index;
-				switch(index){
-					case 0:
-						break;
-					case 1:
-					    break;
-					case 2:
-						break;
+				cancel: "取消",
+				buttons: bts
+			}, function(e) {
+				var i = e.index;
+				if (i > 0) {
+					var s_id = ids[i - 1].id;
+					var share = shares[s_id];
+					if (share) {
+						if (share.authenticated) {
+							shareMessage(share, ids[i - 1].ex);
+						} else {
+							share.authorize(function() {
+								shareMessage(share, ids[i - 1].ex);
+							}, function(e) {
+								console.log("认证授权失败：" + e.code + " - " + e.message);
+							});
+						}
+					} else {
+						mui.toast("无法获取分享服务，请检查manifest.json中分享插件参数配置，并重新打包")
+					}
 				}
 			});
-			this.classList.remove('mui-active');
+		};
+		
+		var shareMessage = function (share, ex) {
+			var path = localStorage.getItem('path');
+			var msg = {
+				content: "图片分享",
+				pictures: [],
+				extra: {
+					scene: ex
+				}
+			};
+			msg.pictures.push(path);
+			share.send(msg, function() {
+				console.log("分享到\"" + share.description + "\"成功！ ");
+			}, function(e) {
+				console.log("分享到\"" + share.description + "\"失败: " + e.code + " - " + e.message);
+			});
+		}
+		
+		var laterOpenEvent = function(){
+			mui.openWindow({
+				url: 'info.html',
+				show: {
+					autoShow: true,
+					aniShow: 'slide-in-top',
+					duration: 500
+				}
+			});
 		};
 		// 		this.scroller.addEventListener('tap',function(){
 		// 			this.footer.classList.add($.className('hidden'));
@@ -206,6 +300,7 @@
                 self.backer.addEventListener('tap', laterCloseEvent);
 				self.deleter.addEventListener('tap',laterDeleteEvent);
 				self.forwarder.addEventListener('tap',laterForwardEvent);
+				self.infoer.addEventListener('tap',laterOpenEvent);
 			}
 		});
 		this.element.addEventListener('slide', function(e) {
@@ -216,6 +311,7 @@
 				}
 			}
 			var slideNumber = e.detail.slideNumber;
+			// console.log(slideNumber);
 			self.lastIndex = slideNumber;
 			self.indicator && (self.indicator.innerText = (slideNumber + 1) + '/' + self.currentGroup.length);
 			self._loadItem(slideNumber);
@@ -235,6 +331,7 @@
 			imgs = document.querySelectorAll("img[data-preview-src]");
 		}
 		if (imgs.length) {
+			// console.log(imgs.length);
 			for (var i = 0, len = imgs.length; i < len; i++) {
 				this.addImage(imgs[i]);
 			}
@@ -305,12 +402,25 @@
 		img.removeEventListener('webkitTransitionEnd', this._imgTransitionEnd.bind(this));
 	};
 	proto._loadItem = function(index, isOpening) { //TODO 暂时仅支持img
+// 	    console.log(index);
+// 		console.log(isOpening);
 		var itemEl = this.scroller.querySelector($.classSelector('.slider-item:nth-child(' + (index + 1) + ')'));
+// 		var white = true;
+// 		itemEl.addEventListener('tap',function(){
+// 			if(white){
+// 				this.classList.remove('mui-color');
+// 				white = false;
+// 			}else{
+// 				this.classList.add('mui-color');
+// 				white = true;
+// 			}			
+// 		});
 		var itemData = this.currentGroup[index];
 		var imgEl = itemEl.querySelector('img');
 		//获取照片路径
 		currentPreviewSrc = imgEl.src;
-		// console.log("src", currentPreviewSrc);
+		// console.log(currentPreviewSrc);
+		localStorage.setItem('path',currentPreviewSrc);
 		this._initImgData(itemData, imgEl);
 		if (isOpening) {
 			var posi = this._getPosition(itemData);
@@ -475,10 +585,14 @@
 		this._loadItem(currentIndex, true);
 	};
 	proto.openByGroup = function(index, group) {
+// 		console.log(index);
+// 		console.log(group);
 		index = Math.min(Math.max(0, index), this.groups[group].length - 1);
 		this.refresh(index, this.groups[group]);
 	};
 	proto.open = function(index, group) {
+// 		console.log(index);
+// 		console.log(group);
 		if (this.isShown()) {
 			return;
 		}
@@ -489,6 +603,8 @@
 			this.openByGroup(index, group);
 		} else {
 			group = index.getAttribute('data-preview-group');
+// 			console.log(group);
+// 			console.log(index);
 			group = group || defaultGroupName;
 			this.addImages(group, index); //刷新当前group
 			this.openByGroup(this.groups[group].indexOf(index.__mui_img_data), group);
