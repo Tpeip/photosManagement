@@ -335,6 +335,34 @@
 	document.getElementById("choose").addEventListener('tap', function() {
 		chooseImage();
 	}, false);
+	
+	mui.back = function(){
+		var el = document.getElementById("imgs");
+		if (el.childNodes.length == 5) {
+			refreshParent();
+		} else {
+			var buttonAry = [{
+				title: '放弃上传',
+				style: 'destructive'
+			}];
+			plus.nativeUI.actionSheet({
+				cancel: '取消',
+				buttons: buttonAry
+			}, function(event) {
+				var index = event.index;
+				switch (index) {
+					case 0:
+						break;
+					case 1:
+						{
+							refreshParent();
+							break;
+						}
+				}
+			});
+		}
+	};
+	
 	//刷新父页面数据并且关闭当前页面
 	function refreshParent() {
 		//获得列表界面的webview
