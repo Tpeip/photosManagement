@@ -618,7 +618,15 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		Promise.all(pm).then(function(result) {
+		Promise.all(pm).then(function() {
+			let num = files.length;
+			return InsertToImage(num, imageArr);
+		}).then(function(result) {
+			if (per_num == 0)
+				return result;
+			else
+				return InsertToPerson(per_num, person);
+		}).then(function(result) {
 			let len = per_path.length;
 			let proArr = [];
 			for (let i = 0; i < len; i++) {
@@ -713,14 +721,6 @@
 					reject(err);
 				});
 			});
-		}).then(function() {
-			let num = files.length;
-			return InsertToImage(num, imageArr);
-		}).then(function(result) {
-			if (per_num == 0)
-				return result;
-			else
-				return InsertToPerson(per_num, person);
 		}).then(function(result) {
 			wt.close();
 			var btnArray = ['确定'];
