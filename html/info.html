@@ -186,7 +186,8 @@
 								let age = e.rows.item(i).age;								
 								let gender = e.rows.item(i).gender;
 								let beauty = e.rows.item(i).beauty;
-								let ethnicity = e.rows.item(i).ethnicity;                                
+								let ethnicity = e.rows.item(i).ethnicity; 
+								let emotion = e.rows.item(i).emotion;  
                                 var person_html = '<div class="mui-row">'+
 													   '<div class="mui-media mui-col-xs-3">'+
 														   '<img class="face" src=\"'+ face_src +'\" />'+
@@ -196,6 +197,7 @@
 														   '<p class="person-tags">性别：<label>'+ gender +'</label></p>'+
 														   '<p class="person-tags">颜值：<label>'+ beauty +'</label></p>'+
 														   '<p class="person-tags">种族：<label>'+ ethnicity +'</label></p>'+
+														   '<p class="person-tags">表情：<label>'+ emotion +'</label></p>'+
 														'</div>'+
 												   '</div>';
 								persons_html = persons_html + person_html;

@@ -204,7 +204,7 @@ function createPersonImage() {
 	var tableName = 'person';
 	var params =
 		"personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num INTEGER, face_token text," +
-		" width INTEGER, top INTEGER, left INTEGER, height INTEGER, age INTEGER, gender text, beauty text, ethnicity text, face_src text, group_id text";
+		" width INTEGER, top INTEGER, left INTEGER, height INTEGER, age INTEGER, gender text, beauty text, ethnicity text, emotion text, face_src text, group_id text";
 	websqlCreatTable(tableName, params);
 }
 
@@ -295,9 +295,9 @@ function getFaceByGroup(group_id) {
 function InsertToPerson(num, personArr) {
 	websqlOpenDB();
 	var insertImageSQL =
-		'INSERT INTO person (image_path,person_num, face_token, width, top, left, height, age, gender, beauty, ethnicity) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+		'INSERT INTO person (image_path,person_num, face_token, width, top, left, height, age, gender, beauty, ethnicity, emotion) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)';
 	for (var i = 0; i < num - 1; i++) {
-		insertImageSQL += ',(?,?,?,?,?,?,?,?,?,?,?)';
+		insertImageSQL += ',(?,?,?,?,?,?,?,?,?,?,?,?)';
 	}
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
@@ -521,7 +521,7 @@ function DeleteGroup(group_id) {
 
 function createRelation() {
 	var tableName = 'relation';
-	var params = " person_core text NOT NULL, person_main text NOT NULL, person_relation text, person_intimacy integer, PRIMARY KEY(person_core, person_main)";
+	var params = " person_core text NOT NULL, person_main text NOT NULL, person_relation text, person_intimacy integer, image_num INTEGER, PRIMARY KEY(person_core, person_main)";
 	websqlCreatTable(tableName, params);
 }
 
@@ -560,12 +560,12 @@ function getOneRelation(person_core, person_main) {
 }
 
 
-function InsertToRelation(person_core, person_main, person_relation, person_intimacy) {
+function InsertToRelation(person_core, person_main, person_relation, person_intimacy, image_num) {
 	websqlOpenDB();
-	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy) VALUES (?,?,?,?)';
+	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy, image_num) VALUES (?,?,?,?,?)';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy], function(ctx, result) {
+			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy, image_num], function(ctx, result) {
 					// console.log("插入成功");
 					resolve(result);
 				},
@@ -610,12 +610,30 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 	return pm;
 }
 
-function UpdatePersonIntimacy(person_core, person_main, person_intimacy) {
+function UpdatePersonIntimacy(person_core, person_main, person_relation, person_intimacy, image_num) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE relation SET person_intimacy=? WHERE person_core=? and person_main=? ';
+	var updateSQL = 'UPDATE relation SET person_relation=?,person_intimacy=?,image_num=? WHERE person_core=? and person_main=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [person_intimacy, person_core, person_main], function(ctx, result) {
+			ctx.executeSql(updateSQL, [person_relation, person_intimacy, image_num, person_core, person_main], function(ctx, result) {
+					// console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function UpdateRelationImageNum(person_core, person_main, image_num) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE relation SET image_num=? WHERE person_core=? and person_main=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [image_num, person_core, person_main], function(ctx, result) {
 					console.log("更新成功");
 					resolve(result);
 				},
@@ -646,3 +664,20 @@ function DeleteRelation(group_id) {
 	return pm;
 }
 
+function DeleteOneRelation(person_core, person_main) {
+	websqlOpenDB();
+	var deleteSQL = 'DELETE FROM relation WHERE person_core=? and person_main=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteSQL, [person_core, person_main], function(ctx, result) {
+					// console.log("删除成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('删除失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}

@@ -163,6 +163,7 @@
 		function getPersonIntimacy(group_id) {
 			var promiseArr = [];
 			let persons_intimacy = {};
+			let persons_intimacy_num = {};
 			getFaceByGroup(group_id).then(function(e) {
 				var image_num = e.rows.length;
 				for (let i = 0; i < e.rows.length; i++) {
@@ -191,11 +192,12 @@
 				Promise.all(promiseArr).then(function() {
 					// console.log(JSON.stringify(persons_intimacy));
 					for (let id in persons_intimacy) {
+						persons_intimacy_num[id] = persons_intimacy[id];
 						persons_intimacy['' + id + ''] = parseInt(persons_intimacy['' + id + ''] / image_num * 100);
 						// console.log(persons_intimacy[''+ id +'']);
 					}
 					// console.log(JSON.stringify(persons_intimacy));
-					handleCorePerson(persons_intimacy, group_id);
+					handleCorePerson(persons_intimacy, group_id, persons_intimacy_num);
 				})
 			}).catch(function(err) {
 				console.log(err);
@@ -203,12 +205,12 @@
 		}
 		
 		//处理核心人物所有照片中的人脉关系
-		function handleCorePerson(persons_intimacy, group_id) {
+		function handleCorePerson(persons_intimacy, group_id, persons_intimacy_num) {
 			getFaceByGroup(group_id).then(function(e) {
 				var image_num = e.rows.length;
 				for (let i = 0; i < e.rows.length; i++) {
 					let image_path = e.rows.item(i).image_path;
-					handleOneImage(persons_intimacy, image_path, group_id);
+					handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy_num);
 				}
 			}).catch(function(err) {
 				console.log(err);
@@ -216,7 +218,7 @@
 		}
 		
 		//获取一张照片中核心人物与相关人物间的关系
-		function handleOneImage(persons_intimacy, image_path, group_id) {
+		function handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy_num) {
 			getPersonImage(image_path).then(function(res) {
 				let person_core;
 				let persons_main = [];
@@ -242,57 +244,105 @@
 					let persons_num = persons_main.length;
 					let id = persons_main[i].group_id;
 					getOneRelation(person_core.group_id, id).then(function(e) {
-						if (e.rows.length == 0) {
+						// if (e.rows.length == 0) {
 							// if(persons_num == 1){
 							if (persons_main[i].gender != person_core.gender) {
 								if (person_core.age > 20) {
 									if (Math.abs(persons_main[i].age - person_core.age) <= 10) {
 										if (persons_intimacy[id] >= 60) {
-											InsertToRelation(person_core.group_id, id, relations[8], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
 											person_core.age) <=25 ) {
 										if (persons_intimacy[id] >= 50) {
-											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else {
 										if (persons_intimacy[id] >= 60) {
 											if (person_core.age > persons_main[i].age) {
-												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[7], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id], persons_intimacy_num[id]);
 											} else {
-												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									}
 								} else {
 									if (Math.abs(persons_main[i].age - person_core.age) <= 3) {
 										if (persons_intimacy[id] >= 20) {
-											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[1], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else if (Math.abs(persons_main[i].age - person_core.age) >= 23) {
 										if (persons_intimacy[id] >= 60) {
-											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
 										} else if (persons_intimacy[id] >= 50 && persons_intimacy[id] < 60) {
-											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else {
-										InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+										if(e.rows.length != 0){
+											UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+										}else
+										InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 									}
 								}
 							} else {
@@ -300,65 +350,122 @@
 									if (Math.abs(persons_main[i].age - person_core.age) <= 10) {
 										if (persons_intimacy[id] >= 40) {
 											if (person_core.gender == '男') {
-												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[3], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id], persons_intimacy_num[id]);
 											} else {
-												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[4], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 40) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
 											person_core.age) < 22) {
 										if (persons_intimacy[id] >= 50) {
-											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else {
 										if (persons_intimacy[id] >= 60) {
 											if (person_core.age > persons_main[i].age) {
-												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[7], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[7], persons_intimacy[id], persons_intimacy_num[id]);
 											} else {
-												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
-											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									}
 								} else {
 									if (Math.abs(persons_main[i].age - person_core.age) <= 3) {
 										if (persons_intimacy[id] >= 20) {
-											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[1], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[1], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else if (Math.abs(persons_main[i].age - person_core.age) >= 23) {
 										if (persons_intimacy[id] >= 60) {
-											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
 										} else if (persons_intimacy[id] >= 50 && persons_intimacy[id] < 60) {
-											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} else {
 										if (persons_intimacy[id] >= 40) {
 											if (person_core.gender == '男') {
-												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[3], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[3], persons_intimacy[id], persons_intimacy_num[id]);
 											} else {
-												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id]);
+												if(e.rows.length != 0){
+													UpdatePersonIntimacy(person_core.group_id, id, relations[4], persons_intimacy[id], persons_intimacy_num[id]);
+												}else
+												InsertToRelation(person_core.group_id, id, relations[4], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else {
-											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id]);
+											if(e.rows.length != 0){
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+											}else
+											InsertToRelation(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									}
 								}
-							}
+							// }
 							// }
 						}
 		

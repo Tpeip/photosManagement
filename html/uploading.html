@@ -504,7 +504,7 @@
 					// console.log(image_main_type);
 					return new Promise((resolve, reject) => {
 						facepp.detectFace(params, function success(e) {
-							// console.log(JSON.stringify(e));
+							 // console.log(JSON.stringify(e));
 							let face_num = e.faces.length;
 							if(face_num == 0){
 								let nu = imageArr.indexOf(image_path);
@@ -517,6 +517,9 @@
 								}
 							}else{
 								per_path.push(image_path);
+								if(face_num > 5){
+									face_num = 5;
+								}
 								for (let k = 0; k < face_num; k++) {
 									per_num++;
 									let face_token = e.faces[k].face_token;
@@ -536,6 +539,47 @@
 										beauty = e.faces[k].attributes.beauty.male_score;
 									}
 									let ethnicity = e.faces[k].attributes.ethnicity.value;
+									let emotions = e.faces[k].attributes.emotion;
+									let emotionEng = 'sadness';
+									let score = emotions.sadness;
+									for(let t in emotions){
+										if(emotions[t] > score){
+											emotionEng = t;
+											score = emotions[t];
+										}
+									}
+									let emotion = emotionEng;
+									switch(emotionEng){
+										case 'sadness' : {
+											emotion = '伤心';
+											break;
+										} 
+										case 'neutral' : {
+											emotion = '平静';
+											break;
+										} 
+										case 'disgust' : {
+											emotion = '反感';
+											break;
+										} 
+										case 'anger' : {
+											emotion = '生气';
+											break;
+										} 
+										case 'surprise' : {
+											emotion = '惊讶';
+											break;
+										} 
+										case 'fear' : {
+											emotion = '害怕';
+											break;
+										} 
+										case 'happiness' : {
+											emotion = '高兴';
+											break;
+										} 
+										default : break;
+									}
 									person.push(image_path);
 									person.push(face_num);
 									person.push(face_token);
@@ -547,6 +591,7 @@
 									person.push(gender);
 									person.push(beauty);
 									person.push(ethnicity);
+									person.push(emotion);
 								
 								}
 								resolve(e);
@@ -582,7 +627,7 @@
 		if (ps != -1) {
 			let nm = person[ps + 1];
 			per_num = per_num - nm;
-			person.splice(ps, nm * 11);
+			person.splice(ps, nm * 12);
 		}
 	}
 
@@ -646,7 +691,7 @@
 					}, function failed(err) {
 						//console.log(JSON.stringify(err));
 						if (err.responseJSON.error_message == 'NO_FACE_FOUND')
-							return;
+							resolve();
 						else
 							reject(err);
 					})

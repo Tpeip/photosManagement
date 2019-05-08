@@ -182,8 +182,10 @@
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
 						let length = personRes.rows.length;
+						let group = []
 						for(let i = 0;i < length; i++){
 							let group_id = personRes.rows.item(i).group_id;
+							group.push(group_id);
 							let face_src = personRes.rows.item(i).face_src;
 							getGroupFaceById(group_id).then(function(groupRes){
 								let image_num = groupRes.rows.item(0).image_num;
@@ -200,6 +202,25 @@
 									}
 								}
 							})
+						}
+						for(let i = 0;i < group.length; i++){
+							let person_core = group[i];
+							for(let j = 0; j < group.length; j++){
+								let person_main = group[j];
+								if(person_core != person_main){
+									getOneRelation(person_core, person_main).then(function(relRes){
+										if(relRes.rows.length !=0){
+											let old_image_num = relRes.rows.item(0).image_num;
+											let image_num = old_image_num - 1;
+											if(image_num == 0){
+												DeleteOneRelation(person_core, person_main);
+											}else{
+												UpdateRelationImageNum(person_core, person_main, image_num);
+											}
+										}
+									})
+								}
+							}
 						}
 					})
 				}
