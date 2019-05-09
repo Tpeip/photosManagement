@@ -521,7 +521,7 @@ function DeleteGroup(group_id) {
 
 function createRelation() {
 	var tableName = 'relation';
-	var params = " person_core text NOT NULL, person_main text NOT NULL, person_relation text, person_intimacy integer, image_num INTEGER, PRIMARY KEY(person_core, person_main)";
+	var params = " person_core text NOT NULL, person_main text NOT NULL, person_relation text, person_intimacy integer, image_num INTEGER, modify_flag INTEGER, PRIMARY KEY(person_core, person_main)";
 	websqlCreatTable(tableName, params);
 }
 
@@ -562,10 +562,10 @@ function getOneRelation(person_core, person_main) {
 
 function InsertToRelation(person_core, person_main, person_relation, person_intimacy, image_num) {
 	websqlOpenDB();
-	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy, image_num) VALUES (?,?,?,?,?)';
+	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy, image_num, modify_flag) VALUES (?,?,?,?,?,?)';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy, image_num], function(ctx, result) {
+			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy, image_num, 0], function(ctx, result) {
 					// console.log("插入成功");
 					resolve(result);
 				},
@@ -581,32 +581,53 @@ function InsertToRelation(person_core, person_main, person_relation, person_inti
 
 function UpdatePersonRelation(person_core, person_main, person_relation) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE relation SET person_relation=? WHERE person_core=? and person_main=? ';
-	var person_relation1 = person_relation;
-	if(person_relation == '父母'){
-		person_relation1 = '孩子';
-	}
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [person_relation, person_core, person_main], function(ctx, result) {
-					console.log("更新成功");
-					// resolve(result);
-					//return ;
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
-			ctx.executeSql(updateSQL, [person_relation1, person_main, person_core], function(ctx, result) {
-					console.log("更新成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
+	var updateSQL = 'UPDATE relation SET person_relation=?,modify_flag=? WHERE person_core=? and person_main=? ';
+	var pm ;
+	if(person_relation == '爱人' ||person_relation == '父母' || person_relation == '孩子'){
+		var person_relation1 = person_relation;
+		if(person_relation == '父母'){
+			person_relation1 = '孩子';
+		}
+		if(person_relation == '孩子'){
+			person_relation1 = '父母';
+		}
+		pm = new Promise(function(resolve, reject) {
+			dataBase.transaction(function(ctx) {
+				ctx.executeSql(updateSQL, [person_relation, 1, person_core, person_main], function(ctx, result) {
+						console.log("更新成功");
+						// resolve(result);
+						//return ;
+					},
+					function(tx, error) {
+						console.log('更新失败: ' + error.message);
+						reject(error);
+					});
+				ctx.executeSql(updateSQL, [person_relation1, 1, person_main, person_core], function(ctx, result) {
+						console.log("更新成功");
+						resolve(result);
+					},
+					function(tx, error) {
+						console.log('更新失败: ' + error.message);
+						reject(error);
+					});
+			});
 		});
-	});
+	}else{
+		pm = new Promise(function(resolve, reject) {
+			dataBase.transaction(function(ctx) {
+				ctx.executeSql(updateSQL, [person_relation, 1, person_core, person_main], function(ctx, result) {
+						console.log("更新成功");
+						 resolve(result);
+						//return ;
+					},
+					function(tx, error) {
+						console.log('更新失败: ' + error.message);
+						reject(error);
+					});
+			});
+		});
+	}
+	
 	return pm;
 }
 
