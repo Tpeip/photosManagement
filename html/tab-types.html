@@ -20,7 +20,7 @@
 			}
 			.label-font{
 				font-size: 14px;
-				color: #6D6D72;
+				color:  #0062CC;
 			}
 			.icon-style{
 				font-size: 18px;
@@ -60,7 +60,7 @@
 		<div id="image-types-person" class="mui-content">
 			<div id="" class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
-				<label class="mui-tab-label label-font">人物</label>
+				<label class="mui-tab-label label-font">数量</label>
 				<div id="persons">
 					<!-- <p class="image-border" onclick="turnTo()">
 						<img class="images" src="images/shuijiao.jpg" />
@@ -72,6 +72,13 @@
 						<label class="label-photo-type">合照</label><br>
 						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
 					</p> -->
+				</div>
+			</div>
+			<div id="" class="mui-content-padded">
+				<label class="mui-icon mui-icon-paperplane icon-style"></label>
+				<label class="mui-tab-label label-font">年龄</label>
+				<div id="persons-type">
+				
 				</div>
 			</div>
 			<div class="mui-content-padded">
@@ -98,103 +105,20 @@
 		</div>
 		
 	</body>
-	<script type="text/javascript" src="../js/mui.min.js"></script>
 	<script type="text/javascript" src="../js/mui.js"></script>
-	<!-- <script type="text/javascript" src="../js/common.js"></script>
-	<script type="text/javascript" src="../js/exif.js"></script>
-	<script type="text/javascript" src="../js/facepp_sdk.js"></script> -->
 	<script type="text/javascript" src="../js/jquery.min.js"></script>
 	<script type="text/javascript" src="../js/mui.zoom.js"></script>
 	<script type="text/javascript" src="../js/mui.previewimage.js"></script>
 	<script src="../js/websql.js"></script>
+	<script src="../js/types.js"></script>
 	<script type="text/javascript">
 		mui.init();	
 		getPersonType();
 		getImageType();
+		getOtherType();
 		window.addEventListener('refresh', function(event) {
 			location.reload();
-		});
-	
-	    //获取所有照片的类型
-		function getImageType() {
-			getAllType().then(function(result) {
-				for (let i = 0; i < result.rows.length; i++) {
-					//console.log(JSON.stringify(result.rows.item(i)));
-					let image_type = result.rows.item(i).image_main_type;
-					getTypeOne(image_type).then(function(result) {
-						//console.log(JSON.stringify(result.rows.item(0)));
-						var image_path = result.rows.item(0).image_path;
-						var length = result.rows.length;
-						setTypeHtml(image_type, length, image_path);
-					}).catch(function(err) {
-						console.log(err);
-					})
-				}
-			}).catch(function(err) {
-				console.log(err);
-			});
-		}
-		
-		//获取人物照片类型
-		function getPersonType() {
-			for (let i = 1; i <= 3; i++) {
-				getPersonNumImage(i).then(function(e) {
-					if (e.rows.length != 0) {
-						let path = e.rows.item(0).image_path;
-						let length = e.rows.length;
-						setPersonHtml(path, length, i);
-					}
-				}).catch(function(e) {
-					console.log(e);
-				})
-			}
-		}
-		
-		//显示人物照片类型
-		function setPersonHtml(src, num, i) {
-			let person_num = '';
-			if (i == 1) {
-				person_num = '单人照';
-			} else if (i == 2) {
-				person_num = '双人照';
-			} else {
-				person_num = '合照';
-			}
-			var str = '';
-			var name = 'person-' + person_num;
-			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
-			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
-				'<img class="images" src="' + src + '" />' +
-				'<label class="label-photo-type">' + person_num + '</label>' + '<br>' +
-				'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
-				'</p>';
-			jQuery("#persons").append(str);
-		}
-		
-		//显示所有照片类型
-		function setTypeHtml(type, num, src) {
-			var str = '';
-			var name = 'type-' + type;
-			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
-				'<img class="images" src="' + src + '" />' +
-				'<label class="label-photo-type">' + type + '</label>' + '<br>' +
-				'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
-				'</p>';
-			jQuery("#types").append(str);
-		}
-		
-		//查看每个类型的所有照片
-		function turnTo(type) {
-			localStorage.setItem("type", type);
-			console.log(type);
-			mui.openWindow({
-				url: 'tab-types-photo.html',
-				show: {
-					autoShow: true,
-					aniShow: 'slide-in-right',
-					duration: 200
-				}
-			});
-		}
+		});	
+	    
 	</script>
 </html>

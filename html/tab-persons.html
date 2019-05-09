@@ -7,6 +7,8 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/mui.picker.css" rel="stylesheet" />
+		<link href="../css/mui.poppicker.css" rel="stylesheet" />
 		<style type="text/css">
 			img {
 				height: 70px;
@@ -66,6 +68,8 @@
 	<script src="../js/mui.min.js"></script>
 	<script src="../js/jquery.min.js"></script>
 	<script src="../js/echarts.min.js"></script>
+	<script src="../js/mui.picker.js"></script>
+	<script src="../js/mui.poppicker.js"></script>
 	<!-- <script src="../js/esl.js"></script> -->
 	<script src="../js/websql.js"></script>
 	<script src="../js/person.js"></script>
@@ -179,30 +183,16 @@
 			} else {
 				getGroupFaceById(group_id).then(function(e) {
 					let core_face_src = e.rows.item(0).face_src;
+// 					getImgData(core_face_src).then(function(e){
+// 						console.log(e);
+// 					});
 					var core_person = {
 						category: 0,
 						name: '',
-						symbol: 'image://' + core_face_src,
+						symbol: 'image://' + getImgData(core_face_src),
 						symbolSize: [60, 60],
 						value: 10,
-						id: group_id,
-// 						onclick: function(params) {
-// 							localStorage.setItem('id', group_id);
-// 							mui.openWindow({
-// 								url: 'person-images.html'
-// 							})
-// 						},
-						itemStyle: {
-							normal: {
-								x: -30,
-								y: -30,
-								width: 80,
-								height: 80,
-								image: core_face_src,
-								// 							shadowBlur: 30, // 默认为0，阴影模糊度，大于0有效
-								// 							shadowColor: 'red'
-							}
-						}
+						id: group_id
 					};
 					faceArr.push(core_person);
 				}).then(function() {
@@ -214,13 +204,15 @@
 								getGroupFaceById(person_main).then(function(res) {
 									let main_face_src = res.rows.item(0).face_src;
 									let main_face_info = res.rows.item(0).group_info;
+									console.log(main_face_info);
 									let k = relations.indexOf(person_relation) + 1;
+									console.log(k);
 									let j = i + 1;
 									var main_person = {
 										category: k,
 										name: main_face_info,
-										symbol: 'image://' + main_face_src,
-										symbolSize: [45, 45],
+										symbol: 'image://' + getImgData(main_face_src),
+										symbolSize: [50, 50],
 										value: 3,	
 									    core_id: group_id,
 										main_id: person_main,
@@ -455,30 +447,103 @@
 				}
 			});
 		}
+		 
 
 		//修改人物间关系
 		function modifyRelation(group_id, person_main, person_relation) {
 			// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
-			var btnArray = ['取消', '确定'];
-			mui.prompt('', '请输入关系', '关系：' + person_relation, btnArray, function(e) {
-				if (e.index == 1) {
-					var relation = '';
-					if (e.value == null || e.value == '') {
-						relation = person_relation;
-					} else {
-						relation = e.value;
-						var index = relations.indexOf(relation);
-						if (index >= 0) {
-							relationGraph(group_id);
-							UpdatePersonRelation(group_id, person_main, relation);
-						} else {
-							mui.toast('关系输入不正确');
-							modifyRelation(group_id, person_main, person_relation);
-						}
-
-					}
-				}
-			}, 'div');
+// 			var btnArray = ['取消', '确定'];
+// 			mui.prompt('', '请输入关系', '关系：' + person_relation, btnArray, function(e) {
+// 				if (e.index == 1) {
+// 					var relation = '';
+// 					if (e.value == null || e.value == '') {
+// 						relation = person_relation;
+// 					} else {
+// 						relation = e.value;
+// 						var index = relations.indexOf(relation);
+// 						if (index >= 0) {
+// 							relationGraph(group_id);
+// 							UpdatePersonRelation(group_id, person_main, relation);
+// 						} else {
+// 							mui.toast('关系输入不正确');
+// 							modifyRelation(group_id, person_main, person_relation);
+// 						}
+// 
+// 					}
+// 				}
+// 			}, 'div');
+			var userPicker = new mui.PopPicker();
+			userPicker.setData([{
+				value: '朋友',
+				text: '朋友'
+			}, {
+				value: '同学',
+				text: '同学'
+			}, {
+				value: '同事',
+				text: '同事'
+			}, {
+				value: '兄弟',
+				text: '兄弟'
+			}, {
+				value: '姐妹',
+				text: '姐妹'
+			}, {
+				value: '家人',
+				text: '家人'
+			}, {
+				value: '父母',
+				text: '父母'
+			}, {
+				value: '孩子',
+				text: '孩子'
+			}, {
+				value: '爱人',
+				text: '爱人'
+			}]);
+			var relation = person_relation;
+			userPicker.show(function(items) {
+				// console.log(JSON.stringify(items[0])) ;
+				relation = items[0].value;
+				relationGraph(group_id);
+				UpdatePersonRelation(group_id, person_main, relation);
+				//返回 false 可以阻止选择框的关闭
+				//return false;
+			});
 		}
+ 
+        function getImgData(imgSrc) {
+			 // var fun = function (resolve) {
+                const canvas = document.createElement('canvas');
+                const contex = canvas.getContext('2d');
+                const img = new Image();
+				img.src = imgSrc;
+                img.crossOrigin = ''; 
+                // img.onload = function () {
+                    center = {
+                        x: img.width / 2,
+                        y: img.height / 2
+                    }
+                    var diameter = img.width;
+                    canvas.width = diameter;
+                    canvas.height = diameter;
+                    contex.clearRect(0, 0, diameter, diameter);
+                    contex.save();
+                    contex.beginPath();
+					console.log(diameter);
+                    radius = img.width / 2;
+                    contex.arc(radius, radius, radius, 0, 2 * Math.PI); //画出圆
+                    contex.clip(); //裁剪上面的圆形
+                    contex.drawImage(img, 0, 0, diameter, diameter); // 在刚刚裁剪的园上画图
+                    contex.restore(); // 还原状态
+                    // resolve(canvas.toDataURL('image/png', 1))
+					let src = canvas.toDataURL('image/png', 1);
+					return src;
+                // }
+                
+//             } 
+//             var promise = new Promise(fun); 
+//             return promise;			
+        }
 	</script>
 </html>

@@ -171,9 +171,9 @@
 		var deleteImage = function(image_path){
 			getImageByPath(image_path).then(function(imageRes){
 				let image_type = imageRes.rows.item(0).image_main_type;
-				deleteOneImage(image_path).then(function(){							
-					getPersonGroup();
+				deleteOneImage(image_path).then(function(){						
 					setPhotoHtml();
+					getPersonGroup();
 					var list = plus.webview.currentWebview().opener();
 					mui.fire(list, 'refresh');
 				});

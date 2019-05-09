@@ -8,6 +8,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/mystyle.css" rel="stylesheet" />
 		<style>
 			.mui-preview-image.mui-fullscreen {
 				position: fixed;
@@ -238,7 +239,6 @@
 		});
 		
 		function setPhotoHtml(){
-			console.log(12343556);
 			var type = localStorage.getItem('type');
 			var types = type.split('-');
 			jQuery('#image-content').empty();
@@ -253,7 +253,7 @@
 				}).catch(function(err) {
 					console.log(err);
 				})
-			} else {
+			} else if(types[0] == 'person'){
 				var person_num;
 				if (types[1] == '单人照') {
 					person_num = 1;
@@ -272,6 +272,16 @@
 				}).catch(function(err) {
 					console.log(err);
 				})
+			}else{
+				var allImg = localStorage.getItem('allImage');
+				console.log(allImg);
+				var imgArr = allImg.split(",");
+				for(let i=0; i< imgArr.length; i++){
+					let src = imgArr[i];
+					image = '<p class="image-border"><img class="images" src="' + src +
+						'" data-preview-src="" data-preview-group="1" /></p>';
+					jQuery('#image-content').append(image);
+				}
 			}
 		}
 		// mui.previewImage();

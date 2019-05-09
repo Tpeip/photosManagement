@@ -73,58 +73,170 @@ function getOtherTypeRes() {
 	return pro;
 }
 
-function getOtherType() {
-	getOtherTypeRes().then(function(typeRes) {
-		for(let i in typeRes){
-			let type = '';
-			let num = 0;
-			let path = '';
-			let allImage = [];
-			switch(i){
-				case 'beauty':{
-					type = '小姐姐';
-					num = typeRes.beauty.length;
-					path = typeRes.beauty[0];
-					allImage = typeRes.beauty;
-					break;
+//获取所有照片的类型
+		function getImageType() {
+			getAllType().then(function(result) {
+				for (let i = 0; i < result.rows.length; i++) {
+					//console.log(JSON.stringify(result.rows.item(i)));
+					let image_type = result.rows.item(i).image_main_type;
+					getTypeOne(image_type).then(function(result) {
+						//console.log(JSON.stringify(result.rows.item(0)));
+						var image_path = result.rows.item(0).image_path;
+						var length = result.rows.length;
+						setTypeHtml(image_type, length, image_path);
+					}).catch(function(err) {
+						console.log(err);
+					})
 				}
-				case 'handsomeboy':{
-					type = '帅哥';
-					num = typeRes.handsomeboy.length;
-					path = typeRes.handsomeboy[0];
-					allImage = typeRes.handsomeboy;
-					break;
-				}
-				case 'youngboy':{
-					type = '小鲜肉';
-					num = typeRes.youngboy.length;
-					path = typeRes.youngboy[0];
-					allImage = typeRes.youngboy;
-					break;
-				}
-				case 'publicman':{
-					type = '明星';
-					num = typeRes.publicman.length;
-					path = typeRes.publicman[0];
-					allImage = typeRes.publicman;
-					break;
-				}
-				case 'baby':{
-					type = '儿童';
-					num = typeRes.baby.length;
-					path = typeRes.baby[0];
-					allImage = typeRes.baby;
-					break;
-				}
-				case 'teen':{
-					type = '青少年';
-					num = typeRes.teen.length;
-					path = typeRes.teen[0];
-					allImage = typeRes.teen;
-					break;
-				},
-				default : break;
+			}).catch(function(err) {
+				console.log(err);
+			});
+		}
+		
+		//获取人物照片类型
+		function getPersonType() {
+			for (let i = 1; i <= 3; i++) {
+				getPersonNumImage(i).then(function(e) {
+					if (e.rows.length != 0) {
+						let path = e.rows.item(0).image_path;
+						let length = e.rows.length;
+						setPersonHtml(path, length, i);
+					}
+				}).catch(function(e) {
+					console.log(e);
+				})
 			}
 		}
-	});
-}
+		
+		//显示人物照片类型
+		function setPersonHtml(src, num, i) {
+			let person_num = '';
+			if (i == 1) {
+				person_num = '单人照';
+			} else if (i == 2) {
+				person_num = '双人照';
+			} else {
+				person_num = '合照';
+			}
+			var str = '';
+			var name = 'person-' + person_num;
+			//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
+			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
+				'<img class="images" src="' + src + '" />' +
+				'<label class="label-photo-type">' + person_num + '</label>' + '<br>' +
+				'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
+				'</p>';
+			jQuery("#persons").append(str);
+		}
+		
+		//显示所有照片类型
+		function setTypeHtml(type, num, src) {
+			var str = '';
+			var name = 'type-' + type;
+			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
+				'<img class="images" src="' + src + '" />' +
+				'<label class="label-photo-type">' + type + '</label>' + '<br>' +
+				'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
+				'</p>';
+			jQuery("#types").append(str);
+		}
+		
+		
+		function getOtherType() {
+			getOtherTypeRes().then(function(typeRes) {
+				for(let i in typeRes){
+					let type = '';
+					let num = 0;
+					let path = '';
+					let allImage = [];
+					switch(i){
+						case 'beauty':{
+							type = '小姐姐';
+							num = typeRes.beauty.length;
+							path = typeRes.beauty[0];
+							allImage = typeRes.beauty;
+							break;
+						}
+						case 'handsomeboy':{
+							type = '帅哥';
+							num = typeRes.handsomeboy.length;
+							path = typeRes.handsomeboy[0];
+							allImage = typeRes.handsomeboy;
+							break;
+						}
+						case 'youngboy':{
+							type = '小鲜肉';
+							num = typeRes.youngboy.length;
+							path = typeRes.youngboy[0];
+							allImage = typeRes.youngboy;
+							break;
+						}
+						case 'publicman':{
+							type = '明星';
+							num = typeRes.publicman.length;
+							path = typeRes.publicman[0];
+							allImage = typeRes.publicman;
+							break;
+						}
+						case 'baby':{
+							type = '儿童';
+							num = typeRes.baby.length;
+							path = typeRes.baby[0];
+							allImage = typeRes.baby;
+							break;
+						}
+						case 'teen':{
+							type = '青少年';
+							num = typeRes.teen.length;
+							path = typeRes.teen[0];
+							allImage = typeRes.teen;
+							break;
+						}
+						default : break;
+					}
+					setPersonTypeHtml(type, num, path, allImage);
+				}
+			});
+		}
+		
+		function setPersonTypeHtml(type, num, src, allImage) {
+			var str = '';
+			var name = 'persontype-' + type;
+			if(num != 0){
+				str = '<p class="image-border" onclick="turn(\'' + name + '\'' + ',' + '\'' + allImage + '\')">' +
+					'<img class="images" src="' + src + '" />' +
+					'<label class="label-photo-type">' + type + '</label>' + '<br>' +
+					'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
+					'</p>';
+				jQuery("#persons-type").append(str);
+			}			
+		}
+		
+		//查看每个类型的所有照片
+		function turnTo(type) {
+			localStorage.setItem("type", type);
+			console.log(type);
+			mui.openWindow({
+				url: 'tab-types-photo.html',
+				show: {
+					autoShow: true,
+					aniShow: 'slide-in-right',
+					duration: 200
+				}
+			});
+		}
+		
+		function turn(type, allImage) {
+			localStorage.setItem("type", type);
+			localStorage.setItem("allImage", allImage);
+			mui.openWindow({
+				url: 'tab-types-photo.html',
+				show: {
+					autoShow: true,
+					aniShow: 'slide-in-right',
+					duration: 200
+				}
+			});
+		}
+
+
