@@ -264,7 +264,7 @@
 				<span id="uploadImage" class="mui-icon mui-icon-upload"></span>
 			</a> -->
 			<button id="uploadImage" class="mui-pull-right mui-btn-link">
-				<span style="font-size: 18px;">上传</span>
+				<span style="font-size: 18px;">添加</span>
 			</button>
 		</header>
 		<div class="mui-content mui-content-padded" style="background-color:#fff">
@@ -342,7 +342,7 @@
 			refreshParent();
 		} else {
 			var buttonAry = [{
-				title: '放弃上传',
+				title: '放弃添加',
 				style: 'destructive'
 			}];
 			plus.nativeUI.actionSheet({
@@ -382,7 +382,7 @@
 				title: "从手机相册选择"
 			}];
 			plus.nativeUI.actionSheet({
-				title: "上传图片",
+				title: "添加图片",
 				cancel: "取消",
 				buttons: buttonTit
 			}, function(b) { /*actionSheet 按钮点击事件*/
@@ -666,7 +666,7 @@
 			refreshParent();
 		} else {
 			var buttonAry = [{
-				title: '放弃上传',
+				title: '放弃添加',
 				style: 'destructive'
 			}];
 			plus.nativeUI.actionSheet({
@@ -797,7 +797,7 @@
 		}).then(function(result) {
 			wt.close();
 			var btnArray = ['确定'];
-			mui.alert(' ', '上传成功', btnArray, function(e) {
+			mui.alert(' ', '添加成功', btnArray, function(e) {
 				//console.log(e.index);
 				if(e.index == 0){
 					refreshParent();					
@@ -815,7 +815,7 @@
 					}					
 				}, 'div');
 			}else{
-				mui.alert(' ', '上传失败', btnArray, function(e) {
+				mui.alert(' ', '添加失败', btnArray, function(e) {
 					//console.log(e.index);
 					if(e.index == 0){
 						refreshParent();					

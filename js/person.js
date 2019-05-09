@@ -368,20 +368,20 @@
 									if (person_core.age > 20) {
 										if (Math.abs(persons_main[i].age - person_core.age) <= 10) {
 											if (persons_intimacy[id] >= 60) {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[8], persons_intimacy[id], persons_intimacy_num[id]);
 											} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 60) {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id]);
 											} else {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else if (Math.abs(persons_main[i].age - person_core.age) > 10 && Math.abs(persons_main[i].age -
 												person_core.age) <=25 ) {
 											if (persons_intimacy[id] >= 50) {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 											} else if (persons_intimacy[id] >= 20 && persons_intimacy[id] < 50) {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[2], persons_intimacy[id], persons_intimacy_num[id], persons_intimacy_num[id]);
 											} else {
-												UpdatePersonIntimacyUpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
+												UpdatePersonIntimacy(person_core.group_id, id, relations[0], persons_intimacy[id], persons_intimacy_num[id]);
 											}
 										} else {
 											if (persons_intimacy[id] >= 60) {
