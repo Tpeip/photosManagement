@@ -86,7 +86,7 @@
 				},
 				isShowScrollBar: false,
 				series: [{
-					type: 'kforce',
+					type: 'force',
 					categories: [{
 							name: '人物',
 							itemStyle: {
@@ -320,7 +320,7 @@
 			require(
 				[
 					'echarts',
-					'echarts/chart/kforce',
+					'echarts/chart/force',
 				],
 				function(ec) {
 					var myChart = ec.init(document.getElementById('demo1'));
@@ -331,3 +331,183 @@
 	</body>
 
 </html>
+
+<!-- require.config({
+				packages: [{
+					name: 'echarts',
+					location: '../echarts/src',
+					main: 'echarts'
+				}, {
+					name: 'zrender',
+					location: '../zrender/src',
+					main: 'zrender'
+				}]
+			});
+
+			var option = {
+				// 				title: {
+				// 					text: '人物关系：乔布斯',
+				// 					subtext: '数据来自人立方',
+				// 					x: 'right',
+				// 					y: 'bottom'
+				// 				},
+				tooltip: {
+					trigger: 'item',
+					formatter: '{a} : {b}'
+				},
+				legend: {
+					x: 'left',
+					selected: {
+						'朋友': true,
+						'同学': true,
+						'同事': true,
+						'兄弟': true,
+						'姐妹': true,
+						'家人': true,
+						'父母': true,
+						'孩子': true,
+						'爱人': true
+					},
+					data: ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人']
+				},
+				isShowScrollBar: false,
+				series: [{
+					type: 'kforce',
+					categories: [{
+							name: '人物',
+							itemStyle: {
+								normal: {
+									shadowBlur: 80,
+									shadowColor: 'black'
+								}
+							}
+						},
+						{
+							name: '朋友',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									// shadowColor: '#007fff'
+									shadowColor: '#e65c00'
+								}
+							}
+						},
+						{
+							name: '同学',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#66e0ff'
+								}
+							}
+						},
+						{
+							name: '同事',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#ff80df'
+								}
+							}
+						},
+						{
+							name: '兄弟',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#80ff80'
+								}
+							}
+						},
+						{
+							name: '姐妹',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#4d94ff'
+								}
+							}
+						},
+						{
+							name: '家人',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#ff80aa'
+								}
+							}
+						},
+						{
+							name: '父母',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#cc00cc'
+								}
+							}
+						},
+						{
+							name: '孩子',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#ff1a1a'
+								}
+							}
+						},
+						{
+							name: '爱人',
+							itemStyle: {
+								normal: {
+									shadowBlur: 50,
+									shadowColor: '#ffd633'
+								}
+							}
+						}
+					],
+					itemStyle: {
+						normal: {
+							label: {
+								show: false, //不显示名字
+								textStyle: {
+									color: '#000000'
+								}
+							},
+							nodeStyle: {
+								brushType: 'both',
+								strokeColor: 'rgba(255,215,0,0.4)',
+								lineWidth: 2
+							},
+// 							linkStyle: {
+// 								show : true,
+// 								color: 'target',//决定边的颜色是与起点相同还是与终点相同
+// 								curveness: 0.6//边的曲度，支持从 0 到 1 的值，值越大曲度越大。						
+// 							}
+						},
+						emphasis: {
+							linkStyle: {
+								type: 'curve'
+								// strokeColor: '#5182AB'
+							}
+						}
+					},
+					minRadius: 15,
+					maxRadius: 25,
+					density: 0.8,
+					attractiveness: 0.8,
+					roam: 'move',
+					nodes: faceArr,
+					links: linkArr
+				}]
+			};
+			require(
+				[
+					'echarts',
+					'echarts/chart/kforce',
+				],
+				function(ec) {
+					var myChart = ec.init(document.getElementById('demo1'));
+					myChart.setOption(option);
+				}
+			)
+ -->

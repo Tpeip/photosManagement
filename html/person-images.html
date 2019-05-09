@@ -287,7 +287,7 @@
 					//获得父页面的webview
 					var listpage = plus.webview.currentWebview().opener();
 					//触发父页面的自定义事件(refresh),从而进行刷新
-					mui.fire(listpage, 'refresh');
+					mui.fire(listpage, 'fresh');
 // 					var list = plus.webview.currentWebview().opener();
 // 					mui.fire(list, 'fresh');
 					//返回true,继续页面关闭逻辑
@@ -319,6 +319,7 @@
 			//获取当前页面的人脸
 			function getFace() {
 				var group_id = localStorage.getItem('id');
+				console.log(group_id);
 				getGroupFaceById(group_id).then(function(e) {
 					var face_src = e.rows.item(0).face_src;
 					var person_text = e.rows.item(0).group_info;

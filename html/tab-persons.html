@@ -58,14 +58,15 @@
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">人脉关系图</label>
 				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">修改</a>
-				<div id="demo1" style="height:500px;border-top:1px solid #ccc;margin-top:10px"></div>
+				<div id="main" style="height:500px;border-top:1px solid #ccc;margin-top:10px"></div>
 			</div>
 		</div>
 
 	</body>
 	<script src="../js/mui.min.js"></script>
 	<script src="../js/jquery.min.js"></script>
-	<script src="../js/esl.js"></script>
+	<script src="../js/echarts.min.js"></script>
+	<!-- <script src="../js/esl.js"></script> -->
 	<script src="../js/websql.js"></script>
 	<script src="../js/person.js"></script>
 	<script type="text/javascript">
@@ -75,7 +76,7 @@
 		// 			});
 		var relations = ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人'];
 
-		window.addEventListener('refresh', function() {
+		window.addEventListener('fresh', function() {
 			// location.reload();
 			getAllRelation();
 			setFaceHtml();
@@ -117,11 +118,10 @@
 				// console.log(e.rows.item(0));
 				var length = e.rows.length;
 				// console.log(length);
-				if(length == 0){
+				if (length == 0) {
 					relationGraph("");
-				}
-				else{
-					console.log(length);
+				} else {
+					// console.log(length);
 					var person_one = e.rows.item(0).group_id;
 					relationGraph(person_one);
 					for (let i = 0; i < length; i++) {
@@ -162,13 +162,13 @@
 			});
 		}
 
-// 		function getPersonRelation(group_id) {
-// 			localStorage.setItem('id', group_id);
-// 			// getPersonIntimacy(group_id);
-// 			// 			handleCorePerson(group_id);
-// 			// relationGraph(group_id);
-// 		}
-// 
+		// 		function getPersonRelation(group_id) {
+		// 			localStorage.setItem('id', group_id);
+		// 			// getPersonIntimacy(group_id);
+		// 			// 			handleCorePerson(group_id);
+		// 			// relationGraph(group_id);
+		// 		}
+		// 
 		//绘制显示核心人物的人脉关系图
 		function relationGraph(group_id) {
 			var faceArr = [];
@@ -182,14 +182,16 @@
 					var core_person = {
 						category: 0,
 						name: '',
+						symbol: 'image://' + core_face_src,
+						symbolSize: [60, 60],
 						value: 10,
-						shapeType: 'image',
-						onclick: function(params) {
-							localStorage.setItem('id', group_id);
-							mui.openWindow({
-								url: 'person-images.html'
-							})
-						},
+						id: group_id,
+// 						onclick: function(params) {
+// 							localStorage.setItem('id', group_id);
+// 							mui.openWindow({
+// 								url: 'person-images.html'
+// 							})
+// 						},
 						itemStyle: {
 							normal: {
 								x: -30,
@@ -217,23 +219,12 @@
 									var main_person = {
 										category: k,
 										name: main_face_info,
-										value: 3,
-										shapeType: 'image',
-										onclick: function(params) {
-											var mod = localStorage.getItem('mod');
-											if (mod == 1) {
-												modifyRelation(group_id, person_main, person_relation);
-											}
-										},
-										itemStyle: {
-											normal: {
-												x: -30,
-												y: -30,
-												width: 50,
-												height: 50,
-												image: main_face_src,
-											}
-										}
+										symbol: 'image://' + main_face_src,
+										symbolSize: [45, 45],
+										value: 3,	
+									    core_id: group_id,
+										main_id: person_main,
+										person_relation: person_relation										
 									};
 									var main_link = {
 										source: j,
@@ -242,8 +233,6 @@
 									}
 									faceArr.push(main_person);
 									linkArr.push(main_link);
-									// console.log(faceArr.length);
-									// console.log(JSON.stringify(faceArr));
 								}).catch(function(err) {
 									console.log(JSON.stringify(err));
 								})
@@ -263,29 +252,21 @@
 		}
 
 		function drawGraph(faceArr, linkArr) {
-			require.config({
-				packages: [{
-					name: 'echarts',
-					location: '../echarts/src',
-					main: 'echarts'
-				}, {
-					name: 'zrender',
-					location: '../zrender/src',
-					main: 'zrender'
-				}]
-			});
-
-			var option = {
-				// 				title: {
-				// 					text: '人物关系：乔布斯',
-				// 					subtext: '数据来自人立方',
-				// 					x: 'right',
-				// 					y: 'bottom'
-				// 				},
+			var myChart = echarts.init(document.getElementById('main'));			
+			option = {
 				tooltip: {
 					trigger: 'item',
-					formatter: '{a} : {b}'
+					formatter: function(param){
+						let label = relations[param.data.category-1];
+						let name = param.data.name;
+						var text = label + ": " + name;
+						if(name == null || name == ""){
+							text = label;
+						}
+						return text;
+					}
 				},
+				color: ['#b30000', '#ff9900', '#99cc00', '#4db8ff', '#b2b300', '#ff80bf', '#0044cc', '#b266ff', '#bf8040'],
 				legend: {
 					x: 'left',
 					selected: {
@@ -298,13 +279,32 @@
 						'父母': true,
 						'孩子': true,
 						'爱人': true
-					},
+					},					
 					data: ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人']
 				},
-				isShowScrollBar: false,
 				series: [{
-					type: 'kforce',
-					categories: [{
+					type: 'graph',
+					layout: 'force',
+					symbolSize: 50,
+					roam: 'move',
+					// edgeSymbol: ['circle', ''],
+					// edgeSymbolSize: [4, 10],
+					// 							edgeSymbolSize: [4, 10],
+					edgeLabel: {
+						normal: {
+							textStyle: {
+								fontSize: 10
+							}
+						}
+					},
+					force: {
+						repulsion: 2500,
+						edgeLength: [10, 20]
+					},
+					draggable: true,
+					ribbonType: false,
+					name: '',
+					categories: [{	
 							name: '人物',
 							itemStyle: {
 								normal: {
@@ -317,9 +317,9 @@
 							name: '朋友',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
+									shadowBlur: 40,
 									// shadowColor: '#007fff'
-									shadowColor: '#e65c00'
+									shadowColor: '#ff9900'
 								}
 							}
 						},
@@ -328,7 +328,7 @@
 							itemStyle: {
 								normal: {
 									shadowBlur: 50,
-									shadowColor: '#66e0ff'
+									shadowColor: '#99cc00'
 								}
 							}
 						},
@@ -336,8 +336,8 @@
 							name: '同事',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#ff80df'
+									shadowBlur: 40,
+									shadowColor: '#4db8ff'
 								}
 							}
 						},
@@ -345,8 +345,8 @@
 							name: '兄弟',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#80ff80'
+									shadowBlur: 40,
+									shadowColor: '#b2b300'
 								}
 							}
 						},
@@ -354,8 +354,8 @@
 							name: '姐妹',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#4d94ff'
+									shadowBlur: 40,
+									shadowColor: '#ff80bf'
 								}
 							}
 						},
@@ -363,8 +363,8 @@
 							name: '家人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#ff80aa'
+									shadowBlur: 40,
+									shadowColor: '#0044cc'
 								}
 							}
 						},
@@ -372,8 +372,8 @@
 							name: '父母',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#cc00cc'
+									shadowBlur: 40,
+									shadowColor: '#b266ff'
 								}
 							}
 						},
@@ -381,8 +381,8 @@
 							name: '孩子',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#ff1a1a'
+									shadowBlur: 40,
+									shadowColor: '#bf8040'
 								}
 							}
 						},
@@ -390,8 +390,8 @@
 							name: '爱人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 50,
-									shadowColor: '#ffd633'
+									shadowBlur: 40,
+									shadowColor: '#b30000'
 								}
 							}
 						}
@@ -399,48 +399,61 @@
 					itemStyle: {
 						normal: {
 							label: {
-								show: false, //不显示名字
+								show: false,
 								textStyle: {
-									color: '#000000'
+									color: '#333'
 								}
 							},
 							nodeStyle: {
 								brushType: 'both',
-								strokeColor: 'rgba(255,215,0,0.4)',
-								lineWidth: 2
+								borderColor: 'rgba(255,215,0,0.4)',
+								borderWidth: 1
 							},
-// 							linkStyle: {
-// 								show : true,
-// 								color: 'target',//决定边的颜色是与起点相同还是与终点相同
-// 								curveness: 0.6//边的曲度，支持从 0 到 1 的值，值越大曲度越大。						
-// 							}
-						},
-						emphasis: {
 							linkStyle: {
 								type: 'curve'
-								// strokeColor: '#5182AB'
 							}
+						},
+						emphasis: {
+							label: {
+								show: false
+								// textStyle: null      // 默认使用全局文本样式，详见TEXTSTYLE
+							},
+							nodeStyle: {
+								//r: 30
+							},
+							linkStyle: {}
 						}
 					},
+					useWorker: false,
 					minRadius: 15,
 					maxRadius: 25,
-					density: 0.8,
-					attractiveness: 0.8,
+					gravity: 1.1,
+					scaling: 1.1,
 					roam: 'move',
-					nodes: faceArr,
+					data: faceArr,
 					links: linkArr
 				}]
 			};
-			require(
-				[
-					'echarts',
-					'echarts/chart/kforce',
-				],
-				function(ec) {
-					var myChart = ec.init(document.getElementById('demo1'));
-					myChart.setOption(option);
+
+			// 为echarts对象加载数据 
+			myChart.setOption(option);
+			myChart.on('click', function(param){
+				var id = param.data.id;
+				if(param.data.category == 0){
+					localStorage.setItem('id', id);
+					mui.openWindow({
+						url: 'person-images.html'
+					})
+				}else{
+					var mod = localStorage.getItem('mod');
+					if (mod == 1) {
+						let group_id = param.data.core_id;
+						let person_main = param.data.main_id;
+						let person_relation = param.data.person_relation;
+						modifyRelation(group_id, person_main, person_relation);
+					}
 				}
-			)
+			});
 		}
 
 		//修改人物间关系
