@@ -522,3 +522,37 @@
 				console.log(error);
 			})
 		}
+		
+		var allPerson =[];
+		function getPersonData(){
+			var promiseArr =[];
+			return getGroupFace().then(function(e){
+				for(let i = 0; i<e.rows.length; i++){
+					let group_id = e.rows.item(i).group_id;
+					let face_src = e.rows.item(i).face_src;
+					let group_info = e.rows.item(i).group_info;
+					let onePerson = {
+						'group_id' : group_id,
+						'group_info' : group_info,
+						'persons' : [],
+						'face_src' : face_src
+					};
+					allPerson.push(onePerson);
+					promiseArr.push(
+						 getRelatedPerson(group_id).then(function(res){
+							for(let j =0;j<res.rows.length;j++){
+								let id = res.rows.item(j).person_main;
+								let relation =res.rows.item(j).person_relation;
+								let relatedPerson ={
+									'id' : id,
+									'relation' : relation
+								};
+								onePerson.persons.push(relatedPerson);
+							}
+						})
+					)
+					
+				}
+				return Promise.all(promiseArr);
+			});
+		}

@@ -60,7 +60,7 @@
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">人脉关系图</label>
 				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">修改</a>
-				<div id="main" style="height:500px;border-top:1px solid #ccc;margin-top:10px"></div>
+				<div id="main" style="height:500px;width: 350px; border-top:1px solid #ccc;margin-top:10px"></div>
 			</div>
 		</div>
 
@@ -90,6 +90,8 @@
 
 		mui.plusReady(function() {
 			getAllRelation();
+		
+			
 			//				getPersonGroup();
 			// updateGroupFace();
 			setFaceHtml();
@@ -127,7 +129,8 @@
 				} else {
 					// console.log(length);
 					var person_one = e.rows.item(0).group_id;
-					relationGraph(person_one);
+					// relationGraph(person_one);
+					allRelationGraph();
 					for (let i = 0; i < length; i++) {
 						let face_url = e.rows.item(i).face_src;
 						let group_id = e.rows.item(i).group_id;
@@ -183,9 +186,9 @@
 			} else {
 				getGroupFaceById(group_id).then(function(e) {
 					let core_face_src = e.rows.item(0).face_src;
-// 					getImgData(core_face_src).then(function(e){
-// 						console.log(e);
-// 					});
+					// 					getImgData(core_face_src).then(function(e){
+					// 						console.log(e);
+					// 					});
 					var core_person = {
 						category: 0,
 						name: '',
@@ -213,10 +216,10 @@
 										name: main_face_info,
 										symbol: 'image://' + getImgData(main_face_src),
 										symbolSize: [50, 50],
-										value: 3,	
-									    core_id: group_id,
+										value: 3,
+										core_id: group_id,
 										main_id: person_main,
-										person_relation: person_relation										
+										person_relation: person_relation
 									};
 									var main_link = {
 										source: j,
@@ -244,15 +247,15 @@
 		}
 
 		function drawGraph(faceArr, linkArr) {
-			var myChart = echarts.init(document.getElementById('main'));			
+			var myChart = echarts.init(document.getElementById('main'));
 			option = {
 				tooltip: {
 					trigger: 'item',
-					formatter: function(param){
-						let label = relations[param.data.category-1];
+					formatter: function(param) {
+						let label = relations[param.data.category - 1];
 						let name = param.data.name;
 						var text = label + ": " + name;
-						if(name == null || name == ""){
+						if (name == null || name == "") {
 							text = label;
 						}
 						return text;
@@ -271,7 +274,7 @@
 						'父母': true,
 						'孩子': true,
 						'爱人': true
-					},					
+					},
 					data: ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人']
 				},
 				series: [{
@@ -291,12 +294,12 @@
 					},
 					force: {
 						repulsion: 2500,
-						edgeLength: [10, 20]
+						edgeLength: [10, 50]
 					},
 					draggable: true,
 					ribbonType: false,
 					name: '',
-					categories: [{	
+					categories: [{
 							name: '人物',
 							itemStyle: {
 								normal: {
@@ -429,14 +432,14 @@
 
 			// 为echarts对象加载数据 
 			myChart.setOption(option);
-			myChart.on('click', function(param){
+			myChart.on('click', function(param) {
 				var id = param.data.id;
-				if(param.data.category == 0){
+				if (param.data.category == 0) {
 					localStorage.setItem('id', id);
 					mui.openWindow({
 						url: 'person-images.html'
 					})
-				}else{
+				} else {
 					var mod = localStorage.getItem('mod');
 					if (mod == 1) {
 						let group_id = param.data.core_id;
@@ -447,31 +450,57 @@
 				}
 			});
 		}
-		 
+
 
 		//修改人物间关系
 		function modifyRelation(group_id, person_main, person_relation) {
 			// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
-// 			var btnArray = ['取消', '确定'];
-// 			mui.prompt('', '请输入关系', '关系：' + person_relation, btnArray, function(e) {
-// 				if (e.index == 1) {
-// 					var relation = '';
-// 					if (e.value == null || e.value == '') {
-// 						relation = person_relation;
-// 					} else {
-// 						relation = e.value;
-// 						var index = relations.indexOf(relation);
-// 						if (index >= 0) {
-// 							relationGraph(group_id);
-// 							UpdatePersonRelation(group_id, person_main, relation);
-// 						} else {
-// 							mui.toast('关系输入不正确');
-// 							modifyRelation(group_id, person_main, person_relation);
-// 						}
-// 
-// 					}
-// 				}
-// 			}, 'div');
+			// 			var btnArray = ['取消', '确定'];
+			// 			mui.prompt('', '请输入关系', '关系：' + person_relation, btnArray, function(e) {
+			// 				if (e.index == 1) {
+			// 					var relation = '';
+			// 					if (e.value == null || e.value == '') {
+			// 						relation = person_relation;
+			// 					} else {
+			// 						relation = e.value;
+			// 						var index = relations.indexOf(relation);
+			// 						if (index >= 0) {
+			// 							relationGraph(group_id);
+			// 							UpdatePersonRelation(group_id, person_main, relation);
+			// 						} else {
+			// 							mui.toast('关系输入不正确');
+			// 							modifyRelation(group_id, person_main, person_relation);
+			// 						}
+			// 
+			// 					}
+			// 				}
+			// 			}, 'div');
+			// var btnArray = ['取消', '确认'];
+			// 			var html = '';
+			// 			for(let i=0; i<relations.length; i++){
+			// 				if((i+1)%3 == 0){
+			// 					let htmlone = '<input type="radio" value=">'+relations[i]+'"/>'+relations[i]+'<br>';
+			// 					// let htmlone = '<button class="mui-btn" value="'+relations[i]+'" style="height:20px;line-height:10px;margin:0px 10px 5px 10px">'+relations[i]+'</button><br/>';
+			// 					html += htmlone;
+			// 				}else{
+			// 					let htmlone = '<input type="radio" value=">'+relations[i]+'"/>'+relations[i];
+			// 					// let htmlone = '<button class="mui-btn" value="'+relations[i]+'" style="height:20px;line-height:10px;margin:0px 10px 5px 10px">'+relations[i]+'</button>';
+			// 					html += htmlone;
+			// 				}					
+			// 			}
+			// var html = '<select>'+
+			// 						'<option value="朋友">朋友</option>'+
+			// 						'<option value="同学">同学</option>'+
+			// 						'<option value="同事">同事</option>'+
+			// 						'</select>';
+
+			// 			mui.confirm(html,  '关系：' + person_relation, btnArray, function(e) {
+			// 				if (e.index == 1) {
+			// 					console.log('你刚确认MUI是个好框架');
+			// 				} else {
+			// 					console.log('123');
+			// 				}
+			// 			},'div');
 			var userPicker = new mui.PopPicker();
 			userPicker.setData([{
 				value: '朋友',
@@ -511,39 +540,247 @@
 				//return false;
 			});
 		}
- 
-        function getImgData(imgSrc) {
-			 // var fun = function (resolve) {
-                const canvas = document.createElement('canvas');
-                const contex = canvas.getContext('2d');
-                const img = new Image();
-				img.src = imgSrc;
-                img.crossOrigin = ''; 
-                // img.onload = function () {
-                    center = {
-                        x: img.width / 2,
-                        y: img.height / 2
-                    }
-                    var diameter = img.width;
-                    canvas.width = diameter;
-                    canvas.height = diameter;
-                    contex.clearRect(0, 0, diameter, diameter);
-                    contex.save();
-                    contex.beginPath();
-					console.log(diameter);
-                    radius = img.width / 2;
-                    contex.arc(radius, radius, radius, 0, 2 * Math.PI); //画出圆
-                    contex.clip(); //裁剪上面的圆形
-                    contex.drawImage(img, 0, 0, diameter, diameter); // 在刚刚裁剪的园上画图
-                    contex.restore(); // 还原状态
-                    // resolve(canvas.toDataURL('image/png', 1))
-					let src = canvas.toDataURL('image/png', 1);
-					return src;
-                // }
-                
-//             } 
-//             var promise = new Promise(fun); 
-//             return promise;			
-        }
+
+		function getImgData(imgSrc) {
+			// var fun = function (resolve) {
+			const canvas = document.createElement('canvas');
+			const contex = canvas.getContext('2d');
+			const img = new Image();
+			img.src = imgSrc;
+			img.crossOrigin = '';
+			// img.onload = function () {
+			center = {
+				x: img.width / 2,
+				y: img.height / 2
+			}
+			var diameter = img.width;
+			canvas.width = diameter;
+			canvas.height = diameter;
+			contex.clearRect(0, 0, diameter, diameter);
+			contex.save();
+			contex.beginPath();
+			radius = img.width / 2;
+			contex.arc(radius, radius, radius, 0, 2 * Math.PI); //画出圆
+			contex.clip(); //裁剪上面的圆形
+			contex.drawImage(img, 0, 0, diameter, diameter); // 在刚刚裁剪的园上画图
+			contex.restore(); // 还原状态
+			// resolve(canvas.toDataURL('image/png', 1))
+			let src = canvas.toDataURL('image/png', 1);
+			return src;
+			// }
+
+			//             } 
+			//             var promise = new Promise(fun); 
+			//             return promise;			
+		}
+
+
+		var visited = [];
+		var personArr = [];
+		var lineArr = [];
+
+// 		function allRelationGraph() {
+// 			var promiseArr = [];
+// 			getGroupFace().then(function(res) {
+// 				// for (let i = 0; i < res.rows.length; i++) {
+// 				let group_id = res.rows.item(0).group_id;
+// 				let core_face_src = res.rows.item(0).face_src;
+// 				if (visited.indexOf(group_id) < 0) {
+// 					promiseArr.push(
+// 						wideTraversal(group_id, core_face_src)
+// 					);
+// 
+// 				}
+// 				// }
+// 				Promise.all(promiseArr).then(function() {
+// 					// console.log(JSON.stringify(personArr));
+// 					console.log(visited);
+// 					console.log(JSON.stringify(lineArr));
+// 					drawGraph(personArr, lineArr);
+// 				});
+// 			})
+// 		}
+
+		function allRelationGraph() {
+			var promiseArr = [];
+			getPersonData().then(function(){
+				for(let i =0;i<allPerson.length;i++){
+					let group_id = allPerson[i].group_id;
+					let core_face_src = allPerson[i].face_src;
+					let group_info = allPerson[i].group_info;
+					if (visited.indexOf(group_id) < 0) {
+						promiseArr.push(
+							wideTraversal(group_id, core_face_src, i)
+						);
+							
+					}
+				}
+				Promise.all(promiseArr).then(function() {
+					// console.log(JSON.stringify(personArr));
+					console.log(visited);
+					console.log(JSON.stringify(lineArr));
+					drawGraph(personArr, lineArr);
+				});
+			})
+		}
+		
+		function wideTraversal(core_person, core_face_src, pos) {
+			var promiseArr = [];
+			var proArr = [];
+			let persons = allPerson[pos].persons;
+			if(persons.length == 0) {
+					visited.push(core_person);
+					let core_person_node = {
+						category: 0,
+						name: '',
+						symbol: 'image://' + getImgData(core_face_src),
+						symbolSize: [60, 60],
+						value: 10,
+						person: core_person
+					};
+					personArr.push(core_person_node);
+			} else{
+				let queue = [];
+				queue.unshift(core_person);
+				visited.push(core_person);
+				let core_person_node = {
+					category: 0,
+					name: '',
+					symbol: 'image://' + getImgData(core_face_src),
+					symbolSize: [60, 60],
+					value: 10,
+					person: core_person
+				};
+				personArr.push(core_person_node);
+				while (queue.length > 0) {
+					console.log(queue.length);
+					let core = queue.shift();
+					let key = allPerson.findIndex(function (x) {
+						return x.group_id == core;
+					});
+					let len = allPerson[key].persons.length;
+					for(let i = 0; i<len;i++){
+						let main_person = allPerson[key].persons[i].id;
+						let relation = allPerson[key].persons[i].relation;
+						let index = relations.indexOf(relation) + 1;
+						let main_key = allPerson.findIndex(function (x) {
+							return x.group_id == main_person;
+						});
+						if (visited.indexOf(main_person) < 0) {
+							
+							let main_face_src = allPerson[main_key].face_src;
+							queue.push(main_person);
+// 							console.log(queue);
+// 							console.log(queue.length);
+							visited.push(main_person);
+							let main_person_node = {
+								category: index,
+								name: '',
+								symbol: 'image://' + getImgData(main_face_src),
+								symbolSize: [60, 60],
+								value: 10,
+								person: main_person
+							};
+							personArr.push(main_person_node);
+							let target_value = visited.indexOf(core);
+							let source_value = visited.indexOf(main_person);
+							let line = {
+								source: source_value,
+								target: target_value,
+								weight: source_value
+							};
+							lineArr.push(line);
+						}
+						
+
+					}
+				}
+			}
+		}
+
+// 		function wideTraversal(core_person, core_face_src) {
+// 			var promiseArr = [];
+// 			var proArr = [];
+// 			return getRelatedPerson(core_person).then(function(re) {
+// 				let length = re.rows.length;
+// 				if (length == 0) {
+// 					visited.push(core_person);
+// 					let core_person_node = {
+// 						category: 0,
+// 						name: '',
+// 						symbol: 'image://' + getImgData(core_face_src),
+// 						symbolSize: [60, 60],
+// 						value: 10,
+// 						person: core_person
+// 					};
+// 					personArr.push(core_person_node);
+// 				} else {
+// 					let queue = [];
+// 					queue.unshift(core_person);
+// 					visited.push(core_person);
+// 					let core_person_node = {
+// 						category: 0,
+// 						name: '',
+// 						symbol: 'image://' + getImgData(core_face_src),
+// 						symbolSize: [60, 60],
+// 						value: 10,
+// 						person: core_person
+// 					};
+// 					personArr.push(core_person_node);
+// 					while (queue.length > 0) {
+// 						console.log(queue.length);
+// 						let core = queue.shift();
+// 						// let core = queue[0];
+// 						// setTimeout(function(){queue.shift();},1000);
+// 						console.log(core);
+// 						proArr.push(
+// 							getRelatedPerson(core).then(function(res) {
+// 								console.log("##########");
+// 								for (let j = 0; j < res.rows.length; j++) {
+// 									let main_person = res.rows.item(j).person_main;
+// 									let relation = res.rows.item(j).person_relation;
+// 									let index = relations.indexOf(relation) + 1;
+// 									if (visited.indexOf(main_person) < 0) {
+// 										promiseArr.push(
+// 											getGroupFaceById(main_person).then(function(e) {
+// 												// 										console.log(main_person);
+// 												// 										console.log(e.rows.length);
+// 												let main_face_src = e.rows.item(0).face_src;
+// 												queue.push(main_person);
+// 												console.log(queue);
+// 												console.log(queue.length);
+// 												visited.push(main_person);
+// 												let main_person_node = {
+// 													category: index,
+// 													name: '',
+// 													symbol: 'image://' + getImgData(main_face_src),
+// 													symbolSize: [60, 60],
+// 													value: 10,
+// 													person: main_person
+// 												};
+// 												personArr.push(main_person_node);
+// 												let target_value = visited.indexOf(core);
+// 												let source_value = visited.indexOf(main_person);
+// 												let line = {
+// 													source: source_value,
+// 													target: target_value,
+// 													weight: source_value
+// 												};
+// 												lineArr.push(line);
+// 											})
+// 										);
+// 									}
+// 							
+// 								}
+// 							})
+// 						)
+// 						console.log(queue.length);
+// 					}
+// 					return Promise.all(proArr).then(function(){
+// 						return Promise.all(promiseArr);
+// 					});
+// 				}
+// 			});
+// 		}
 	</script>
 </html>
