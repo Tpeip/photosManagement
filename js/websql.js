@@ -291,6 +291,22 @@ function getFaceByGroup(group_id) {
 	return pm;
 }
 
+function getFaceByFacesrc(group_id, face_src) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM person WHERE group_id=? and face_src=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [group_id, face_src], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
 
 function InsertToPerson(num, personArr) {
 	websqlOpenDB();

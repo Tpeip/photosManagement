@@ -39,6 +39,8 @@
 					getPersonGroup();
 				}).then(function(){
 					updateGroupFace();
+				}).then(function(){
+					verifyFace();
 				}).catch(function(err){
 					console.log(err);
 				})
@@ -141,6 +143,32 @@
 						}
 					}).catch(function(e){
 						console.log(e);
+					})
+				}
+			}).catch(function(err){
+				console.log(err);
+			})
+		}
+		
+		//处理人脸出错
+		function verifyFace(){
+			getGroupFace().then(function(groupRes){
+				let num = groupRes.rows.length;
+				for(let i = 0; i<num; i++){
+					let group_id = groupRes.rows.item(i).group_id;
+					let face_src = groupRes.rows.item(i).face_src;
+					getFaceByFacesrc(group_id, face_src).then(function(faceRes){
+						let length = faceRes.rows.length;
+						if(length == 0){
+							getFaceByGroup(group_id).then(function(res){
+								let new_face_src = res.rows.item(0).face_src;
+								UpdateGroupFaceSrc(group_id, new_face_src);
+							}).catch(function(err){
+								console.log(err);
+							})
+						}
+					}).catch(function(err){
+						console.log(err);
 					})
 				}
 			}).catch(function(err){

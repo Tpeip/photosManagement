@@ -28,21 +28,23 @@ function getOtherTypeRes() {
 					for (let j = 0; j < num; j++) {
 						let age = personRes.rows.item(j).age;
 						let gender = personRes.rows.item(j).gender;
-						if (age <= 25 && age >= 14 && gender == '男' && Number(beauty) > 60) {
+						let beautyscore = personRes.rows.item(j).beauty;
+						if (age <= 25 && age >= 14 && gender == '男' && Number(beautyscore) > 60) {
 							if (youngboy.indexOf(image_path) == -1) {
 								youngboy.push(image_path);
 							}
 						}
-						if (gender == '女' && Number(beauty) > 65) {
+						if (gender == '女' && Number(beautyscore) > 65) {
 							if (beauty.indexOf(image_path) == -1) {
 								beauty.push(image_path);
 							}
+							
 						}
-						if (gender == '男' && Number(beauty) > 65) {
-							if (handsomeboy.indexOf(image_path) == -1) {
-								handsomeboy.push(image_path);
-							}
-						}
+						// if (gender == '男' && Number(beautyscore) > 65) {
+						// 	if (handsomeboy.indexOf(image_path) == -1) {
+						// 		handsomeboy.push(image_path);
+						// 	}
+						// }
 						if (age <= 12) {
 							if (baby.indexOf(image_path) == -1) {
 								baby.push(image_path);
@@ -54,6 +56,7 @@ function getOtherTypeRes() {
 							}
 						}
 					}
+
 				}));
 			}
 		}
@@ -66,6 +69,7 @@ function getOtherTypeRes() {
 				'baby': baby,
 				'teen': teen
 			};
+
 			return typeJson;
 		});
 		return promise;
