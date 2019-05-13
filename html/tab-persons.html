@@ -485,30 +485,52 @@
 			var relation = person_relation;
 			userPicker.show(function(items) {
 				relation = items[0].value;
-				// UpdateOneRelation(group_id, person_main, relation);
-				let id = group_id;
-				let key = allPerson.findIndex(function(x) {
-					return x.group_id == id;
-				});
-				let persons = allPerson[key].persons;
-				let k = persons.findIndex(function(e) {
-					return e.id == person_main;
-				});
-				allPerson[key].persons[k].relation = relation;
-				console.log(allPerson[key].persons[k].relation);
-				UpdatePersonRelation(group_id, person_main, relation).then(function(){
-					showOneRelation(id);
-				});				
+				UpdateOneRelation(group_id, person_main, relation);
+							
 				//返回 false 可以阻止选择框的关闭
 				//return false;
 			});
+		}
+		
+		function UpdateOneRelation(group_id, person_main, relation){
+			let id = group_id;
+			let key = allPerson.findIndex(function(x) {
+				return x.group_id == id;
+			});
+			let persons = allPerson[key].persons;
+			let k = persons.findIndex(function(e) {
+				return e.id == person_main;
+			});			
+			allPerson[key].persons[k].relation = relation;
+			if(relation == '爱人' || relation == '父母' || relation == '孩子'){
+				let core_id = persons[k].id;
+				let m = allPerson.findIndex(function(e){
+					return e.group_id == core_id;
+				});
+				let main_persons = allPerson[m].persons;
+				let n = main_persons.findIndex(function(e){
+					return e.id == id;
+				});
+				if(relation == '爱人'){
+					allPerson[m].persons[n].relation = '爱人';
+				}
+				if(relation == '父母'){
+					allPerson[m].persons[n].relation = '孩子';
+				}
+				if(relation == '孩子'){
+					allPerson[m].persons[n].relation = '父母';
+				}
+			}
+			UpdatePersonRelation(group_id, person_main, relation).then(function(){
+				showOneRelation(id);
+			});	
 		}
 
 		//显示总人脉关系图
 		function showAllRelation() {
 			visited = [];
 			personArr = [];
-			lineArr = [];
+			lineArr = []
 			var update = document.getElementById('update');
 			update.classList.remove('showtext');
 			var modify = document.getElementById('modify');
