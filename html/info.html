@@ -133,8 +133,10 @@
 		<script src="../js/jquery.min.js"></script>
 		<script src="../js/websql.js"></script>
 		<script type="text/javascript">
+			
 			mui.init();
-			var path = localStorage.getItem('path');
+			var path1 = localStorage.getItem('path');
+			var path = decodeURIComponent(path1);
 			console.log(path);
 // 			var img = document.getElementById('img');
 // 			img.src = path;
