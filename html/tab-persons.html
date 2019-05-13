@@ -35,6 +35,9 @@
 				color: #0062CC;
 				font-weight: bolder;
 			}
+			.showtext{
+				display: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -58,8 +61,9 @@
 			</div>
 			<div class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
-				<label class="mui-tab-label label-font">人脉关系图</label>
-				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">修改</a>
+				<label class="mui-tab-label label-font">人脉关系图</label>				
+				<a id="graph" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">图谱</a>
+				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;margin-right: 15px;">修改</a>
 				<div id="main" style="height:500px;width: 350px; border-top:1px solid #ccc;margin-top:10px"></div>
 			</div>
 		</div>
@@ -70,35 +74,31 @@
 	<script src="../js/echarts.min.js"></script>
 	<script src="../js/mui.picker.js"></script>
 	<script src="../js/mui.poppicker.js"></script>
-	<!-- <script src="../js/esl.js"></script> -->
+	<script src="../js/esl.js"></script>
 	<script src="../js/websql.js"></script>
 	<script src="../js/person.js"></script>
 	<script type="text/javascript">
-		// 			mui.init();
-		// 			mui('#slider').scroll({
-		// 				indicators: true
-		// 			});
+		mui.init();
 		var relations = ['朋友', '同学', '同事', '兄弟', '姐妹', '家人', '父母', '孩子', '爱人'];
+		var flag = 0;
+		localStorage.setItem('mod', flag);
+		var visited = [];
+		var personArr = [];
+		var lineArr = [];
 
+		//监听页面刷新
 		window.addEventListener('fresh', function() {
 			// location.reload();
 			getAllRelation();
 			setFaceHtml();
-			// 			var group_id = localStorage.getItem('id');
-			// 			relationGraph(group_id);
-		})
+		});
 
 		mui.plusReady(function() {
 			getAllRelation();
-		
-			
-			//				getPersonGroup();
-			// updateGroupFace();
 			setFaceHtml();
 		})
 
-		var flag = 0;
-		localStorage.setItem('mod', flag);
+		//判断人物关系修改状态		
 		document.getElementById('modify').addEventListener('tap', function() {
 			if (flag == 0) {
 				document.getElementById('modify').innerHTML = '取消修改';
@@ -111,53 +111,34 @@
 			}
 		})
 
-
-
 		//显示人物分组
 		function setFaceHtml() {
 			jQuery('#img-faces').empty();
 			var length = $("#img-faces").children("img").length;
-			// console.log(length);
 			var html = '';
 			getGroupFace().then(function(e) {
-				// console.log(e.rows.length);
-				// console.log(e.rows.item(0));
 				var length = e.rows.length;
-				// console.log(length);
 				if (length == 0) {
-					relationGraph("");
+					showOneRelation("");
 				} else {
-					// console.log(length);
 					var person_one = e.rows.item(0).group_id;
-					// relationGraph(person_one);
-					allRelationGraph();
+					showAllRelation();
 					for (let i = 0; i < length; i++) {
 						let face_url = e.rows.item(i).face_src;
 						let group_id = e.rows.item(i).group_id;
-						// console.log(group_id);
-						// console.log(face_url);
 						var face_html = '<img src="' + face_url + '" onclick="turnTo(\'' + group_id + '\')" />'
 						html += face_html;
 					}
 					html = html + '<img id="more" src="../images/more.png"  onclick="showPersons()"/>';
 					jQuery('#img-faces').append(html);
 				}
-
-				// relationGraph(person_one);
-
 			}).catch(function(e) {
 				console.log(JSON.stringify(e));
 			});
 
 		}
 
-
-
-		function turnTo(group_id) {
-			// getPersonRelation(group_id);
-			relationGraph(group_id);
-		}
-
+		//显示核心人物的相关照片
 		function showPersons() {
 			mui.openWindow({
 				url: 'persons.html',
@@ -169,84 +150,82 @@
 			});
 		}
 
-		// 		function getPersonRelation(group_id) {
-		// 			localStorage.setItem('id', group_id);
-		// 			// getPersonIntimacy(group_id);
-		// 			// 			handleCorePerson(group_id);
-		// 			// relationGraph(group_id);
-		// 		}
-		// 
-		//绘制显示核心人物的人脉关系图
-		function relationGraph(group_id) {
+		function turnTo(group_id) {
+			showOneRelation(group_id);
+		}
+		//显示核心人物的人脉关系图
+		function showOneRelation(group_id) {
+			var modify = document.getElementById('modify');
+			modify.classList.remove('showtext');
+			var graph = document.getElementById('graph');
+			graph.classList.remove('showtext');
+			// console.log(group_id);
 			var faceArr = [];
 			var linkArr = [];
-			var promiseArr = [];
 			if (group_id == null || group_id == '') {
-				drawGraph(faceArr, linkArr);
+				drawOneGraph(faceArr, linkArr);
 			} else {
-				getGroupFaceById(group_id).then(function(e) {
-					let core_face_src = e.rows.item(0).face_src;
-					// 					getImgData(core_face_src).then(function(e){
-					// 						console.log(e);
-					// 					});
-					var core_person = {
-						category: 0,
-						name: '',
-						symbol: 'image://' + getImgData(core_face_src),
-						symbolSize: [60, 60],
-						value: 10,
-						id: group_id
-					};
-					faceArr.push(core_person);
-				}).then(function() {
-					getRelatedPerson(group_id).then(function(e) {
-						for (let i = 0; i < e.rows.length; i++) {
-							let person_main = e.rows.item(i).person_main;
-							let person_relation = e.rows.item(i).person_relation;
-							promiseArr.push(
-								getGroupFaceById(person_main).then(function(res) {
-									let main_face_src = res.rows.item(0).face_src;
-									let main_face_info = res.rows.item(0).group_info;
-									console.log(main_face_info);
-									let k = relations.indexOf(person_relation) + 1;
-									console.log(k);
-									let j = i + 1;
-									var main_person = {
-										category: k,
-										name: main_face_info,
-										symbol: 'image://' + getImgData(main_face_src),
-										symbolSize: [50, 50],
-										value: 3,
-										core_id: group_id,
-										main_id: person_main,
-										person_relation: person_relation
-									};
-									var main_link = {
-										source: j,
-										target: 0,
-										weight: j
-									}
-									faceArr.push(main_person);
-									linkArr.push(main_link);
-								}).catch(function(err) {
-									console.log(JSON.stringify(err));
-								})
-							)
+				let id = group_id;
+				let key = allPerson.findIndex(function(x) {
+					return x.group_id == id;
+				});
+				let core_face_src = allPerson[key].face_src;
+				let core_group_info = allPerson[key].group_info;
+				let persons = allPerson[key].persons;
+				let core_person = {
+					category: 0,
+					name: core_group_info,
+					symbol: 'image://' + getImgData(core_face_src),
+					symbolSize: [70, 70],
+					value: 10,
+					person: id
+				};
+				faceArr.push(core_person);
+				if (persons.length > 0) {
+					for (let i = 0; i < persons.length; i++) {
+						let person_id = persons[i].id;
+						let person_relation = persons[i].relation;
+						let index = relations.indexOf(person_relation) + 1;
+						let k = allPerson.findIndex(function(x) {
+							return x.group_id == person_id;
+						});
+						let info = allPerson[k].group_info;
+						let main_face_src = allPerson[k].face_src;
+						let main_person = {
+							category: index,
+							name: info,
+							symbol: 'image://' + getImgData(main_face_src),
+							symbolSize: [50, 50],
+							value: 10,
+							core_id: id,
+							main_id: person_id,
+							person_relation: person_relation
 						}
-						Promise.all(promiseArr).then(function() {
-							drawGraph(faceArr, linkArr);
-							// console.log(JSON.stringify(faceArr));
-						})
-					});
-
-				}).catch(function(err) {
-					console.log(err);
-				})
+						faceArr.push(main_person);
+						let j = i + 1;
+						var main_link = {
+							source: j,
+							target: 0,
+							name: person_relation
+						};
+						linkArr.push(main_link);
+					};
+// 					faceArr.push(main_person);
+// 					let j = i + 1;
+// 					var main_link = {
+// 						source: j,
+// 						target: 0,
+// 						weight: j
+// 					};
+// 					linkArr.push(main_link);
+				}
 			}
+			drawOneGraph(faceArr, linkArr);
 
 		}
 
-		function drawGraph(faceArr, linkArr) {
+		//绘制单个人物的人脉关系图
+		function drawOneGraph(faceArr, linkArr) {
 			var myChart = echarts.init(document.getElementById('main'));
 			option = {
 				tooltip: {
@@ -280,11 +259,10 @@
 				series: [{
 					type: 'graph',
 					layout: 'force',
-					symbolSize: 50,
+					symbolSize: 80,
 					roam: 'move',
-					// edgeSymbol: ['circle', ''],
-					// edgeSymbolSize: [4, 10],
-					// 							edgeSymbolSize: [4, 10],
+					// edgeSymbol: ['circle', 'arrow'],
+					edgeSymbolSize: [4, 10],
 					edgeLabel: {
 						normal: {
 							textStyle: {
@@ -293,12 +271,12 @@
 						}
 					},
 					force: {
-						repulsion: 2500,
-						edgeLength: [10, 50]
+						repulsion: 1000,
+						edgeLength: [100, 150]
 					},
 					draggable: true,
+					name: "",
 					ribbonType: false,
-					name: '',
 					categories: [{
 							name: '人物',
 							itemStyle: {
@@ -312,7 +290,7 @@
 							name: '朋友',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									// shadowColor: '#007fff'
 									shadowColor: '#ff9900'
 								}
@@ -331,7 +309,7 @@
 							name: '同事',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#4db8ff'
 								}
 							}
@@ -340,7 +318,7 @@
 							name: '兄弟',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#b2b300'
 								}
 							}
@@ -349,7 +327,7 @@
 							name: '姐妹',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#ff80bf'
 								}
 							}
@@ -358,7 +336,7 @@
 							name: '家人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#0044cc'
 								}
 							}
@@ -367,7 +345,7 @@
 							name: '父母',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#b266ff'
 								}
 							}
@@ -376,7 +354,7 @@
 							name: '孩子',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#bf8040'
 								}
 							}
@@ -385,7 +363,7 @@
 							name: '爱人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: '#b30000'
 								}
 							}
@@ -419,11 +397,26 @@
 							linkStyle: {}
 						}
 					},
+					lineStyle: {
+						normal: {
+							width: 1,
+							color: '#4b565b'
+						}
+					},
+					edgeLabel: {
+						normal: {
+							show: true,
+							formatter: function(x) {
+								if (x.data.name)
+									return x.data.name;
+							}
+						}
+					},
 					useWorker: false,
 					minRadius: 15,
 					maxRadius: 25,
-					gravity: 1.1,
-					scaling: 1.1,
+					gravity: 0.1,
+					scaling: 0.1,
 					roam: 'move',
 					data: faceArr,
 					links: linkArr
@@ -433,7 +426,7 @@
 			// 为echarts对象加载数据 
 			myChart.setOption(option);
 			myChart.on('click', function(param) {
-				var id = param.data.id;
+				var id = param.data.person;
 				if (param.data.category == 0) {
 					localStorage.setItem('id', id);
 					mui.openWindow({
@@ -446,6 +439,8 @@
 						let person_main = param.data.main_id;
 						let person_relation = param.data.person_relation;
 						modifyRelation(group_id, person_main, person_relation);
+					}else{
+						showOneRelation(param.data.main_id);
 					}
 				}
 			});
@@ -454,53 +449,6 @@
 
 		//修改人物间关系
 		function modifyRelation(group_id, person_main, person_relation) {
-			// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
-			// 			var btnArray = ['取消', '确定'];
-			// 			mui.prompt('', '请输入关系', '关系：' + person_relation, btnArray, function(e) {
-			// 				if (e.index == 1) {
-			// 					var relation = '';
-			// 					if (e.value == null || e.value == '') {
-			// 						relation = person_relation;
-			// 					} else {
-			// 						relation = e.value;
-			// 						var index = relations.indexOf(relation);
-			// 						if (index >= 0) {
-			// 							relationGraph(group_id);
-			// 							UpdatePersonRelation(group_id, person_main, relation);
-			// 						} else {
-			// 							mui.toast('关系输入不正确');
-			// 							modifyRelation(group_id, person_main, person_relation);
-			// 						}
-			// 
-			// 					}
-			// 				}
-			// 			}, 'div');
-			// var btnArray = ['取消', '确认'];
-			// 			var html = '';
-			// 			for(let i=0; i<relations.length; i++){
-			// 				if((i+1)%3 == 0){
-			// 					let htmlone = '<input type="radio" value=">'+relations[i]+'"/>'+relations[i]+'<br>';
-			// 					// let htmlone = '<button class="mui-btn" value="'+relations[i]+'" style="height:20px;line-height:10px;margin:0px 10px 5px 10px">'+relations[i]+'</button><br/>';
-			// 					html += htmlone;
-			// 				}else{
-			// 					let htmlone = '<input type="radio" value=">'+relations[i]+'"/>'+relations[i];
-			// 					// let htmlone = '<button class="mui-btn" value="'+relations[i]+'" style="height:20px;line-height:10px;margin:0px 10px 5px 10px">'+relations[i]+'</button>';
-			// 					html += htmlone;
-			// 				}					
-			// 			}
-			// var html = '<select>'+
-			// 						'<option value="朋友">朋友</option>'+
-			// 						'<option value="同学">同学</option>'+
-			// 						'<option value="同事">同事</option>'+
-			// 						'</select>';
-
-			// 			mui.confirm(html,  '关系：' + person_relation, btnArray, function(e) {
-			// 				if (e.index == 1) {
-			// 					console.log('你刚确认MUI是个好框架');
-			// 				} else {
-			// 					console.log('123');
-			// 				}
-			// 			},'div');
 			var userPicker = new mui.PopPicker();
 			userPicker.setData([{
 				value: '朋友',
@@ -532,79 +480,37 @@
 			}]);
 			var relation = person_relation;
 			userPicker.show(function(items) {
-				// console.log(JSON.stringify(items[0])) ;
 				relation = items[0].value;
-				relationGraph(group_id);
-				UpdatePersonRelation(group_id, person_main, relation);
+				UpdateOneRelation(group_id, person_main, relation);
 				//返回 false 可以阻止选择框的关闭
 				//return false;
 			});
 		}
 
-		function getImgData(imgSrc) {
-			// var fun = function (resolve) {
-			const canvas = document.createElement('canvas');
-			const contex = canvas.getContext('2d');
-			const img = new Image();
-			img.src = imgSrc;
-			img.crossOrigin = '';
-			// img.onload = function () {
-			center = {
-				x: img.width / 2,
-				y: img.height / 2
-			}
-			var diameter = img.width;
-			canvas.width = diameter;
-			canvas.height = diameter;
-			contex.clearRect(0, 0, diameter, diameter);
-			contex.save();
-			contex.beginPath();
-			radius = img.width / 2;
-			contex.arc(radius, radius, radius, 0, 2 * Math.PI); //画出圆
-			contex.clip(); //裁剪上面的圆形
-			contex.drawImage(img, 0, 0, diameter, diameter); // 在刚刚裁剪的园上画图
-			contex.restore(); // 还原状态
-			// resolve(canvas.toDataURL('image/png', 1))
-			let src = canvas.toDataURL('image/png', 1);
-			return src;
-			// }
-
-			//             } 
-			//             var promise = new Promise(fun); 
-			//             return promise;			
+		//更新数据库人物关系
+		function UpdateOneRelation(group_id, person_main, relation) {
+			let id = group_id;
+			let key = allPerson.findIndex(function(x) {
+				return x.group_id == id;
+			});
+			let persons = allPerson[key].persons;
+			let k = persons.findIndex(function(e) {
+				return e.id == person_main;
+			});
+			allPerson[key].persons[k].relation = relation;
+			showOneRelation(id);
+			UpdatePersonRelation(group_id, person_main, relation);
 		}
 
-
-		var visited = [];
-		var personArr = [];
-		var lineArr = [];
-
-// 		function allRelationGraph() {
-// 			var promiseArr = [];
-// 			getGroupFace().then(function(res) {
-// 				// for (let i = 0; i < res.rows.length; i++) {
-// 				let group_id = res.rows.item(0).group_id;
-// 				let core_face_src = res.rows.item(0).face_src;
-// 				if (visited.indexOf(group_id) < 0) {
-// 					promiseArr.push(
-// 						wideTraversal(group_id, core_face_src)
-// 					);
-// 
-// 				}
-// 				// }
-// 				Promise.all(promiseArr).then(function() {
-// 					// console.log(JSON.stringify(personArr));
-// 					console.log(visited);
-// 					console.log(JSON.stringify(lineArr));
-// 					drawGraph(personArr, lineArr);
-// 				});
-// 			})
-// 		}
-
-		function allRelationGraph() {
+		//显示总人脉关系图
+		function showAllRelation() {
+			var modify = document.getElementById('modify');
+			modify.classList.add('showtext');
+			var graph = document.getElementById('graph');
+			graph.classList.add('showtext');
 			var promiseArr = [];
-			getPersonData().then(function(){
-				for(let i =0;i<allPerson.length;i++){
+			getPersonData().then(function() {
+				for (let i = 0; i < allPerson.length; i++) {
 					let group_id = allPerson[i].group_id;
 					let core_face_src = allPerson[i].face_src;
 					let group_info = allPerson[i].group_info;
@@ -612,34 +518,34 @@
 						promiseArr.push(
 							wideTraversal(group_id, core_face_src, i)
 						);
-							
 					}
 				}
 				Promise.all(promiseArr).then(function() {
-					// console.log(JSON.stringify(personArr));
-					console.log(visited);
-					console.log(JSON.stringify(lineArr));
-					drawGraph(personArr, lineArr);
+					drawAllGraph(personArr, lineArr);
 				});
 			})
 		}
-		
+
+
+		//遍历一个人的人脉关系
 		function wideTraversal(core_person, core_face_src, pos) {
 			var promiseArr = [];
 			var proArr = [];
 			let persons = allPerson[pos].persons;
-			if(persons.length == 0) {
-					visited.push(core_person);
-					let core_person_node = {
-						category: 0,
-						name: '',
-						symbol: 'image://' + getImgData(core_face_src),
-						symbolSize: [60, 60],
-						value: 10,
-						person: core_person
-					};
-					personArr.push(core_person_node);
-			} else{
+			if (persons.length == 0) {
+				visited.push(core_person);
+				let core_person_node = {
+					category: 0,
+					name: '',
+					symbol: 'image://' + getImgData(core_face_src),
+					symbolSize: [55, 55],
+					value: 10,
+					person: core_person,
+					src: core_face_src,
+					pos: pos
+				};
+				personArr.push(core_person_node);
+			} else {
 				let queue = [];
 				queue.unshift(core_person);
 				visited.push(core_person);
@@ -647,140 +553,250 @@
 					category: 0,
 					name: '',
 					symbol: 'image://' + getImgData(core_face_src),
-					symbolSize: [60, 60],
+					symbolSize: [55, 55],
 					value: 10,
-					person: core_person
+					person: core_person,
+					src: core_face_src,
+					pos: pos
 				};
 				personArr.push(core_person_node);
 				while (queue.length > 0) {
-					console.log(queue.length);
 					let core = queue.shift();
-					let key = allPerson.findIndex(function (x) {
+					let key = allPerson.findIndex(function(x) {
 						return x.group_id == core;
 					});
 					let len = allPerson[key].persons.length;
-					for(let i = 0; i<len;i++){
+					for (let i = 0; i < len; i++) {
 						let main_person = allPerson[key].persons[i].id;
 						let relation = allPerson[key].persons[i].relation;
 						let index = relations.indexOf(relation) + 1;
-						let main_key = allPerson.findIndex(function (x) {
+						let main_key = allPerson.findIndex(function(x) {
 							return x.group_id == main_person;
 						});
 						if (visited.indexOf(main_person) < 0) {
-							
 							let main_face_src = allPerson[main_key].face_src;
 							queue.push(main_person);
-// 							console.log(queue);
-// 							console.log(queue.length);
 							visited.push(main_person);
 							let main_person_node = {
 								category: index,
 								name: '',
 								symbol: 'image://' + getImgData(main_face_src),
-								symbolSize: [60, 60],
+								symbolSize: [55, 55],
 								value: 10,
-								person: main_person
+								person: main_person,
+								src: main_face_src,
+								pos: main_key
 							};
 							personArr.push(main_person_node);
-							let target_value = visited.indexOf(core);
-							let source_value = visited.indexOf(main_person);
-							let line = {
-								source: source_value,
-								target: target_value,
-								weight: source_value
-							};
+
+						}
+						let target_value = visited.indexOf(core);
+						let source_value = visited.indexOf(main_person);
+						let line = {
+							source: source_value,
+							target: target_value
+						};
+						let k = lineArr.findIndex(function(e) {
+							return line.source == e.target && line.target == e.source;
+						});
+						if (k < 0) {
+							line.name = relation;
 							lineArr.push(line);
 						}
-						
 
 					}
 				}
 			}
 		}
 
-// 		function wideTraversal(core_person, core_face_src) {
-// 			var promiseArr = [];
-// 			var proArr = [];
-// 			return getRelatedPerson(core_person).then(function(re) {
-// 				let length = re.rows.length;
-// 				if (length == 0) {
-// 					visited.push(core_person);
-// 					let core_person_node = {
-// 						category: 0,
-// 						name: '',
-// 						symbol: 'image://' + getImgData(core_face_src),
-// 						symbolSize: [60, 60],
-// 						value: 10,
-// 						person: core_person
-// 					};
-// 					personArr.push(core_person_node);
-// 				} else {
-// 					let queue = [];
-// 					queue.unshift(core_person);
-// 					visited.push(core_person);
-// 					let core_person_node = {
-// 						category: 0,
-// 						name: '',
-// 						symbol: 'image://' + getImgData(core_face_src),
-// 						symbolSize: [60, 60],
-// 						value: 10,
-// 						person: core_person
-// 					};
-// 					personArr.push(core_person_node);
-// 					while (queue.length > 0) {
-// 						console.log(queue.length);
-// 						let core = queue.shift();
-// 						// let core = queue[0];
-// 						// setTimeout(function(){queue.shift();},1000);
-// 						console.log(core);
-// 						proArr.push(
-// 							getRelatedPerson(core).then(function(res) {
-// 								console.log("##########");
-// 								for (let j = 0; j < res.rows.length; j++) {
-// 									let main_person = res.rows.item(j).person_main;
-// 									let relation = res.rows.item(j).person_relation;
-// 									let index = relations.indexOf(relation) + 1;
-// 									if (visited.indexOf(main_person) < 0) {
-// 										promiseArr.push(
-// 											getGroupFaceById(main_person).then(function(e) {
-// 												// 										console.log(main_person);
-// 												// 										console.log(e.rows.length);
-// 												let main_face_src = e.rows.item(0).face_src;
-// 												queue.push(main_person);
-// 												console.log(queue);
-// 												console.log(queue.length);
-// 												visited.push(main_person);
-// 												let main_person_node = {
-// 													category: index,
-// 													name: '',
-// 													symbol: 'image://' + getImgData(main_face_src),
-// 													symbolSize: [60, 60],
-// 													value: 10,
-// 													person: main_person
-// 												};
-// 												personArr.push(main_person_node);
-// 												let target_value = visited.indexOf(core);
-// 												let source_value = visited.indexOf(main_person);
-// 												let line = {
-// 													source: source_value,
-// 													target: target_value,
-// 													weight: source_value
-// 												};
-// 												lineArr.push(line);
-// 											})
-// 										);
-// 									}
-// 							
-// 								}
-// 							})
-// 						)
-// 						console.log(queue.length);
-// 					}
-// 					return Promise.all(proArr).then(function(){
-// 						return Promise.all(promiseArr);
-// 					});
-// 				}
-// 			});
-// 		}
+		//绘制总人脉关系图
+		function drawAllGraph(faceArr, linkArr) {
+			var myChart = echarts.init(document.getElementById('main'));
+			var option = {
+				title: {
+					text: '人脉关系图'
+				},
+				isShowScrollBar: false,
+				series: [{
+					type: 'graph',
+					layout: 'force',
+					symbolSize: 80,
+					roam: 'move',
+					// edgeSymbol: ['circle', 'arrow'],
+					edgeSymbolSize: [4, 10],
+					edgeLabel: {
+						normal: {
+							textStyle: {
+								fontSize: 10
+							}
+						}
+					},
+					force: {
+						repulsion: 1000,
+						edgeLength: [120, 150]
+					},
+					draggable: true,
+					name: "",
+					ribbonType: false,
+					categories: [{
+							name: '人物',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '朋友',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '同学',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '同事',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '兄弟',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '姐妹',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '家人',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '父母',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '孩子',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						},
+						{
+							name: '爱人',
+							itemStyle: {
+								normal: {
+									shadowBlur: 40,
+									shadowColor: 'red'
+								}
+							}
+						}
+					],
+					itemStyle: {
+						normal: {
+							label: {
+								show: false,
+								textStyle: {
+									color: '#333'
+								}
+							},
+							nodeStyle: {
+								brushType: 'both',
+								borderColor: 'rgba(255,215,0,0.4)',
+								borderWidth: 1
+							},
+							linkStyle: {
+								type: 'curve'
+							}
+						},
+						emphasis: {
+							label: {
+								show: false
+								// textStyle: null      // 默认使用全局文本样式，详见TEXTSTYLE
+							},
+							nodeStyle: {
+								//r: 30
+							},
+							linkStyle: {}
+						}
+					},
+					lineStyle: {
+						normal: {
+							width: 1,
+							color: '#4b565b'
+						}
+					},
+					edgeLabel: {
+						normal: {
+							show: true,
+							formatter: function(x) {
+								if (x.data.name)
+									return x.data.name;
+							}
+						}
+					},
+					useWorker: false,
+					minRadius: 15,
+					maxRadius: 25,
+					gravity: 0.1,
+					scaling: 0.1,
+					roam: 'move',
+					data: faceArr,
+					links: linkArr
+				}]
+			};
+
+			// 为echarts对象加载数据 
+			myChart.setOption(option);
+			myChart.on('click', function(param) {
+				var id = param.data.person;
+				var src = param.data.src;
+				var pos = param.data.pos;
+				showOneRelation(id);
+				// wideTraversal(id, src, pos);
+			});
+		}
+		
+		document.getElementById('graph').addEventListener('tap', function(){
+			showAllRelation();
+		});
 	</script>
 </html>
+
