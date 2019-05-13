@@ -35,7 +35,8 @@
 				color: #0062CC;
 				font-weight: bolder;
 			}
-			.showtext{
+
+			.showtext {
 				display: none;
 			}
 		</style>
@@ -61,9 +62,10 @@
 			</div>
 			<div class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
-				<label class="mui-tab-label label-font">人脉关系图</label>				
+				<label class="mui-tab-label label-font">人脉关系图</label>
 				<a id="graph" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;">图谱</a>
 				<a id="modify" class="mui-tab-label label-font mui-pull-right" style="color: #0062CC;margin-right: 15px;">修改</a>
+				<a id="update" class="mui-tab-label label-font" style="color: #0062CC;position:absolute; right: 10px;">刷新</a>
 				<div id="main" style="height:500px;width: 350px; border-top:1px solid #ccc;margin-top:10px"></div>
 			</div>
 		</div>
@@ -159,6 +161,8 @@
 			modify.classList.remove('showtext');
 			var graph = document.getElementById('graph');
 			graph.classList.remove('showtext');
+			var update = document.getElementById('update');
+			update.classList.add('showtext');
 			// console.log(group_id);
 			var faceArr = [];
 			var linkArr = [];
@@ -210,14 +214,14 @@
 						};
 						linkArr.push(main_link);
 					};
-// 					faceArr.push(main_person);
-// 					let j = i + 1;
-// 					var main_link = {
-// 						source: j,
-// 						target: 0,
-// 						weight: j
-// 					};
-// 					linkArr.push(main_link);
+					// 					faceArr.push(main_person);
+					// 					let j = i + 1;
+					// 					var main_link = {
+					// 						source: j,
+					// 						target: 0,
+					// 						weight: j
+					// 					};
+					// 					linkArr.push(main_link);
 				}
 			}
 			drawOneGraph(faceArr, linkArr);
@@ -240,7 +244,7 @@
 						return text;
 					}
 				},
-				color: ['#b30000', '#ff9900', '#99cc00', '#4db8ff', '#b2b300', '#ff80bf', '#0044cc', '#b266ff', '#bf8040'],
+				color: ['#b30000', '#ff9900', '#99cc00', '#4db8ff', '#b2b300', '#ff80bf', '#0044cc', '#b266ff', '#009999'],
 				legend: {
 					x: 'left',
 					selected: {
@@ -355,7 +359,7 @@
 							itemStyle: {
 								normal: {
 									shadowBlur: 50,
-									shadowColor: '#bf8040'
+									shadowColor: '#009999'
 								}
 							}
 						},
@@ -439,7 +443,7 @@
 						let person_main = param.data.main_id;
 						let person_relation = param.data.person_relation;
 						modifyRelation(group_id, person_main, person_relation);
-					}else{
+					} else {
 						showOneRelation(param.data.main_id);
 					}
 				}
@@ -481,29 +485,32 @@
 			var relation = person_relation;
 			userPicker.show(function(items) {
 				relation = items[0].value;
-				UpdateOneRelation(group_id, person_main, relation);
+				// UpdateOneRelation(group_id, person_main, relation);
+				let id = group_id;
+				let key = allPerson.findIndex(function(x) {
+					return x.group_id == id;
+				});
+				let persons = allPerson[key].persons;
+				let k = persons.findIndex(function(e) {
+					return e.id == person_main;
+				});
+				allPerson[key].persons[k].relation = relation;
+				console.log(allPerson[key].persons[k].relation);
+				UpdatePersonRelation(group_id, person_main, relation).then(function(){
+					showOneRelation(id);
+				});				
 				//返回 false 可以阻止选择框的关闭
 				//return false;
 			});
 		}
 
-		//更新数据库人物关系
-		function UpdateOneRelation(group_id, person_main, relation) {
-			let id = group_id;
-			let key = allPerson.findIndex(function(x) {
-				return x.group_id == id;
-			});
-			let persons = allPerson[key].persons;
-			let k = persons.findIndex(function(e) {
-				return e.id == person_main;
-			});
-			allPerson[key].persons[k].relation = relation;
-			showOneRelation(id);
-			UpdatePersonRelation(group_id, person_main, relation);
-		}
-
 		//显示总人脉关系图
 		function showAllRelation() {
+			visited = [];
+			personArr = [];
+			lineArr = [];
+			var update = document.getElementById('update');
+			update.classList.remove('showtext');
 			var modify = document.getElementById('modify');
 			modify.classList.add('showtext');
 			var graph = document.getElementById('graph');
@@ -613,9 +620,9 @@
 		function drawAllGraph(faceArr, linkArr) {
 			var myChart = echarts.init(document.getElementById('main'));
 			var option = {
-				title: {
-					text: '人脉关系图'
-				},
+// 				title: {
+// 					text: '人脉关系图'
+// 				},
 				isShowScrollBar: false,
 				series: [{
 					type: 'graph',
@@ -642,8 +649,8 @@
 							name: '人物',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 80,
+									shadowColor: '#b35900'
 								}
 							}
 						},
@@ -651,8 +658,9 @@
 							name: '朋友',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									// shadowColor: '#007fff'
+									shadowColor: '#ff9900'
 								}
 							}
 						},
@@ -660,8 +668,8 @@
 							name: '同学',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#99cc00'
 								}
 							}
 						},
@@ -669,8 +677,8 @@
 							name: '同事',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#4db8ff'
 								}
 							}
 						},
@@ -678,8 +686,8 @@
 							name: '兄弟',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#b2b300'
 								}
 							}
 						},
@@ -687,8 +695,8 @@
 							name: '姐妹',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#ff80bf'
 								}
 							}
 						},
@@ -696,8 +704,8 @@
 							name: '家人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#0044cc'
 								}
 							}
 						},
@@ -705,8 +713,8 @@
 							name: '父母',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#b266ff'
 								}
 							}
 						},
@@ -714,8 +722,8 @@
 							name: '孩子',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
-									shadowColor: 'red'
+									shadowBlur: 50,
+									shadowColor: '#009999'
 								}
 							}
 						},
@@ -723,7 +731,7 @@
 							name: '爱人',
 							itemStyle: {
 								normal: {
-									shadowBlur: 40,
+									shadowBlur: 50,
 									shadowColor: 'red'
 								}
 							}
@@ -793,10 +801,13 @@
 				// wideTraversal(id, src, pos);
 			});
 		}
+
+		document.getElementById('graph').addEventListener('tap', function() {
+			showAllRelation();
+		});
 		
-		document.getElementById('graph').addEventListener('tap', function(){
+		document.getElementById('update').addEventListener('tap', function() {
 			showAllRelation();
 		});
 	</script>
 </html>
-

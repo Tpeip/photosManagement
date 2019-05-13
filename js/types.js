@@ -135,6 +135,7 @@ function getOtherTypeRes() {
 		
 		//显示所有照片类型
 		function setTypeHtml(type, num, src) {
+			if(type == '人物') return;
 			var str = '';
 			var name = 'type-' + type;
 			str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
