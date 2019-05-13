@@ -168,7 +168,8 @@
 			});
 			this.classList.remove('mui-active');
 		};
-		var deleteImage = function(image_path){
+		var deleteImage = function(path){
+			var image_path = decodeURIComponent(path);
 			getImageByPath(image_path).then(function(imageRes){
 				let image_type = imageRes.rows.item(0).image_main_type;
 				deleteOneImage(image_path).then(function(){					
@@ -270,7 +271,8 @@
 		};
 		
 		var shareMessage = function (share, ex) {
-			var path = localStorage.getItem('path');
+			var path1 = localStorage.getItem('path');
+			var path = decodeURIComponent(path1);
 			var msg = {
 				content: "图片分享",
 				pictures: [],
@@ -437,7 +439,7 @@
 		var itemData = this.currentGroup[index];
 		var imgEl = itemEl.querySelector('img');
 		//获取照片路径
-		currentPreviewSrc = imgEl.src;
+		currentPreviewSrc = decodeURIComponent(imgEl.src);
 		// console.log(currentPreviewSrc);
 		localStorage.setItem('path',currentPreviewSrc);
 		this._initImgData(itemData, imgEl);

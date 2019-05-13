@@ -274,6 +274,7 @@ function getPersonNumImage(num) {
 	return pm;
 }
 
+
 function getFaceByGroup(group_id) {
 	websqlOpenDB();
 	var selectSQL = 'SELECT * FROM person WHERE group_id=? ORDER BY personImg_id DESC';

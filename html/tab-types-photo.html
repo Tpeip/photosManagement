@@ -228,7 +228,8 @@
 	<script src="../js/person.js"></script>
 	<script type="text/javascript">
 		mui.init({
-			swipeBack: true
+			swipeBack: true,
+			
 		});	
 		var type = localStorage.getItem('type');
 		var types = type.split('-');
@@ -237,6 +238,13 @@
 			replaceHeader();
 			setPhotoHtml();
 		});
+		
+		mui.back = function() {
+			var listpage = plus.webview.currentWebview().opener();
+			//触发父页面的自定义事件(refresh),从而进行刷新
+			plus.webview.currentWebview().close();
+			mui.fire(listpage, 'refresh');
+		};
 		
 		function setPhotoHtml(){
 			var type = localStorage.getItem('type');
@@ -302,8 +310,10 @@
 			document.getElementById('title').innerHTML = types[1];
 		}
 		document.getElementById('backing').addEventListener('tap', function() {
+			var listpage = plus.webview.currentWebview().opener();
+			//触发父页面的自定义事件(refresh),从而进行刷新
 			plus.webview.currentWebview().close();
-			
+			mui.fire(listpage, 'refresh');
 		});
 	</script>
 

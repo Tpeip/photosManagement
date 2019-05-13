@@ -213,7 +213,7 @@
 							html = image_html + date_html + photo_html + tag_html;
 							jQuery('#content').append(html);
 						}).catch(function(e){
-							console.log(e);
+							console.log(JSON.stringify(e));
 						});
 						
 					}else{

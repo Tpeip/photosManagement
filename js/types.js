@@ -16,19 +16,25 @@ function getOtherTypeRes() {
 			if (type.search("公众人物") != -1) {
 				publicman.push(image_path);
 			}
-			// if(keyword.search("美女") != -1){
-			// 	beauty.push(image_path);
-			// }
 			if (keyword.search("儿童") != -1) {
 				baby.push(image_path);
 			}
 			if (main == '人物') {
 				promiseArr.push(getPersonImage(image_path).then(function(personRes) {
 					let num = personRes.rows.length;
+					let genders = {
+						'male' : 0,
+						'female' : 0
+					};
 					for (let j = 0; j < num; j++) {
 						let age = personRes.rows.item(j).age;
 						let gender = personRes.rows.item(j).gender;
 						let beautyscore = personRes.rows.item(j).beauty;
+						if(gender == '男'){
+							genders.male++;
+						}else{
+							genders.female++;
+						}
 						if (age <= 25 && age >= 14 && gender == '男' && Number(beautyscore) > 60) {
 							if (youngboy.indexOf(image_path) == -1) {
 								youngboy.push(image_path);
@@ -38,13 +44,7 @@ function getOtherTypeRes() {
 							if (beauty.indexOf(image_path) == -1) {
 								beauty.push(image_path);
 							}
-							
 						}
-						// if (gender == '男' && Number(beautyscore) > 65) {
-						// 	if (handsomeboy.indexOf(image_path) == -1) {
-						// 		handsomeboy.push(image_path);
-						// 	}
-						// }
 						if (age <= 12) {
 							if (baby.indexOf(image_path) == -1) {
 								baby.push(image_path);
@@ -55,6 +55,15 @@ function getOtherTypeRes() {
 								teen.push(image_path);
 							}
 						}
+						
+					}
+					if( genders.female != 0 && youngboy.indexOf(image_path) != -1){
+						let key = youngboy.indexOf(image_path);
+						youngboy.splice(key, 1);
+					}
+					if( genders.male != 0 && beauty.indexOf(image_path) != -1){
+						let key = beauty.indexOf(image_path);
+						beauty.splice(key, 1);
 					}
 
 				}));
@@ -156,21 +165,14 @@ function getOtherTypeRes() {
 					let allImage = [];
 					switch(i){
 						case 'beauty':{
-							type = '小姐姐';
+							type = '漂亮小姐姐';
 							num = typeRes.beauty.length;
 							path = typeRes.beauty[0];
 							allImage = typeRes.beauty;
 							break;
 						}
-						case 'handsomeboy':{
-							type = '帅哥';
-							num = typeRes.handsomeboy.length;
-							path = typeRes.handsomeboy[0];
-							allImage = typeRes.handsomeboy;
-							break;
-						}
 						case 'youngboy':{
-							type = '小鲜肉';
+							type = '帅气小鲜肉';
 							num = typeRes.youngboy.length;
 							path = typeRes.youngboy[0];
 							allImage = typeRes.youngboy;
@@ -184,14 +186,14 @@ function getOtherTypeRes() {
 							break;
 						}
 						case 'baby':{
-							type = '儿童';
+							type = '可爱小宝贝';
 							num = typeRes.baby.length;
 							path = typeRes.baby[0];
 							allImage = typeRes.baby;
 							break;
 						}
 						case 'teen':{
-							type = '青少年';
+							type = '活力青少年';
 							num = typeRes.teen.length;
 							path = typeRes.teen[0];
 							allImage = typeRes.teen;
