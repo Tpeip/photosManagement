@@ -117,15 +117,15 @@
                         "settings-normal" : "", /*iPad设置页面程序图标，分辨率：29x29*/
                         "settings-retina" : ""
                     },
-                    "appstore" : "unpackage/res/icons/logo.png"
+                    "appstore" : "unpackage/res/icons/tubiao1024.png"
                 },
                 "android" : {
-                    "mdpi" : "unpackage/res/icons/logo48.png", /*普通屏程序图标，分辨率：48x48*/
-                    "ldpi" : "unpackage/res/icons/logo48.png", /*大屏程序图标，分辨率：48x48*/
-                    "hdpi" : "unpackage/res/icons/logo72.png", /*高分屏程序图标，分辨率：72x72*/
-                    "xhdpi" : "unpackage/res/icons/logo96.png", /*720P高分屏程序图标，分辨率：96x96*/
-                    "xxhdpi" : "unpackage/res/icons/logo144.png",
-                    "xxxhdpi" : "unpackage/res/icons/logo192.png"
+                    "mdpi" : "unpackage/res/icons/tubiao48.png", /*普通屏程序图标，分辨率：48x48*/
+                    "ldpi" : "unpackage/res/icons/tubiao48.png", /*大屏程序图标，分辨率：48x48*/
+                    "hdpi" : "unpackage/res/icons/tubiao72.png", /*高分屏程序图标，分辨率：72x72*/
+                    "xhdpi" : "unpackage/res/icons/tubiao96.png", /*720P高分屏程序图标，分辨率：96x96*/
+                    "xxhdpi" : "unpackage/res/icons/tubiao144.png",
+                    "xxxhdpi" : "unpackage/res/icons/tubiao192.png"
                 }
             },
             "splashscreen" : {
