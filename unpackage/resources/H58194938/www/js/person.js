@@ -555,7 +555,6 @@ function handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy
 var allPerson = [];
 
 function getPersonData() {
-	allPerson = [];
 	var promiseArr = [];
 	return getGroupFace().then(function(e) {
 		for (let i = 0; i < e.rows.length; i++) {
@@ -571,15 +570,14 @@ function getPersonData() {
 			allPerson.push(onePerson);
 			promiseArr.push(
 				getRelatedPerson(group_id).then(function(res) {
-					var promArr = [];
 					for (let j = 0; j < res.rows.length; j++) {
-							let id = res.rows.item(j).person_main;
-							let relation = res.rows.item(j).person_relation;
-							let relatedPerson = {
-								'id': id,
-								'relation': relation
-							};
-							onePerson.persons.push(relatedPerson);
+						let id = res.rows.item(j).person_main;
+						let relation = res.rows.item(j).person_relation;
+						let relatedPerson = {
+							'id': id,
+							'relation': relation
+						};
+						onePerson.persons.push(relatedPerson);
 					}
 				})
 			)

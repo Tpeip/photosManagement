@@ -537,21 +537,19 @@
 			modify.classList.add('showtext');
 			var graph = document.getElementById('graph');
 			graph.classList.add('showtext');
-			var proArr = [];
+			var promiseArr = [];
 			getPersonData().then(function() {
-				for(let i=0; i<allPerson.length; i++){
-				}
 				for (let i = 0; i < allPerson.length; i++) {
 					let group_id = allPerson[i].group_id;
 					let core_face_src = allPerson[i].face_src;
 					let group_info = allPerson[i].group_info;
 					if (visited.indexOf(group_id) < 0) {
-						proArr.push(
+						promiseArr.push(
 							wideTraversal(group_id, core_face_src, i)
 						);
 					}
 				}
-				Promise.all(proArr).then(function() {
+				Promise.all(promiseArr).then(function() {
 					drawAllGraph(personArr, lineArr);
 				});
 			})
@@ -560,6 +558,8 @@
 
 		//遍历一个人的人脉关系
 		function wideTraversal(core_person, core_face_src, pos) {
+			var promiseArr = [];
+			var proArr = [];
 			let persons = allPerson[pos].persons;
 			if (persons.length == 0) {
 				visited.push(core_person);
@@ -632,6 +632,7 @@
 							line.name = relation;
 							lineArr.push(line);
 						}
+
 					}
 				}
 			}

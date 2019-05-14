@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>照片分类</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<style>
+			html,body {
+				background-color: #efeff4;
+			}
+			.title{
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			.label-font{
+				font-size: 14px;
+				color:  #0062CC;
+			}
+			.icon-style{
+				font-size: 18px;
+				color: #0062CC;
+				font-weight: bolder;
+			}
+			li{
+				display: inline;
+			}
+			.image-border {
+				padding: 2px 0px 20px 0;
+				width: 47%;
+				height: 190px;
+				display: inline-block;
+				margin: 10px 4px 20px 5px;
+				
+			}
+			
+			.images {
+				border-radius: 6px;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+			.label-photo-type{
+				font-size: 16px;
+				color: #555555;
+				padding-left: 4px;
+				letter-spacing: 1px;
+			}
+			
+			
+		</style>
+	</head>
+
+	<body>
+		<div id="image-types-person" class="mui-content">
+			<div id="" class="mui-content-padded">
+				<label class="mui-icon mui-icon-paperplane icon-style"></label>
+				<label class="mui-tab-label label-font">人物</label>
+				<div id="persons">
+					<!-- <p class="image-border" onclick="turnTo()">
+						<img class="images" src="images/shuijiao.jpg" />
+						<label class="label-photo-type">单人照</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">3张</label>
+					</p>
+					<p class="image-border" onclick="turnTo()">
+						<img class="images" src="images/muwu.jpg" />
+						<label class="label-photo-type">合照</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
+					</p> -->
+				</div>
+			</div>
+			<div id="" class="mui-content-padded">
+				<label class="mui-icon mui-icon-paperplane icon-style"></label>
+				<label class="mui-tab-label label-font">美女帅哥</label>
+				<div id="persons-type">
+				
+				</div>
+			</div>
+			<div class="mui-content-padded">
+				<label class="mui-icon mui-icon-paperplane icon-style"></label>
+				<label class="mui-tab-label label-font">类型</label>
+				<div id="types">
+					<!-- <p class="image-border">
+						<img id="phototype" class="images" src="../images/cbd.jpg" />
+						<label class="label-photo-type">风景</label>
+						<labe>2张</label>
+					</p>
+					<p class="image-border">
+						<img class="images" src="../images/muwu.jpg" />
+						<label class="label-photo-type">人物</label>
+						<labe>10张</label>
+					</p>
+					<p class="image-border">
+						<img class="images" src="../images/shuijiao.jpg" />
+						<label class="label-photo-type">动物</label>
+						<labe>8张</label>
+					</p> -->
+				</div>
+			</div>
+		</div>
+		
+	</body>
+	<script type="text/javascript" src="../js/mui.js"></script>
+	<script type="text/javascript" src="../js/jquery.min.js"></script>
+	<script type="text/javascript" src="../js/mui.zoom.js"></script>
+	<script type="text/javascript" src="../js/mui.previewimage.js"></script>
+	<script src="../js/websql.js"></script>
+	<script src="../js/types.js"></script>
+	<script type="text/javascript">
+		mui.init();	
+		getPersonType();
+		getImageType();
+		getOtherType();
+		window.addEventListener('refresh', function(event) {
+			location.reload();
+		});	
+	    
+	</script>
+</html>
