@@ -712,8 +712,6 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		console.log(imageArr);
-		console.log(person);
 		Promise.all(pm).then(function() {
 			let num = files.length;
 			return InsertToImage(num, imageArr);

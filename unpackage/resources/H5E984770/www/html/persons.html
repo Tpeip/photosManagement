@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<style type="text/css">
+			p,
+			img {
+				margin: 0;
+				padding: 0;
+			}
+
+			.mui-content {
+				margin-top: 20px;
+				margin-left: 15px;
+			}
+
+			.image-border {
+				width: 100px;
+				height: 100px;
+				display: inline-block;
+				text-align: center;
+				margin-top: 10px;
+				margin-right: 15px;
+			}
+
+			.image-border a {
+				font-size: 18px;
+			}
+
+			.images {
+				width: 100%;
+				height: 100%;
+				border-radius: 50%;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">人物</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<!-- <p class="image-border" onclick="turnTo()">
+				<img class="images" src="   images/12.png" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/13.png" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/14.jpg" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/15.jpg" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/12.png" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/13.png" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/14.jpg" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p>
+			<p class="image-border" onclick="turnTo()">
+				<img class="images" src="    images/15.jpg" />
+				<a>未命名</a><br>
+				<label>3张</label>
+			</p> -->
+		</div>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/websql.js"></script>
+		<script type="text/javascript">
+			mui.init({
+				beforeback: function() {
+					//获得父页面的webview
+					var listpage = plus.webview.currentWebview().opener();
+					//触发父页面的自定义事件(refresh),从而进行刷新
+					mui.fire(listpage, 'fresh');
+					//返回true,继续页面关闭逻辑
+					return true;
+				}
+			});
+			
+			window.addEventListener('fresh', function(e) { //执行刷新
+				setHtml();
+			});
+			mui.plusReady(function() {
+				setHtml();
+			})
+
+			function setHtml() {
+				jQuery('#content').empty();
+				var html = '';
+				getGroupFace().then(function(e) {
+// 					console.log(e.rows.length);
+// 					console.log(e.rows.item(0));
+					for (let i = 0; i < e.rows.length; i++) {
+						let face_src = e.rows.item(i).face_src;
+						let group_id = e.rows.item(i).group_id;
+						let image_num = e.rows.item(i).image_num;
+						let group_info = e.rows.item(i).group_info;
+						if (group_info == null || '') {
+							group_info = '未命名';
+						}
+						var face_html = '<p class="image-border" onclick="turnTo(\'' + group_id + '\')">' +
+							'<img class="images" src="' + face_src + '" />' +
+							'<a>' + group_info + '</a><br>' +
+							'<label>' + image_num + '张</label>' +
+							'</p>';
+						html += face_html;
+					}
+					jQuery('#content').append(html);
+				}).catch(function(e) {
+					console.log(e);
+				});
+			}
+
+			function turnTo(group_id) {
+				localStorage.setItem('id', group_id);
+				mui.openWindow({
+					url: 'person-images.html',
+					show: {
+						autoShow: true,
+						aniShow: 'slide-in-right',
+						duration: 300
+					}
+				});
+			}
+		</script>
+	</body>
+
+</html>
