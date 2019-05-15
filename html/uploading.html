@@ -256,7 +256,7 @@
 			<button id="cancel" class="mui-pull-left mui-btn-link">
 				<span style="font-size: 18px;">取消</span>
 			</button>
-			<h1 class="mui-title">添加照片</h1>
+			<h1 class="mui-title">导入照片</h1>
 			<!-- <a class="mui-icon-right-nav mui-pull-right">
 				<span id="headImage" class="mui-icon mui-icon-camera"></span>
 			</a>
@@ -264,7 +264,7 @@
 				<span id="uploadImage" class="mui-icon mui-icon-upload"></span>
 			</a> -->
 			<button id="uploadImage" class="mui-pull-right mui-btn-link">
-				<span style="font-size: 18px;">添加</span>
+				<span style="font-size: 18px;">导入</span>
 			</button>
 		</header>
 		<div class="mui-content mui-content-padded" style="background-color:#fff">
@@ -342,7 +342,7 @@
 			refreshParent();
 		} else {
 			var buttonAry = [{
-				title: '放弃添加',
+				title: '放弃导入',
 				style: 'destructive'
 			}];
 			plus.nativeUI.actionSheet({
@@ -382,7 +382,7 @@
 				title: "从手机相册选择"
 			}];
 			plus.nativeUI.actionSheet({
-				title: "添加图片",
+				title: "导入图片",
 				cancel: "取消",
 				buttons: buttonTit
 			}, function(b) { /*actionSheet 按钮点击事件*/
@@ -687,7 +687,7 @@
 			refreshParent();
 		} else {
 			var buttonAry = [{
-				title: '放弃添加',
+				title: '放弃导入',
 				style: 'destructive'
 			}];
 			plus.nativeUI.actionSheet({
@@ -820,7 +820,7 @@
 		}).then(function(result) {
 			wt.close();
 			var btnArray = ['确定'];
-			mui.alert(' ', '添加成功', btnArray, function(e) {
+			mui.alert(' ', '导入成功', btnArray, function(e) {
 				//console.log(e.index);
 				if (e.index == 0) {
 					refreshParent();
@@ -831,7 +831,7 @@
 			wt.close();
 			var length = fileArr.length;
 			var btnArray = ['确定'];
-			let message='添加失败';
+			let message='导入失败';
 			if (length == 0) {
 				mui.alert(' ', '请选择照片', btnArray, function(e) {
 					if (e.index == 0) {
@@ -841,7 +841,7 @@
 			} else {
 				if(err.responseText != null || err.responseText != ''){
 					if(err.responseText.search('413 Request Entity Too Large') != -1) {
-						message = '添加失败：选择图片过大！';
+						message = '导入失败：选择图片过大！';
 					}else if(err.responseJSON.error_message == 'CONCURRENCY_LIMIT_EXCEEDED'){
 						message = '人脸处理超过限制！';
 					}
