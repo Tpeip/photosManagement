@@ -56,11 +56,25 @@ function getPersonGroup() {
 		for (let i = 0; i < num; i++) {
 			let image_path = group_res.rows.item(i).image_path;
 			let group_id = group_res.rows.item(i).group_id;
-			let face_rect = group_res.rows.item(i).face_rec.split('-');
-			let width = face_rect[0];
-			let top = face_rect[1];
-			let left = face_rect[2];
-			let height = face_rect[3];
+			let face_rec = group_res.rows.item(i).face_rec.split("-");
+			let img = new Image();
+			img.src = image_path;
+			let imgW = img.width;
+			let imgH = img.height;
+			let width = Number(face_rec[0]);
+			let top = Number(face_rec[1]);
+			let left = Number(face_rec[2]);
+			let height = Number(face_rec[3]);
+// 			let scaleW = width / imgW;
+// 			let scaleH = height / imgH;
+			// 			let faceW = width + 560 * scaleW; //400
+			// 			let faceH = height + 480 * scaleH; //220
+			// 			let faceX = left - 240 * scaleW; //200
+			// 			let faceY = top - 400 * scaleH; //200
+			let faceW = width * 2;
+			let faceH = height * 2;
+			let faceX = left - width/2;
+			let faceY = top - height/2;
 			let image_num = group_res.rows.item(i).image_num;
 			//let face_src = group_res.rows.item(i).face_src;
 			// console.log(face_src);
@@ -68,7 +82,8 @@ function getPersonGroup() {
 			getGroupFaceById(group_id).then(function(res) {
 				// console.log(res.rows.length);
 				if (res.rows.length == 0) {
-					let face_src = getFaceData(image_path, width, top, left, height);
+					// let face_src = getFaceData(image_path, width, top, left, height);
+					let face_src = getFaceData(image_path, faceW, faceY, faceX, faceH);
 					InsertToGroupFace(group_id, face_src, image_num);
 				}
 				UpdateImageNum(group_id, image_num);
@@ -119,24 +134,41 @@ function updateGroupFace() {
 
 //查询人物照片获取人脸路径添加到person表中
 function getPersonFace() {
-	getOnePerson().then(function(e){
+	getOnePerson().then(function(e) {
 		for (let i = 0; i < e.rows.length; i++) {
 			let path = e.rows.item(i).image_path;
+			let img = new Image();
+			img.src = path;
+			let imgW = img.width;
+			let imgH = img.height;
 			let face_token = e.rows.item(i).face_token;
 			let src = e.rows.item(i).face_src;
 			if (src == null || src == '') {
 				let face_rec = e.rows.item(i).face_rec.split('-');
-				let width = face_rec[0];
-				let top = face_rec[1];
-				let left = face_rec[2];
-				let height = face_rec[3];
-				let face_src = getFaceData(path, width, top, left, height);
-				UpdateToPerson( face_token, face_src);
+				console.log(face_rec);
+				let width = Number(face_rec[0]);
+				let top = Number(face_rec[1]);
+				let left = Number(face_rec[2]);
+				let height = Number(face_rec[3]);
+				let faceW = width * 2;
+				let faceH = height * 2;
+				let faceX = left - width/2;
+				let faceY = top - height/2;
+				let l_border = faceX;
+				let r_border = faceX + faceW - imgW;
+				let t_border = faceY;
+				let b_border = faceY + faceH - imgH;
+				if(l_border>0 && r_border>0 && t_border>0 && b_border>0){
+					let face_src = getFaceData(path, faceW, faceY, faceX, faceH);
+					// console.log(face_src);
+					UpdateToPerson(face_token, face_src);
+				}
+				
 			}
 		}
 	}).catch(function(e) {
 		console.log(e);
-	})	
+	})
 }
 
 //处理人脸出错
@@ -560,13 +592,13 @@ function getPersonData() {
 				getRelatedPerson(group_id).then(function(res) {
 					var promArr = [];
 					for (let j = 0; j < res.rows.length; j++) {
-							let id = res.rows.item(j).person_main;
-							let relation = res.rows.item(j).person_relation;
-							let relatedPerson = {
-								'id': id,
-								'relation': relation
-							};
-							onePerson.persons.push(relatedPerson);
+						let id = res.rows.item(j).person_main;
+						let relation = res.rows.item(j).person_relation;
+						let relatedPerson = {
+							'id': id,
+							'relation': relation
+						};
+						onePerson.persons.push(relatedPerson);
 					}
 				})
 			)

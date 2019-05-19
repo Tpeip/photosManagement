@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<style>
+			 #text{
+			    left: 5%;
+			    position: absolute;
+			    top: 414px;
+			    width: 90%;
+			    bottom: 10px;
+			}
+			#face{
+				width: 200px;
+				height: 200px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<canvas id="can" style="display:none;width:400px;height:400px"></canvas>
+			<img id="img" src="../images/8.jpg" />
+			<!-- <textarea id="text"></textarea> -->
+			<p>
+			<img id="face" />
+			</p>
+		</div>
+		<script src="../js/mui.js"></script>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/facepp_sdk.js"></script>
+		<script src="../js/common.js"></script>
+		<script src="../js/exif.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			var facepp = new FACEPP(APIKEY,APISERET,1);
+
+			function getBase64Image(img) {
+				var canvas = document.createElement("canvas");
+				canvas.width = img.width;
+				canvas.height = img.height;
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(img, 0, 0, img.width, img.height);
+				var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+				var dataURL = canvas.toDataURL("image/" + ext);
+				// 				var image=dataURL.replace(/data:image\/.*;base64,/,'');
+				// 				return image;
+				return dataURL;
+			}
+
+			//图片的base64数据
+			var img = document.getElementById("img");
+			var src = img.src;
+			var width = img.width;
+			var height = img.height;
+			console.log('width: '+width+'height: '+height);
+			var image = new Image();
+			image.src = src;
+			var base64Image = getBase64Image(image);
+
+			//base64方式上传图片
+// 			let dic = {
+// 				'image_base64': base64Image
+// 			};
+			let attributes =
+				'gender,age,smiling,headpose,facequality,blur,eyestatus,emotion,ethnicity,beauty,mouthstatus,eyegaze,skinstatus';
+			//上传图片,获取结果
+			let dic = {
+				'image_base64': base64Image,
+				'return_landmark': 2,
+				'return_attributes': attributes
+			};
+			facepp.detectFace(dic, success, failed);
+
+
+
+			// 以二进制的方式上传图片
+			// 将base64转为二进制
+			// let imageData = facepp.dataURItoBlob(base64Image);
+			//根据个人需求填写的参数,这里全部写上了,包括年龄性别等,详情看官方文档
+// 			let attributes =
+// 				'gender,age,smiling,headpose,facequality,blur,eyestatus,emotion,ethnicity,beauty,mouthstatus,eyegaze,skinstatus';
+// 			//上传图片,获取结果
+// 			let dataDic = {
+// 				'image_file': imageData,
+// 				'return_landmark': 2,
+// 				'return_attributes': attributes
+// 			};
+			//调用接口，检测人脸
+			// facepp.detectFace(dataDic, success, failed);
+
+			//成功的回调
+			function success(e) {
+				//显示结果
+				// console.log(e);
+// 				let textView = document.getElementById('text');
+// 				textView.innerText = JSON.stringify(e, null, "\t");
+// 
+// 				// 画上人脸框,男女颜色不一样
+// 				let imageView = document.getElementById('preview');
+
+				const faces = e.faces;
+
+				for (const index in faces) {
+					const face = faces[index];
+					const face_rectangle = face.face_rectangle;
+
+					//脸部旋转角度
+					var roll = face.attributes.headpose.roll_angle;
+
+					//性别
+					var gender = face.attributes.gender.value;
+
+					const borderColor = (gender == 'Male') ? 'blue' : 'red';
+
+					console.log('人脸框颜色：' + borderColor);
+
+					//脸部坐标
+					var faceX = face_rectangle.left;
+					var faceY = face_rectangle.top;
+					var faceW = face_rectangle.width;
+					var faceH = face_rectangle.height;
+
+					
+
+					const scaleW = faceW / width;
+					const scaleH = faceH / height;
+
+					console.log('scaleW = ' + scaleW);
+					console.log('scaleH = ' + scaleH);
+
+					console.log(faceY);
+					console.log(faceX);
+					console.log(faceH);
+					console.log(faceW);
+					
+					var W = faceW+560*scaleW;
+					var H = faceH+480*scaleH;
+					var X = faceX-240*scaleW;
+					var Y = faceY-400*scaleH;
+					var fa = document.getElementById("face");
+					// fa.src = getFaceData(src,faceW+20, faceY-30, faceX-10, faceH+30);
+					fa.src = getFaceData(src, W, Y, X, H);
+				}
+			}
+			function getFaceData(image_path, width, top, left, height) {
+				//	var rects = face_rect.split('-');
+				var faceW = width;
+				var faceY = top;
+				var faceX = left;
+				var faceH = height;
+				let image = new Image();
+				image.src = image_path;
+				let c = document.getElementById('can');
+				var ctx = c.getContext('2d');
+				ctx.drawImage(image, faceX, faceY, faceW, faceH, 0, 0, 300, 150);
+				var face_url = c.toDataURL('image/png');
+				return face_url;
+			}
+
+			//失败的回调
+			function failed(e) {
+				console.log(e);
+				let textView = document.getElementById('text');
+				textView.innerText = JSON.stringify(e);
+			}
+
+			
+		</script>
+	</body>
+
+</html>

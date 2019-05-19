@@ -183,8 +183,8 @@
 				100% {
 					opacity: 0;
 				}
-			}	
-		    
+			}
+
 			.mui-slider-img-content {
 				position: absolute;
 				bottom: 0;
@@ -198,8 +198,8 @@
 			}
 
 			.image-border {
-				width: 33%;
-				height: 120px;
+				width: 24.7%;
+				height: 89.5px;
 				display: inline-block;
 				margin-right: 1px;
 				margin-top: -9px;
@@ -218,10 +218,17 @@
 			.mui-content {
 				margin: 0px;
 				padding: 0px;
-				padding-top: 15px;
+				padding-top: 10px;
 			}
-			.mui-color{
+
+			.mui-color {
 				background-color: white;
+			}
+
+			.label-date {
+				font-size: 17px;
+				color: #000000;
+				margin-left: 5px;
 			}
 		</style>
 
@@ -232,24 +239,26 @@
 		<canvas id="can" style="display:none;width:200px;height:200px"></canvas>
 		<div id="image-content" class="mui-content">
 			<!-- <div  class="mui-content-padded"> -->
-				<!-- <div>
+			<!-- <div>
 				<p style="position:relative;left: 0px;" >
 					<img style= "position:absolute;clip:rect(0px 328px 262px 66px)" src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1" data-desc="款式:红锦满天星1000粒+肥+生根粉"
 					 data-content="已经收到了，谢谢" />
 				</p>
 				</div> -->
-				
-				<!-- <p class="image-border">
-					<img class="images" src="images/14.jpg" data-preview-src="" data-preview-group="1" >
-				</p>
-				
+			<!-- <div>
+				<p class="label-date">2019年5月17日</p>
 				<p class="image-border">
-					<img id="people" class="images" src="images/14.jpg" data-preview-src="" data-preview-group="1" />
+					<img class="images" src="../images/5.jpg" data-preview-src="" data-preview-group="1">
+				</p>
+
+				<p class="image-border">
+					<img id="people" class="images" src="../images/10.jpeg" data-preview-src="" data-preview-group="1" />
 				</p>
 				<p class="image-border">
-					<img class="images" src="images/shuijiao.jpg" data-preview-src="" data-preview-group="1" >
-				</p> -->
-				<!--  --<p class="image-border">
+					<img class="images" src="../images/shuijiao.jpg" data-preview-src="" data-preview-group="1">
+				</p>
+			</div> -->
+			<!--  --<p class="image-border">
 					<img class="images" src="images/yuantiao.jpg" data-preview-src="" data-preview-group="1" />
 				</p>
 				<p class="image-border">
@@ -283,17 +292,17 @@
 		// createFace();
 		createGroupFace();
 		createRelation();
-// 		window.addEventListener('refresh', function(event) {
-// 			//通过event.detail可获得传递过来的参数内容
-// 			location.reload();;
-// 		});
+		// 		window.addEventListener('refresh', function(event) {
+		// 			//通过event.detail可获得传递过来的参数内容
+		// 			location.reload();;
+		// 		});
 		var shares = {};
-        mui.plusReady(function() {
+		mui.plusReady(function() {
 			CreateAlbum();
 			setHtml();
 			UpdateGroup();
 			//getPersonFace();
-		    // getPersonGroup();
+			// getPersonGroup();
 			plus.share.getServices(function(s) {
 				if (s && s.length > 0) {
 					for (var i = 0; i < s.length; i++) {
@@ -304,8 +313,8 @@
 			}, function() {
 				console.log("获取分享服务列表失败");
 			});
-		});		
-		
+		});
+
 		mui.previewImage(function(img) {
 			plus.webview.currentWebview().setStyle({
 				top: '0px',
@@ -317,21 +326,34 @@
 				bottom: '51px'
 			});
 		});
-		
+
 		//显示照片
-		function setHtml(){
+		function setHtml() {
 			jQuery('#image-content').empty();
-			getAllImage().then(function(result){
-				for (var i=0;i<result.rows.length;i++) {
-					// console.log(data[i].image_name);
-					image = '<p class="image-border"><img class="images" src="' + result.rows.item(i).image_path +
-						'" data-preview-src="" data-preview-group="1" /></p>';
-					jQuery('#image-content').append(image);
+			getAllDate().then(function(res) {
+				for (let i = 0; i < res.rows.length; i++) {
+					let date = res.rows.item(i).image_date;
+					let dateArr = date.split("-");
+					let year = dateArr[0];
+					let month = dateArr[1];
+					let day = dateArr[2];
+					getImageByDate(date).then(function(e) {
+						let html = '<div><p class="label-date">' + year + '年' + month + '月' + day + '日</p>';
+						for (let j = 0; j < e.rows.length; j++) {
+							let src = e.rows.item(j).image_path;
+							let image_html = '<p class="image-border"><img class="images" src="' + src + '" data-preview-src="" data-preview-group="1"></p>';
+							html += image_html;
+						}
+						html = html + '</div>';
+						jQuery('#image-content').append(html);
+					}).catch(function(error) {
+						console.log(error);
+					});
 				}
-			}).catch(function(err){
+			}).catch(function(err) {
 				console.log(err);
-			});
-		}			
+			});			
+		}
 	</script>
 
 </html>

@@ -83,6 +83,42 @@ function getNowFormatDate() {
 	return currentdate;
 }
 
+function getAllDate() {
+	websqlOpenDB();
+	var selectALLSQL = 'SELECT distinct(image_date) FROM image ORDER BY image_date DESC';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectALLSQL, [], function(ctx, result) {
+					//      console.log("查询" +   + "成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('查询失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function getImageByDate(date) {
+	websqlOpenDB();
+	var selectALLSQL = 'SELECT * FROM image WHERE image_date = ? ORDER BY image_id DESC';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectALLSQL, [date], function(ctx, result) {
+					//      console.log("查询" +   + "成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('查询失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
 function getImageByPath(path) {
 	websqlOpenDB();
 	var selectSQL = 'SELECT * FROM image where image_path=?';

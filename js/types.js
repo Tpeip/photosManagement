@@ -87,67 +87,75 @@ function getOtherTypeRes() {
 
 
 //显示人物照片类型
-function setPersonHtml(src, num, i) {
-	let person_num = '';
-	if (i == 1) {
-		person_num = '单人照';
-	} else if (i == 2) {
-		person_num = '双人照';
+// function setPersonHtml(src, num, i) {
+// 	let person_num = '';
+// 	if (i == 1) {
+// 		person_num = '单人照';
+// 	} else if (i == 2) {
+// 		person_num = '双人照';
+// 	} else {
+// 		person_num = '合照';
+// 	}
+// 	var str = '';
+// 	var name = 'person-' + person_num;
+// 	//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
+// 	str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
+// 		'<img class="images" src="' + src + '" />' +
+// 		'<label class="label-photo-type">' + person_num + '</label>' + '<br>' +
+// 		'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
+// 		'</p>';
+// 	jQuery("#persons").append(str);
+// }
+// 
+// //显示所有照片类型
+// function setTypeHtml(type, num, src) {
+// 	if (type == '人物') return;
+// 	var str = '';
+// 	var name = 'type-' + type;
+// 	str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
+// 		'<img class="images" src="' + src + '" />' +
+// 		'<label class="label-photo-type">' + type + '</label>' + '<br>' +
+// 		'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
+// 		'</p>';
+// 	jQuery("#types").append(str);
+// }
+// 
+function setTypeHtml(type, num, allImage) {
+	if (type == '漂亮小姐姐' || type == '帅气小鲜肉' || type == '可爱小宝贝' || type == '活力青少年' || type == '明星') {
+		let html = '';
+		if (num > 0) {
+			html = '<div class="image-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + allImage + '\')">' +
+				'<img class="images" src="' + allImage[0] + '" />' +
+				'<p class="label-photo" style="text-align:left">' + type + '</p><br></div>';
+			jQuery("#photos").append(html);
+		}
 	} else {
-		person_num = '合照';
-	}
-	var str = '';
-	var name = 'person-' + person_num;
-	//	var src = 'http://192.168.1.114:3000/upload/' + user + '/' + name;
-	str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
-		'<img class="images" src="' + src + '" />' +
-		'<label class="label-photo-type">' + person_num + '</label>' + '<br>' +
-		'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
-		'</p>';
-	jQuery("#persons").append(str);
-}
-
-//显示所有照片类型
-function setTypeHtml(type, num, src) {
-	if (type == '人物') return;
-	var str = '';
-	var name = 'type-' + type;
-	str = '<p class="image-border" onclick="turnTo(\'' + name + '\')">' +
-		'<img class="images" src="' + src + '" />' +
-		'<label class="label-photo-type">' + type + '</label>' + '<br>' +
-		'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
-		'</p>';
-	jQuery("#types").append(str);
-}
-
-function setPersonTypeHtml(type, num, src, allImage) {
-	var str = '';
-	var name = 'persontype-' + type;
-	if (num != 0) {
-		str = '<p class="image-border" onclick="turn(\'' + name + '\'' + ',' + '\'' + allImage + '\')">' +
-			'<img class="images" src="' + src + '" />' +
-			'<label class="label-photo-type">' + type + '</label>' + '<br>' +
-			'<label style="padding-left: 6px;letter-spacing: 1px;">' + num + '张</label>' +
-			'</p>';
-		jQuery("#persons-type").append(str);
+		let html = '';
+		if (num > 0) {
+			html = '<div class="img-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + allImage + '\')">' +
+				'<img class="images" src="' + allImage[0] + '" />' +
+				'<p class="label-type">' + type + '</p>' +
+				'<p style="padding-left: 6px;word-spacing: 1px;">' + num + '张</p><br></div>';
+			jQuery("#types").append(html);
+		}
 	}
 }
 
 //查看每个类型的所有照片
-function turnTo(type) {
-	localStorage.setItem("type", type);
-	console.log(type);
-	mui.openWindow({
-		url: 'tab-types-photo.html',
-		show: {
-			autoShow: true,
-			aniShow: 'slide-in-right',
-			duration: 200
-		}
-	});
-}
+// function turnTo(type) {
+// 	localStorage.setItem("type", type);
+// 	console.log(type);
+// 	mui.openWindow({
+// 		url: 'tab-types-photo.html',
+// 		show: {
+// 			autoShow: true,
+// 			aniShow: 'slide-in-right',
+// 			duration: 200
+// 		}
+// 	});
+// }
 
-function turn(type, allImage) {
+function turnTo(type, allImage) {
 	localStorage.setItem("type", type);
 	localStorage.setItem("allImage", allImage);
 	mui.openWindow({
@@ -265,7 +273,7 @@ function getTypeImageRes() {
 
 function getTypeImage() {
 	getTypeImageRes().then(function(typeRes) {
-		console.log(JSON.stringify(typeRes));
+		// console.log(JSON.stringify(typeRes));
 		for (let i in typeRes) {
 			let type = '';
 			let num = 0;
@@ -397,17 +405,17 @@ function getTypeImage() {
 						allImage = typeRes.animal;
 						break;
 					}
-					case 'other':
-						{
-							type = '其他';
-							num = typeRes.other.length;
-							allImage = typeRes.other;
-							break;
-						}
+				case 'other':
+					{
+						type = '其他';
+						num = typeRes.other.length;
+						allImage = typeRes.other;
+						break;
+					}
 				default:
 					break;
 			}
-			//setPersonTypeHtml(type, num, path, allImage);
+			setTypeHtml(type, num, allImage);
 		}
 	});
 }

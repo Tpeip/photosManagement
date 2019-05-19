@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<link href="../css/mui.css" rel="stylesheet" />
+		<!-- <link href="../css/mui.css" rel="stylesheet" /> -->
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<style>
 			html,body {
@@ -18,9 +18,21 @@
 				color: #6d6d72;
 				font-size: 15px;
 			}
+			.mui-content{
+				margin-top:10px;
+			}
+			.mui-content-padded{
+				/* margin: 0; */
+			}
 			.label-font{
 				font-size: 14px;
 				color:  #0062CC;
+				margin-left: -2px;
+			}
+			.label-font>span{
+				margin-left: 6px;
+				font-size: 12px;
+				color: #888888;
 			}
 			.icon-style{
 				font-size: 18px;
@@ -30,23 +42,44 @@
 			li{
 				display: inline;
 			}
-			.image-border {
-				padding: 2px 0px 20px 0;
-				width: 47%;
-				height: 190px;
-				display: inline-block;
-				margin: 10px 4px 20px 5px;
-				
+			p{
+				margin: 0;
+				padding: 0;
 			}
 			
+			.image-border {
+				width: 120px;
+				height: 88px;
+				display: inline-block;
+				margin-right: 10px;
+			}
+			.img-border{
+				width: 150px;
+				height:150px;
+				display: inline-block;
+				margin: 0px 15px 30px 5px;
+			}
 			.images {
-				border-radius: 6px;
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
+				border-radius: 4px;
 			}
-			.label-photo-type{
+			#slider {
+				height: 130px;
+				padding-top: 5px;
+			}
+			#types{
+				margin-top: 5px;
+			}
+			.label-photo{
+				font-size: 15px;
+				color: #555555;
+				letter-spacing: 1px;
+			}
+			.label-type{
 				font-size: 16px;
+				text-align: left;
 				color: #555555;
 				padding-left: 4px;
 				letter-spacing: 1px;
@@ -59,10 +92,141 @@
 	<body>
 		<div id="image-types-person" class="mui-content">
 			<div id="" class="mui-content-padded">
+				<div>
+					<span class="mui-icon mui-icon-paperplane icon-style" style="color: #4CD964"></span>
+					<label class="mui-tab-label label-font" style="color:black">相簿</label>
+				</div>
+				<div id="slider" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div id="photos" class="mui-scroll">
+						<!-- <p class="image-border" onclick="turnTo()">
+							<img class="images" src="../images/10.jpeg" /><br>
+							<label class="label-photo">漂亮小姐姐</label><br> -->
+							<!-- <label style="padding-left: 6px;word-spacing: 1px;font-size: 12px;margin-left: -40px;">3张</label> -->
+						<!-- </p> -->
+						<!-- <p class="image-border" onclick="turnTo()">
+							<img class="images" src="../images/8.jpg" /><br>
+							<label class="label-photo">帅气小鲜肉</label><br> -->
+							<!-- <label style="padding-left: 6px;word-spacing: 1px;">10张</label> -->
+						<!-- </p>
+						<p class="image-border" onclick="turnTo()">
+							<img class="images" src="../images/child.jpg" /><br>
+							<label class="label-photo">可爱小宝贝</label><br> -->
+							<!-- <label style="padding-left: 6px;word-spacing: 1px;">10张</label> -->
+						<!-- </p>
+						<p class="image-border" onclick="turnTo()">
+							<img class="images" src="../images/8.jpg" /><br>
+							<label class="label-photo">明星</label><br> -->
+							<!-- <label style="padding-left: 6px;word-spacing: 1px;">10张</label> -->
+						<!-- </p> -->
+					</div>
+				</div>
+			</div>
+			<div id="" class="mui-content-padded">
+				<span class="mui-icon mui-icon-paperplane icon-style"  style="color: #EC971F"></span>
+				<label class="mui-tab-label label-font" style="color:black">类型</label>
+				<div id="types">
+					<!-- <p class="img-border" onclick="turnTo()"> -->
+					<!-- <div onclick="turnTo()">
+						
+						<div class="container">
+							<div class="parent">
+								<div class="item"><img class="imgs" src="../images/6.jpg" /></div>
+								<div class="item"><img class="imgs" src="../images/6.jpg" /></div>
+							</div>
+							<div class="parent">
+								<div class="item"><img class="imgs" src="../images/6.jpg" /></div>
+								<div class="item"><img class="imgs" src="../images/6.jpg" /></div>
+							</div>
+						</div> -->
+					
+						<!-- <img class="images" src="../images/6.jpg" />
+						<label class="label-type">人物</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">4位</label>
+					</p>
+					<p class="img-border" onclick="turnTo()">
+						<img class="images" src="../images/muwu.jpg" />
+						<label class="label-type">合照</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
+					</p>
+					<p class="img-border" onclick="turnTo()">
+						<img class="images" src="../images/muwu.jpg" />
+						<label class="label-type">自拍</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
+					</p>
+					<p class="img-border" onclick="turnTo()">
+						<img class="images" src="../images/muwu.jpg" />
+						<label class="label-type">风景</label><br>
+						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
+					</p> -->
+				</div>
+			</div>
+
+			<!-- <div id="" class="mui-content-padded">
+				<div>
+					<span class="mui-icon mui-icon-paperplane icon-style"></span>
+					<label class="mui-tab-label label-font">漂亮小姐姐<span>6张</span></label>
+					<span class="mui-icon mui-icon-forward mui-pull-right"></span>
+				</div>
+				<div id="slider" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div class="mui-scroll">
+						<p class="image-border">
+							<img class="images" src="../images/6.jpg" data-preview-src="" data-preview-group="1">
+						</p>
+						<p class="image-border">
+							<img id="people" class="images" src="../images/9.jpg" data-preview-src="" data-preview-group="1" />
+						</p>
+						<p class="image-border">
+							<img id="people" class="images" src="../images/10.jpeg" data-preview-src="" data-preview-group="1" />
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="" class="mui-content-padded">
+				<div>
+					<span class="mui-icon mui-icon-paperplane icon-style"></span>
+					<label class="mui-tab-label label-font">可爱小宝贝<span>2张</span></label>
+					<span class="mui-icon mui-icon-forward mui-pull-right"></span>
+				</div>
+				<div id="slider" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div class="mui-scroll">
+						<p class="image-border">
+							<img class="images" src="../images/one.jpg" data-preview-src="" data-preview-group="1">
+						</p>
+						<p class="image-border">
+							<img id="people" class="images" src="../images/child.jpg" data-preview-src="" data-preview-group="1" />
+						</p>
+					</div>
+				</div>
+			</div>
+			<div id="" class="mui-content-padded">
+				<div>
+					<span class="mui-icon mui-icon-paperplane icon-style"></span>
+					<label class="mui-tab-label label-font">明星<span>7张</span></label>
+					<span class="mui-icon mui-icon-forward mui-pull-right"></span>
+				</div>
+				<div id="slider" class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+					<div class="mui-scroll">
+						<p class="image-border">
+							<img class="images" src="../images/2.jpg" data-preview-src="" data-preview-group="1">
+						</p>
+						<p class="image-border">
+							<img id="people" class="images" src="../images/8.jpg" data-preview-src="" data-preview-group="1" />
+						</p>
+						<p class="image-border">
+							<img class="images" src="../images/13.jpeg" data-preview-src="" data-preview-group="1">
+						</p>
+						<p class="image-border">
+							<img id="people" class="images" src="../images/shuijiao.jpg" data-preview-src="" data-preview-group="1" />
+						</p>						
+					</div>
+				</div>
+			</div> -->
+
+			<!-- <div id="" class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">人物</label>
-				<div id="persons">
-					<!-- <p class="image-border" onclick="turnTo()">
+				<div id="persons"> -->
+			<!-- <p class="image-border" onclick="turnTo()">
 						<img class="images" src="images/shuijiao.jpg" />
 						<label class="label-photo-type">单人照</label><br>
 						<label style="padding-left: 6px;word-spacing: 1px;">3张</label>
@@ -72,7 +236,7 @@
 						<label class="label-photo-type">合照</label><br>
 						<label style="padding-left: 6px;word-spacing: 1px;">10张</label>
 					</p> -->
-				</div>
+			<!-- </div>
 			</div>
 			<div id="" class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
@@ -84,8 +248,8 @@
 			<div class="mui-content-padded">
 				<label class="mui-icon mui-icon-paperplane icon-style"></label>
 				<label class="mui-tab-label label-font">类型</label>
-				<div id="types">
-					<!-- <p class="image-border">
+				<div id="types"> -->
+			<!-- <p class="image-border">
 						<img id="phototype" class="images" src="../images/cbd.jpg" />
 						<label class="label-photo-type">风景</label>
 						<labe>2张</label>
@@ -100,12 +264,12 @@
 						<label class="label-photo-type">动物</label>
 						<labe>8张</label>
 					</p> -->
-				</div>
-			</div>
+			<!-- </div>
+			</div> -->
 		</div>
-		
+
 	</body>
-	<script type="text/javascript" src="../js/mui.js"></script>
+	<script type="text/javascript" src="../js/mui.min.js"></script>
 	<script type="text/javascript" src="../js/jquery.min.js"></script>
 	<script type="text/javascript" src="../js/mui.zoom.js"></script>
 	<script type="text/javascript" src="../js/mui.previewimage.js"></script>
@@ -114,9 +278,15 @@
 	<script type="text/javascript">
 		mui.init();	
 		getTypeImage();
-		window.addEventListener('refresh', function(event) {
+		window.addEventListener('update', function(event) {
 			location.reload();
 		});	
-	    
+		
+		// 		getPersonType();
+		// 		getImageType();
+		// 		getOtherType();
+		// 		window.addEventListener('refresh', function(event) {
+		// 			location.reload();
+		// 		});
 	</script>
 </html>

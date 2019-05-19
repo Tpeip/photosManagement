@@ -209,6 +209,9 @@
 				margin: 0;
 				padding: 0;
 			}
+			.showImage{
+				display: none;
+			}
 		</style>
 	</head>
 
@@ -229,68 +232,69 @@
 	<script type="text/javascript">
 		mui.init({
 			swipeBack: true,
-			
-		});	
+
+		});
 		var type = localStorage.getItem('type');
-		var types = type.split('-');
+		var allImage = localStorage.getItem('allImage');
 
 		mui.plusReady(function() {
 			replaceHeader();
 			setPhotoHtml();
 		});
-		
+
 		mui.back = function() {
 			var listpage = plus.webview.currentWebview().opener();
 			//触发父页面的自定义事件(refresh),从而进行刷新
 			plus.webview.currentWebview().close();
-			mui.fire(listpage, 'refresh');
+			mui.fire(listpage, 'update');
 		};
-		
-		function setPhotoHtml(){
-			var type = localStorage.getItem('type');
-			var types = type.split('-');
+
+		function setPhotoHtml() {
+			// 			var type = localStorage.getItem('type');
+			// 			var types = type.split('-');
+			// 			jQuery('#image-content').empty();
+			// 			if (types[0] == 'type') {
+			// 				getTypeOne(types[1]).then(function(result) {
+			// 					for (let i = 0; i < result.rows.length; i++) {
+			// 						let src = result.rows.item(i).image_path;
+			// 						image = '<p class="image-border"><img class="images" src="' + src +
+			// 							'" data-preview-src="" data-preview-group="1" /></p>';
+			// 						jQuery('#image-content').append(image);
+			// 					}
+			// 				}).catch(function(err) {
+			// 					console.log(err);
+			// 				})
+			// 			} else if(types[0] == 'person'){
+			// 				var person_num;
+			// 				if (types[1] == '单人照') {
+			// 					person_num = 1;
+			// 				} else if (types[1] == '双人照') {
+			// 					person_num = 2;
+			// 				} else {
+			// 					person_num = 3;
+			// 				}
+			// 				getPersonNumImage(person_num).then(function(result) {
+			// 					for (let i = 0; i < result.rows.length; i++) {
+			// 						let src = result.rows.item(i).image_path;
+			// 						image = '<p class="image-border"><img class="images" src="' + src +
+			// 							'" data-preview-src="" data-preview-group="1" /></p>';
+			// 						jQuery('#image-content').append(image);
+			// 					}
+			// 				}).catch(function(err) {
+			// 					console.log(err);
+			// 				})
+			// 			}else{
 			jQuery('#image-content').empty();
-			if (types[0] == 'type') {
-				getTypeOne(types[1]).then(function(result) {
-					for (let i = 0; i < result.rows.length; i++) {
-						let src = result.rows.item(i).image_path;
-						image = '<p class="image-border"><img class="images" src="' + src +
-							'" data-preview-src="" data-preview-group="1" /></p>';
-						jQuery('#image-content').append(image);
-					}
-				}).catch(function(err) {
-					console.log(err);
-				})
-			} else if(types[0] == 'person'){
-				var person_num;
-				if (types[1] == '单人照') {
-					person_num = 1;
-				} else if (types[1] == '双人照') {
-					person_num = 2;
-				} else {
-					person_num = 3;
-				}
-				getPersonNumImage(person_num).then(function(result) {
-					for (let i = 0; i < result.rows.length; i++) {
-						let src = result.rows.item(i).image_path;
-						image = '<p class="image-border"><img class="images" src="' + src +
-							'" data-preview-src="" data-preview-group="1" /></p>';
-						jQuery('#image-content').append(image);
-					}
-				}).catch(function(err) {
-					console.log(err);
-				})
-			}else{
-				var allImg = localStorage.getItem('allImage');
-				console.log(allImg);
-				var imgArr = allImg.split(",");
-				for(let i=0; i< imgArr.length; i++){
-					let src = imgArr[i];
-					image = '<p class="image-border"><img class="images" src="' + src +
-						'" data-preview-src="" data-preview-group="1" /></p>';
-					jQuery('#image-content').append(image);
-				}
+			var allImg = localStorage.getItem('allImage');
+			console.log(allImg);
+			var imgArr = allImg.split(",");
+			for (let i = 0; i < imgArr.length; i++) {
+				let src = imgArr[i];
+				image = '<p id="'+ src +'" class="image-border"><img class="images" src="' + src +
+					'" data-preview-src="" data-preview-group="1" /></p>';
+				jQuery('#image-content').append(image);
 			}
+			// }
 		}
 		// mui.previewImage();
 		mui.previewImage(function(img) {
@@ -307,13 +311,13 @@
 
 		function replaceHeader() {
 			var el = document.getElementById('title').innerHTML;
-			document.getElementById('title').innerHTML = types[1];
+			document.getElementById('title').innerHTML = type;
 		}
 		document.getElementById('backing').addEventListener('tap', function() {
 			var listpage = plus.webview.currentWebview().opener();
 			//触发父页面的自定义事件(refresh),从而进行刷新
 			plus.webview.currentWebview().close();
-			mui.fire(listpage, 'refresh');
+			mui.fire(listpage, 'update');
 		});
 	</script>
 
