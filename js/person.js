@@ -56,10 +56,11 @@ function getPersonGroup() {
 		for (let i = 0; i < num; i++) {
 			let image_path = group_res.rows.item(i).image_path;
 			let group_id = group_res.rows.item(i).group_id;
-			let width = group_res.rows.item(i).width;
-			let top = group_res.rows.item(i).top;
-			let left = group_res.rows.item(i).left;
-			let height = group_res.rows.item(i).height;
+			let face_rect = group_res.rows.item(i).face_rec.split('-');
+			let width = face_rect[0];
+			let top = face_rect[1];
+			let left = face_rect[2];
+			let height = face_rect[3];
 			let image_num = group_res.rows.item(i).image_num;
 			//let face_src = group_res.rows.item(i).face_src;
 			// console.log(face_src);
