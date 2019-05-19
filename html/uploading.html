@@ -518,7 +518,7 @@
 				for(let i = 0; i < res.result.length; i++){
 					let keyword = res.result[i].keyword;
 					let types = res.result[i].root.split('-');
-					if(types[0].indexOf('公众人物') || types[1].indexOf('公众人物')){
+					if(types[0] == '公众人物' || types[1] == '公众人物'){
 						keyArr.push('公众人物');
 					}
 					keyArr.push(keyword);
