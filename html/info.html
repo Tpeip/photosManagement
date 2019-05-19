@@ -142,7 +142,7 @@
 // 			img.src = path;
 			mui.plusReady(function(){
 				getImageByPath(path).then(function(result){
-					var type = result.rows.item(0).image_main_type;
+					var type = result.rows.item(0).image_type.split('-');
 					var date = result.rows.item(0).image_date;
 					var items = result.rows.item(0).image_keyword;
 					var item = items.split('-');
@@ -174,7 +174,7 @@
 								'<div class="mui-media mui-col-xs-8">'+ tags +'</div>'+									
 								'<div class="mui-media mui-col-xs-1"></div>'+
 							  '</div>';
-					if(type == '人物') {
+					if(type.indexOf('人物') != -1) {
 						var persons_html = '';
 						getPersonImage(path).then(function(e){
 							var length = e.rows.item(0).person_num;

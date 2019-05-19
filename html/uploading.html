@@ -490,72 +490,112 @@
 			let image_base64 = getBase64Image(img);
 			let image_path = fileSrc;
 			pm.push(AIPImageClassify(image_base64).then(function(res) {
-				console.log(JSON.stringify(res));
+				// console.log(JSON.stringify(res));
 				
-				let image_main_type = '';
-				let typesArr = new Array();
-				let keyArr = new Array();
-				keyArr.push(res.result[0].keyword);
-				for (let j = 0; j < res.result_num; j++) {
-					let types = res.result[j].root.split("-");
-					keyArr.push(res.result[j].keyword);
-					if (types[0] == '非自然图像' || types[0] == '商品'){
-						types[0] = types[1];
+				var screenshot =[ "屏幕截图"];
+				var card = ['身份证', '信用卡', '名片', '银行卡'];
+				var scene = [ '风景','自然风景', '树', '植物', '峡谷', '湖泊', '山峦', '草原', '夜景', '江河'];
+				var food = ['食物', '美食', '蛋糕', '炸鸡','烧烤', '鸡翅', '排骨', '冰淇淋', '面条', '饮料', '肉', '烤肉', '菜肴', '炒饭', '饭', '食品'];
+				var tex = ['文字', '文字图', '表格', '二维码'];
+				var construction = ['建筑', '街道', '居民', '居民楼', '寺塔'];
+				var cartoon = ['图画', '卡通动漫人物', '彩色动漫', '艺术品', '艺术画', '娃娃', '玩具', '绘画', '图像素材'];
+				var transport = ['交通工具', '自行车', '摩托车', '轿车', '火车', '地铁', '飞机', '轮船'];
+				var animal = ['动物', '猫', '鸟类', '鼠', '鸡', '狗', '狐狸', '牛', '马', '羊', '兔子', '猪'];
+				var people = ['人物', '人物特写', '公众人物'];
+				
+				let typeArr = [];
+				let keyArr = [];
+				let screen = 0;
+				let cad = 0;
+				let sce = 0;
+				let fo = 0;
+				let te = 0;
+				let cons = 0;
+				let carto = 0;
+				let trans = 0;
+				let ani = 0;
+				let peo = 0;
+				for(let i = 0; i < res.result.length; i++){
+					let keyword = res.result[i].keyword;
+					let types = res.result[i].root.split('-');
+					keyArr.push(keyword);
+					if( screenshot.indexOf(types[0])!= -1 || screenshot.indexOf(types[1])!= -1){
+						screen++;
 					}
-					if (types[0] == '公众人物')
-						image_main_type = '人物';
-					if (types[0] == '人物')
-						image_main_type = types[0];
-					if (types[0] == '自然风景')
-						types[0] = '风景';
-					if (image_main_type == '自然风景')
-						image_main_type = '风景';
-					if(image_main_type == '工艺品'){
-						image_main_type = types[0];
+					if( card.indexOf(types[0])!= -1 || card.indexOf(types[1])!= -1){
+						cad++;
 					}
-					if(image_main_type == '彩色动漫' ||image_main_type == '艺术画'){
-						image_main_type = '卡通';
+					if( scene.indexOf(types[0])!= -1 || scene.indexOf(types[1])!= -1){
+						sce++;
 					}
-					if(image_main_type == ''){
-						image_main_type = types[0];
+					if( food.indexOf(types[0])!= -1 || food.indexOf(types[1])!= -1){
+						fo++;
 					}
-					if(image_main_type == '其他'){
-						image_main_type = '';
+					if( tex.indexOf(types[0])!= -1 || tex.indexOf(types[1])!= -1){
+						te++;
 					}
-					typesArr.push(types[0]);
+					if( construction.indexOf(types[0])!= -1 || construction.indexOf(types[1])!= -1){
+						cons++;
+					}
+					if( cartoon.indexOf(types[0])!= -1 || cartoon.indexOf(types[1])!= -1){
+						carto++;
+					}
+					if( transport.indexOf(types[0])!= -1 || transport.indexOf(types[1])!= -1){
+						trans++;
+					}
+					if( animal.indexOf(types[0])!= -1 || animal.indexOf(types[1])!= -1){
+						ani++;
+					}
+					if( people.indexOf(types[0])!= -1 || people.indexOf(types[1])!= -1){
+						peo++;
+					}
 				}
-				let image_type = typesArr.join("-");
-				let image_keyword = keyArr.join("-");
-				let image_date = getNowFormatDate();
-				//console.log(image_path,image_main_type,image_type,image_keyword);imageArr.push(image_path);
-				imageArr.push(image_path);
-				imageArr.push(image_main_type);
-				imageArr.push(image_type);
-				imageArr.push(image_keyword);
-				imageArr.push(image_date);
-				if (image_main_type == '人物') {
-
+				if(image_path.indexOf('Screenshot')!= -1 || screen >= 1){
+					typeArr.push('屏幕截图');
+				}
+				if(cad >= 2){
+					typeArr.push('证件照');
+				}
+				if(sce >= 2){
+					typeArr.push('风景');
+				}
+				if(fo >= 2){
+					typeArr.push('美食');
+				}
+				if(cons >= 2){
+					typeArr.push('建筑');
+				}
+				if(carto >= 2){
+					typeArr.push('卡通');
+				}
+				if(trans >= 2){
+					typeArr.push('交通工具');
+				}
+				if(ani >= 2){
+					typeArr.push('动物');
+				}
+				if(peo >= 1){
+					typeArr.push('人物');
+				}
+				if(typeArr.length == 0){
+					typeArr.push('其他');
+				}
+				
+				let pro =new Promise(function(resolve,reject){
+					resolve();
+				});
+				if(typeArr.indexOf('人物') != -1){
 					let image_face = facepp.getFaceBase64Image(img);
 					let params = {
 						'image_base64': image_face,
 						"return_attributes": "gender,age,beauty,ethnicity,emotion"
 					};
-					// console.log(image_main_type);
-					return new Promise((resolve, reject) => {
+					pro = new Promise((resolve, reject) => {
 						facepp.detectFace(params, function success(e) {
-							// console.log(JSON.stringify(e));
 							let face_num = e.faces.length;
 							if (face_num == 0) {
-								let nu = imageArr.indexOf(image_path);
-								for (let j in typesArr) {
-									console.log(typesArr[j]);
-									if (typesArr[j] != '人物') {
-										image_main_type = typesArr[j];
-										imageArr.splice(nu + 1, 1, image_main_type);
-										resolve();
-										break;
-									}
-								}
+								let nu = typeArr.indexOf('人物');
+								typeArr.splice(nu, 1);
 							} else {
 								per_path.push(image_path);
 								if (face_num > 5) {
@@ -568,6 +608,17 @@
 									let top = e.faces[k].face_rectangle.top;
 									let left = e.faces[k].face_rectangle.left;
 									let height = e.faces[k].face_rectangle.height;
+									
+									let img_width = img.width;
+									let img_height = img.height;
+									let rec_area = width*height;
+									let img_area = img_width*img_height;
+									let proper = (rec_area/img_area)*100;
+									if(Math.round(proper) >= 50){
+										typeArr.push('自拍');
+									}
+									
+									let face_rec = width + '-' + top + '-' + left + '-' + height;
 									let age = e.faces[k].attributes.age.value;
 									let gd = e.faces[k].attributes.gender.value;
 									let gender;
@@ -632,26 +683,34 @@
 									person.push(image_path);
 									person.push(face_num);
 									person.push(face_token);
-									person.push(width);
-									person.push(top);
-									person.push(left);
-									person.push(height);
+									person.push(face_rec);
 									person.push(age);
 									person.push(gender);
 									person.push(beauty);
 									person.push(ethnicity);
 									person.push(emotion);
-
 								}
 								resolve(e);
 							}
-
+					
 						}, function failed(err) {
 							console.log(JSON.stringify(err));
 							reject(err);
 						});
 					});
 				}
+				
+				pro.then(function(){
+					let image_type = typeArr.join("-");
+					let image_keyword = keyArr.join("-");
+					let image_date = getNowFormatDate();
+					imageArr.push(image_path);
+					imageArr.push(image_type);
+					imageArr.push(image_keyword);
+					imageArr.push(image_date);
+				});
+				return pro;
+
 			}));
 		}
 	}
@@ -671,12 +730,12 @@
 		fileArr.length--;
 
 		let num = imageArr.indexOf(fileSrc);
-		imageArr.splice(num, 5);
+		imageArr.splice(num, 4);
 		let ps = person.indexOf(fileSrc);
 		if (ps != -1) {
 			let nm = person[ps + 1];
 			per_num = per_num - nm;
-			person.splice(ps, nm * 12);
+			person.splice(ps, nm * 9);
 		}
 	}
 
@@ -766,10 +825,11 @@
 								lf = 0,
 								ht = 0;
 							for (let j = 0; j < length; j++) {
-								let face_width = res.rows.item(j).width;
-								let face_top = res.rows.item(j).top;
-								let face_left = res.rows.item(j).left;
-								let face_height = res.rows.item(j).height;
+								let rectangle = res.rows.item(j).face_rec.split('-');
+								let face_width = Number(rectangle[0]);
+								let face_top = Number(rectangle[1]);
+								let face_left = Number(rectangle[2]);
+								let face_height = Number(rectangle[3]);
 								if (Math.abs(face_width - width) <= 2)
 									wt = face_width;
 								else continue;
@@ -784,7 +844,8 @@
 									break;
 								} else continue;
 							}
-							UpdateToFaceToken(perImg.src, face_token, wt, tp, lf, ht);
+							let face_rec = wt + '-' + tp + '-' + lf + '-' + ht;
+							UpdateToFaceToken(perImg.src, face_token, face_rec);
 						}).catch(function(err) {
 							console.log(err);
 						})
@@ -839,7 +900,12 @@
 					}
 				}, 'div');
 			} else {
-				if(err.responseText != null || err.responseText != ''){
+				if(err.hasOwnProperty("statusText")){
+					if(err.statusText == 'timeout'){
+						message = '导入失败：网络超时！';
+					}
+				}
+				if(err.hasOwnProperty("responseText")){
 					if(err.responseText.search('413 Request Entity Too Large') != -1) {
 						message = '导入失败：选择图片过大！';
 					}else if(err.responseJSON.error_message == 'CONCURRENCY_LIMIT_EXCEEDED'){

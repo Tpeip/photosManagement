@@ -171,14 +171,14 @@
 		var deleteImage = function(path){
 			var image_path = decodeURIComponent(path);
 			getImageByPath(image_path).then(function(imageRes){
-				let image_type = imageRes.rows.item(0).image_main_type;
-				deleteOneImage(image_path).then(function(){					
-					setHtml();	
-					getPersonGroup();
-				});
-				if(image_type == '人物'){
+				let image_type = imageRes.rows.item(0).image_type.split('-');
+				if(image_type.indexOf('人物') != -1){
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
+						deleteOneImage(image_path).then(function(){					
+							setHtml();	
+							getPersonGroup();
+						});
 						let length = personRes.rows.length;
 						let group = [];
 						for(let i = 0;i < length; i++){
@@ -221,7 +221,13 @@
 							}
 						}
 					})
+				}else{
+					deleteOneImage(image_path).then(function(){					
+						setHtml();	
+						getPersonGroup();
+					});
 				}
+				
 			})
 		};
 		var laterForwardEvent = function(){

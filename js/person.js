@@ -118,38 +118,24 @@ function updateGroupFace() {
 
 //查询人物照片获取人脸路径添加到person表中
 function getPersonFace() {
-	let image_type = '人物';
-	getTypeOne(image_type).then(function(res) {
-		for (let i = 0; i < res.rows.length; i++) {
-			let path = res.rows.item(i).image_path;
-			getPersonImage(path).then(function(e) {
-				let src = path;
-				for (let j = 0; j < e.rows.length; j++) {
-					let face_token = e.rows.item(j).face_token;
-					let src = e.rows.item(j).face_src;
-					if (src == null || src == '') {
-						let width = e.rows.item(j).width;
-						let top = e.rows.item(j).top;
-						let left = e.rows.item(j).left;
-						let height = e.rows.item(j).height;
-						let face_src = getFaceData(path, width, top, left, height);
-						UpdateToPerson(path, face_token, face_src);
-						// var image_face=face_src.replace(/data:image\/.*;base64,/,'');
-						// let params={'image_base64' : image_face,"return_attributes": "gender,age,beauty,ethnicity,emotion"};
-						// facepp.detectFace(params, function success(e){
-						// 	console.log(JSON.stringify(e));
-						// },function failed(err){
-						// 	console.log(JSON.stringify(err));
-						// })
-					}
-				}
-			}).catch(function(e) {
-				console.log(e);
-			})
+	getOnePerson().then(function(e){
+		for (let i = 0; i < e.rows.length; i++) {
+			let path = e.rows.item(i).image_path;
+			let face_token = e.rows.item(i).face_token;
+			let src = e.rows.item(i).face_src;
+			if (src == null || src == '') {
+				let face_rec = e.rows.item(i).face_rec.split('-');
+				let width = face_rec[0];
+				let top = face_rec[1];
+				let left = face_rec[2];
+				let height = face_rec[3];
+				let face_src = getFaceData(path, width, top, left, height);
+				UpdateToPerson( face_token, face_src);
+			}
 		}
-	}).catch(function(err) {
-		console.log(err);
-	})
+	}).catch(function(e) {
+		console.log(e);
+	})	
 }
 
 //处理人脸出错
