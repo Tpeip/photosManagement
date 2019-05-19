@@ -10,16 +10,15 @@ function getOtherTypeRes() {
 		let length = imageRes.rows.length;
 		for (let i = 0; i < length; i++) {
 			let image_path = imageRes.rows.item(i).image_path;
-			let main = imageRes.rows.item(i).image_main_type;
-			let type = imageRes.rows.item(i).image_type;
+			let type = imageRes.rows.item(i).image_type.split('-');
 			let keyword = imageRes.rows.item(i).image_keyword;
-			if (type.search("公众人物") != -1) {
+			if (keyword.search("公众人物") != -1) {
 				publicman.push(image_path);
 			}
 			if (keyword.search("儿童") != -1) {
 				baby.push(image_path);
 			}
-			if (main == '人物') {
+			if (type.indexOf('人物')) {
 				promiseArr.push(getPersonImage(image_path).then(function(personRes) {
 					let num = personRes.rows.length;
 					let genders = {
