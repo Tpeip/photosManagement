@@ -579,7 +579,7 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 	websqlOpenDB();
 	var updateSQL = 'UPDATE relation SET person_relation=?,modify_flag=? WHERE person_core=? and person_main=? ';
 	var pm ;
-	if(person_relation == '爱人' ||person_relation == '父母' || person_relation == '孩子'){
+	if(person_relation == '爱人' ||person_relation == '父母' || person_relation == '孩子' || person_relation == '同学' || person_relation == '同事'){
 		var person_relation1 = person_relation;
 		if(person_relation == '父母'){
 			person_relation1 = '孩子';

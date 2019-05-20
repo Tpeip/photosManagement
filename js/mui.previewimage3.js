@@ -176,7 +176,7 @@
 				if(image_type.indexOf('人物') != -1){
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
-						deleteOneImage(image_path).then(function(){					
+						deleteOneImage(image_path).then(function(){	
 							getPersonGroup();					
 							getImages();
 							getFace();
