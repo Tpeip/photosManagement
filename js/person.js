@@ -60,12 +60,12 @@ function getPersonGroup() {
 			let face_src = getFaceSrc(face_rec, image_path);
 			// console.log(face_src);
 			let image_num = group_res.rows.item(i).image_num;
-			console.log(111111);
+			// console.log(111111);
 			getGroupFaceById(group_id).then(function(res) {
 				if (res.rows.length == 0) {
 					InsertToGroupFace(group_id, face_src, image_num);
 				}
-				console.log(image_num);
+				// console.log(image_num);
 				UpdateImageNum(group_id, image_num);
 			}).catch(function(err) {
 				console.log(err);
@@ -169,8 +169,6 @@ function getPersonFace() {
 				let face_rec = e.rows.item(i).face_rec.split('-');
 				let face_src = getFaceSrc(face_rec, path);
 				UpdateToPerson(face_token, face_src);
-
-
 			}
 		}
 	}).catch(function(e) {

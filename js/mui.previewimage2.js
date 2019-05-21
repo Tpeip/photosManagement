@@ -176,10 +176,9 @@
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
 						deleteOneImage(image_path).then(function(){					
-							// setPhotoHtml();
+
 							document.getElementById(image_path).classList.add('showImage');
-							
-							getPersonGroup();
+
 						});
 						let length = personRes.rows.length;
 						let group = [];
@@ -225,9 +224,7 @@
 					})
 				}else{
 					deleteOneImage(image_path).then(function(){					
-						// setPhotoHtml();
 						document.getElementById(image_path).classList.add('showImage');
-						getPersonGroup();
 					});
 				}
 				

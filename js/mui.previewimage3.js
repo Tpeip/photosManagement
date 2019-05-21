@@ -177,7 +177,7 @@
 					getPersonImage(image_path).then(function(personRes){
 						deleteOnePerson(image_path);
 						deleteOneImage(image_path).then(function(){	
-							getPersonGroup();					
+							// getPersonGroup();					
 							getImages();
 							getFace();
 						});
@@ -225,7 +225,7 @@
 					})
 				}else{
 					deleteOneImage(image_path).then(function(){					
-						getPersonGroup();					
+						// getPersonGroup();					
 						getImages();
 						getFace();
 					});
