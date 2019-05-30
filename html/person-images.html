@@ -232,6 +232,9 @@
 			.mui-color{
 				background-color: white;
 			}
+			.hidden{
+				display: none;
+			}
 		</style>
 	</head>
 
@@ -288,34 +291,25 @@
 					var listpage = plus.webview.currentWebview().opener();
 					//触发父页面的自定义事件(refresh),从而进行刷新
 					mui.fire(listpage, 'fresh');
-// 					var list = plus.webview.currentWebview().opener();
-// 					mui.fire(list, 'fresh');
+					// 					var list = plus.webview.currentWebview().opener();
+					// 					mui.fire(list, 'fresh');
 					//返回true,继续页面关闭逻辑
 					return true;
 				}
 			});
-// 			mui.init();
-// 			document.getElementById('backing').addEventListener('tap', function() {
-// 				plus.webview.currentWebview().close();				
-// 			});
-			mui.previewImage(function(img) {
-				plus.webview.currentWebview().setStyle({
-					top: '0px',
-					bottom: '0px'
-				})
-			}, function(img) {
-				plus.webview.currentWebview().setStyle({
-					top: '0px',
-					bottom: '0px'
-				});
-			});
-			var group_id = localStorage.getItem('id');            
+			var group_id = localStorage.getItem('id');
 
-			mui.plusReady(function() {
-				getFace();
-				getImages();
-			})
-			
+			// mui.plusReady(function() {
+			getFace();
+			getImages();
+			// })
+			// 			mui.init();
+			// 			document.getElementById('backing').addEventListener('tap', function() {
+			// 				plus.webview.currentWebview().close();				
+			// 			});
+
+
+
 			//获取当前页面的人脸
 			function getFace() {
 				var group_id = localStorage.getItem('id');
@@ -342,14 +336,15 @@
 					for (let i = 0; i < e.rows.length; i++) {
 						var image_path = e.rows.item(i).image_path;
 						var html = '<p class="image-border">' +
-							'<img class="images" src="' + image_path + '" data-preview-src="" data-preview-group="1" />' +
+							'<img id="' + image_path + '" class="images" src="' + image_path +
+							'" data-preview-src="" data-preview-group="1" />' +
 							'</p>';
 						bottom_html += html;
 					}
 					jQuery('#bottom').append(bottom_html);
 				})
 			}
-			
+
 			//显示顶部人脸及文字
 			function setTopHtml(face_src, person_text, image_num) {
 				jQuery('#top').empty();
@@ -358,7 +353,8 @@
 					'</div>' +
 					'<div class="mui-media mui-col-xs-7">' +
 					'<div class="label-person">' +
-					'<a id="showPerson" onclick="chooseText(\''+ person_text +'\')">' + person_text + '&nbsp;<span class="iconfont icon-write"></span></a>' +
+					'<a id="showPerson" onclick="chooseText(\'' + person_text + '\')">' + person_text +
+					'&nbsp;<span class="iconfont icon-write"></span></a>' +
 					'<p>' + image_num + '张照片</p>' +
 					'</div>' +
 					'</div>';
@@ -371,16 +367,28 @@
 				var btnArray = ['取消', '确定'];
 				mui.prompt('  ', '请输入姓名', '这是谁？', btnArray, function(e) {
 					if (e.index == 1) {
-                        if(e.value == null || e.value == ''){
+						if (e.value == null || e.value == '') {
 							showPerson.innerHTML == person_text;
-						}else{
+						} else {
 							var group_info = e.value;
 							showPerson.innerHTML = e.value + '&nbsp;<span class="iconfont icon-write"></span>';
-							UpdateToInfo(group_id, group_info);	
-						}											
+							UpdateToInfo(group_id, group_info);
+						}
 					}
-				},'div');
+				}, 'div');
 			}
+
+			mui.previewImage(function(img) {
+				plus.webview.currentWebview().setStyle({
+					top: '0px',
+					bottom: '0px'
+				})
+			}, function(img) {
+				plus.webview.currentWebview().setStyle({
+					top: '0px',
+					bottom: '0px'
+				});
+			});
 		</script>
 	</body>
 

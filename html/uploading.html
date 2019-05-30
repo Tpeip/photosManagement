@@ -587,6 +587,7 @@
 				let pro =new Promise(function(resolve,reject){
 					resolve();
 				});
+				//人脸识别
 				if(typeArr.indexOf('人物') != -1){
 					let image_face = facepp.getFaceBase64Image(img);
 					let params = {

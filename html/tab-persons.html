@@ -91,6 +91,7 @@
 		var visited = [];
 		var personArr = [];
 		var lineArr = [];
+		var n = 0;
 
 		//监听页面刷新
 		window.addEventListener('fresh', function() {
@@ -98,11 +99,17 @@
 			getAllRelation();
 			setFaceHtml();
 			getPersonGroup();
+			// var group_id = localStorage.getItem('id');
+			// showAllRelation();
+			// showOneRelation(group_id);
 		});
 
 		mui.plusReady(function() {
+			n = 0;
 			getAllRelation();
 			setFaceHtml();
+			// n++;
+			// showAllRelation();
 		})
 
 		//判断人物关系修改状态		
@@ -127,9 +134,15 @@
 				var length = e.rows.length;
 				if (length == 0) {
 					showOneRelation("");
+					n++;
 				} else {
 					var person_one = e.rows.item(0).group_id;
-					showAllRelation();
+					// if(n == 0){
+						showAllRelation();
+// 					}else{
+// 						var id = localStorage.getItem("id");
+// 						showOneRelation(id);
+// 					}					
 					for (let i = 0; i < length; i++) {
 						let face_url = e.rows.item(i).face_src;
 						let group_id = e.rows.item(i).group_id;
@@ -557,6 +570,7 @@
 				}
 			}
 			UpdatePersonRelation(group_id, person_main, relation).then(function() {
+				mui.toast("修改成功");
 				showOneRelation(id);
 			});
 		}
@@ -592,7 +606,7 @@
 		}
 
 
-		//遍历一个人的人脉关系
+		//广度遍历，遍历一个人的人脉关系
 		function wideTraversal(core_person, core_face_src, pos) {
 			let persons = allPerson[pos].persons;
 			if (persons.length == 0) {

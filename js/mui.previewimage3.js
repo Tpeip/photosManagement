@@ -179,7 +179,13 @@
 						deleteOneImage(image_path).then(function(){	
 							// getPersonGroup();					
 							getImages();
+							// document.getElementById(image_path).classList.add("hidden");
+							// getPersonGroup();
 							getFace();
+							getImages();
+// 							 var list = plus.webview.currentWebview().opener();
+// 							//触发列表界面的自定义事件（refresh）,从而进行数据刷新
+// 							mui.fire(list, 'fresh');							
 						});
 						let length = personRes.rows.length;
 						let group = [];
@@ -215,6 +221,7 @@
 											if(image_num == 0){
 												DeleteOneRelation(person_core, person_main);
 											}else{
+												console.log(image_num);
 												UpdateRelationImageNum(person_core, person_main, image_num);
 											}
 										}
