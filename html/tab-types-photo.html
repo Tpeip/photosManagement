@@ -9,6 +9,9 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link href="../css/mui.css" rel="stylesheet" />
 		<link href="../css/mystyle.css" rel="stylesheet" />
+		<link href="../css/iconfont.css" rel="stylesheet" />
+		<link href="../css/mui.picker.css" rel="stylesheet" />
+		<link href="../css/mui.poppicker.css" rel="stylesheet" />
 		<style>
 			.mui-preview-image.mui-fullscreen {
 				position: fixed;
@@ -194,6 +197,7 @@
 				display: inline-block;
 				margin-right: 1px;
 				 margin-top: -4px; 
+				 position: relative;
 			}
 			
 			.images {
@@ -205,11 +209,21 @@
 				background-color: white;
 			}
 			
+			.icon-move {
+				position: absolute;
+				top: 2px;
+				left:2px;
+				display: block;
+				line-height: 1;
+				cursor: pointer;
+				color: red;
+				font-weight: bold;
+			}
 			p, img {
 				margin: 0;
 				padding: 0;
 			}
-			.showImage{
+			.hiddenimg{
 				display: none;
 			}
 		</style>
@@ -218,7 +232,10 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a id="backing" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="cancel" class="mui-icon mui-pull-left hiddenimg" style="font-size: 18px;margin-top: 5px;">取消</a>
 			<h1 id="title" class="mui-title"> </h1>
+			<a id="move" class="mui-icon mui-pull-right" style="font-size: 18px;margin-top: 5px;">移动</a>
+			<a id="moveto" class="mui-icon mui-pull-right hiddenimg"  style="font-size: 18px;margin-top: 5px;">移动到</a>
 		</header>
 		<div id="image-content" class="mui-content"></div>
 
@@ -227,6 +244,8 @@
 	<script src="../js/jquery.min.js"></script>
 	<script src="../js/mui.zoom.js"></script>
 	<script src="../js/mui.previewimage2.js"></script>
+	<script src="../js/mui.picker.js"></script>
+	<script src="../js/mui.poppicker.js"></script>
 	<script src="../js/websql.js"></script>
 	<script src="../js/person.js"></script>
 	<script type="text/javascript">
@@ -236,6 +255,9 @@
 		});
 		var type = localStorage.getItem('type');
 		var allImage = localStorage.getItem('allImage');
+		var flag = 0;
+		var pathArr = [];
+		
 
 		mui.plusReady(function() {
 			replaceHeader();
@@ -250,40 +272,6 @@
 		};
 
 		function setPhotoHtml() {
-			// 			var type = localStorage.getItem('type');
-			// 			var types = type.split('-');
-			// 			jQuery('#image-content').empty();
-			// 			if (types[0] == 'type') {
-			// 				getTypeOne(types[1]).then(function(result) {
-			// 					for (let i = 0; i < result.rows.length; i++) {
-			// 						let src = result.rows.item(i).image_path;
-			// 						image = '<p class="image-border"><img class="images" src="' + src +
-			// 							'" data-preview-src="" data-preview-group="1" /></p>';
-			// 						jQuery('#image-content').append(image);
-			// 					}
-			// 				}).catch(function(err) {
-			// 					console.log(err);
-			// 				})
-			// 			} else if(types[0] == 'person'){
-			// 				var person_num;
-			// 				if (types[1] == '单人照') {
-			// 					person_num = 1;
-			// 				} else if (types[1] == '双人照') {
-			// 					person_num = 2;
-			// 				} else {
-			// 					person_num = 3;
-			// 				}
-			// 				getPersonNumImage(person_num).then(function(result) {
-			// 					for (let i = 0; i < result.rows.length; i++) {
-			// 						let src = result.rows.item(i).image_path;
-			// 						image = '<p class="image-border"><img class="images" src="' + src +
-			// 							'" data-preview-src="" data-preview-group="1" /></p>';
-			// 						jQuery('#image-content').append(image);
-			// 					}
-			// 				}).catch(function(err) {
-			// 					console.log(err);
-			// 				})
-			// 			}else{
 			jQuery('#image-content').empty();
 			var allImg = localStorage.getItem('allImage');
 			console.log(allImg);
@@ -291,7 +279,10 @@
 			for (let i = 0; i < imgArr.length; i++) {
 				let src = imgArr[i];
 				image = '<p id="'+ src +'" class="image-border"><img class="images" src="' + src +
-					'" data-preview-src="" data-preview-group="1" /></p>';
+					'" data-preview-src="" data-preview-group="1" />'+
+					// '<span id="move" class="mui-icon mui-icon-close icon-move" onclick="move(\'' + src + '\')"></span>' +
+					'<input id="check" type="checkbox" class="mui-checkbox icon-move hiddenimg" value="'+src+'" style="zoom:130%">'+
+					'</p>';
 				jQuery('#image-content').append(image);
 			}
 			// }
@@ -313,12 +304,125 @@
 			var el = document.getElementById('title').innerHTML;
 			document.getElementById('title').innerHTML = type;
 		}
-		document.getElementById('backing').addEventListener('tap', function() {
+		
+		var backing = document.getElementById('backing');
+		var move = document.getElementById('move');
+		var check = document.getElementById('check');
+		var cancel = document.getElementById("cancel");
+		var moveto = document.getElementById("moveto");
+		
+		backing.addEventListener('tap', function() {
 			var listpage = plus.webview.currentWebview().opener();
 			//触发父页面的自定义事件(refresh),从而进行刷新
 			plus.webview.currentWebview().close();
 			mui.fire(listpage, 'update');
 		});
+		
+		move.addEventListener('tap',function(e){
+			$("input:checkbox").each(function(){
+				$(this).prop("checked",false);
+			});
+			$("input").removeClass("hiddenimg");
+			cancel.classList.remove('hiddenimg');
+			moveto.classList.remove('hiddenimg');
+			move.classList.add('hiddenimg');
+			backing.classList.add('hiddenimg');
+			flag = 1;
+		});
+		
+		cancel.addEventListener("tap",function(){
+			$("input").addClass('hiddenimg');
+			cancel.classList.add('hiddenimg');
+			moveto.classList.add('hiddenimg');
+			move.classList.remove('hiddenimg');
+			backing.classList.remove('hiddenimg');
+			flag = 0;
+			pathArr = [];
+		});
+		
+		
+		moveto.addEventListener('tap',function(){
+			pathArr = [];
+			$("input:checkbox").each(function(){
+				if($(this).prop('checked') == true){
+					let path = $(this).val();
+					pathArr.push(path);
+				}
+			});	
+			moveToAblum(pathArr);
+			console.log(pathArr.length);
+		});
+		
+		function moveToAblum(pathArr){
+			var albumPicker = new mui.PopPicker();
+			albumPicker.setData([{
+				value: '漂亮小姐姐',
+				text: '漂亮小姐姐'
+			}, {
+				value: '帅气小鲜肉',
+				text: '帅气小鲜肉'
+			}, {
+				value: '活力青少年',
+				text: '活力青少年'
+			}, {
+				value: '可爱小宝贝',
+				text: '可爱小宝贝'
+			}, {
+				value: '明星',
+				text: '明星'
+			}, {
+				value: '单人照',
+				text: '单人照'
+			}, {
+				value: '双人照',
+				text: '双人照'
+			}, {
+				value: '合照',
+				text: '合照'
+			}, {
+				value: '自拍',
+				text: '自拍'
+			}, {
+				value: '屏幕截图',
+				text: '屏幕截图'
+			}, {
+				value: '风景',
+				text: '风景'
+			}, {
+				value: '美食',
+				text: '美食'
+			}, {
+				value: '建筑',
+				text: '建筑'
+			}, {
+				value: '文本',
+				text: '文本'
+			}, {
+				value: '动物',
+				text: '动物'
+			}, {
+				value: '交通工具',
+				text: '交通工具'
+			}, {
+				value: '卡通',
+				text: '卡通'
+			}, {
+				value: '证件照',
+				text: '证件照'
+			}, {
+				value: '其他',
+				text: '其他'
+			}]);
+			albumPicker.show(function(items) {
+				console.log(items[0].value);
+				var album = items[0].value;
+				pathArr.forEach(function(path){
+					// updateAlbum(type, path, album);
+					document.getElementById(path).classList.add("hiddenimg");
+				});
+			});
+		}
+		
 	</script>
 
 </html>

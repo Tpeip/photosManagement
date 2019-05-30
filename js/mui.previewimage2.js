@@ -13,6 +13,10 @@
 			'<div class="mui-preview-footer mui-hidden" style="box-shadow:1px 1px 4px 1px #ccc inset">'+
 				'<div class="mui-content">'+
 					'<nav class="mui-bar mui-bar-tab">'+
+// 						'<a id="move" class="mui-tab-item" style="color:black;text-align:center;vertical-align:middle;">'+
+// 							'<span class="iconfont icon-yidong" style="font-size:28px;margin-bottom:8px;"></span>'+
+// 						'</a>'+
+// 						'<a class="mui-tab-item" href=""></a>'+
 						'<a id="delete" class="mui-tab-item" style="color:black;text-align:center;vertical-align:middle;">'+
 							'<span class="mui-icon mui-icon-trash" style="font-size:32px;margin-bottom:14px;"></span>'+
 						'</a>'+
@@ -110,8 +114,11 @@
 	proto.initEvent = function() {
 		var self = this;
 		$(document.body).on('tap', 'img[data-preview-src]', function() {
-			self.open(this);
-			return false;
+			// console.log(flag);
+			if(flag == 0){
+				self.open(this);
+				return false;
+			}			
 		});
 		var show = true;
 		var laterClose = null;
