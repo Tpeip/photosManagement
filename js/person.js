@@ -434,7 +434,7 @@ function handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy
 											InsertToRelation(person_core.group_id, id, relations[6], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 									} 
-									else if(persons_intimacy[id] >=50 persons_intimacy[id] < 60){
+									else if(persons_intimacy[id] >=50 && persons_intimacy[id] < 60){
 										InsertToRelation(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 									}
 									else {
@@ -514,7 +514,7 @@ function handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy
 													id]);
 											}
 										} 
-										else if(persons_intimacy[id] >=50 persons_intimacy[id] < 60){
+										else if(persons_intimacy[id] >=50 && persons_intimacy[id] < 60){
 											UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										}
 										else {
@@ -594,7 +594,7 @@ function handleOneImage(persons_intimacy, image_path, group_id, persons_intimacy
 													id]);
 											}
 										}
-										 else if(persons_intimacy[id] >=50 persons_intimacy[id] < 60){
+										 else if(persons_intimacy[id] >=50 && persons_intimacy[id] < 60){
 										 	UpdatePersonIntimacy(person_core.group_id, id, relations[5], persons_intimacy[id], persons_intimacy_num[id]);
 										 }
 										 else {
