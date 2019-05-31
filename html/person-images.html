@@ -315,15 +315,19 @@
 				var person_id = localStorage.getItem('id');
 				console.log(person_id);
 				getOnePerson(person_id).then(function(e) {
-					var person_text = e.rows.item(0).person_name;
-					getFaceByPerson(person_id).then(function(res){
+					var person_name = e.rows.item(0).person_name;
+					var person_age = e.rows.item(0).age;
+					var person_gender = e.rows.item(0).gender;
+					var person_ethnicity = e.rows.item(0).ethnicity;
+					var person_beauty = e.rows.item(0).beauty;
+					getFaceByPerson(person_id).then(function(res) {
 						var face_src = res.rows.item(0).face_src;
 						var image_num = res.rows.length;
-						if (person_text == null || person_text == '') {
-							person_text = '这是谁';
+						if (person_name == '未命名') {
+							person_name = '这是谁';
 						}
-						setTopHtml(face_src, person_text, image_num);
-					})
+						setTopHtml(face_src, person_name, image_num, person_age, person_gender, person_ethnicity, person_beauty);
+					});
 				}).catch(function(e) {
 					console.log(JSON.stringify(e));
 				});
@@ -348,14 +352,16 @@
 			}
 
 			//显示顶部人脸及文字
-			function setTopHtml(face_src, person_text, image_num) {
+			function setTopHtml(face_src, person_name, image_num, person_age, person_gender, person_ethnicity, person_beauty,
+				person_emotion) {
 				jQuery('#top').empty();
 				var html = '<div  class="mui-media mui-col-xs-5" style="left:20px;">' +
 					'<img class="img-face" src="' + face_src + '" />' +
 					'</div>' +
 					'<div class="mui-media mui-col-xs-7">' +
 					'<div class="label-person">' +
-					'<a id="showPerson" onclick="chooseText(\'' + person_text + '\')">' + person_text +
+					'<a id="showPerson" onclick="modifyPersonInfo(\'' + person_name + '\',\'' + person_age + '\',\'' + person_gender +
+					'\',\'' + person_ethnicity + '\',\'' + person_beauty + '\',\'' + person_emotion + '\')">' + person_name +
 					'&nbsp;<span class="iconfont icon-write"></span></a>' +
 					'<p>' + image_num + '张照片</p>' +
 					'</div>' +
@@ -364,18 +370,79 @@
 			}
 
 			//修改人物姓名
-			function chooseText(person_text) {
+			function modifyPersonInfo(name, age, gender, ethnicity, beauty, emotion) {
 				// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
 				var btnArray = ['取消', '确定'];
-				mui.prompt('  ', '请输入姓名', '这是谁？', btnArray, function(e) {
+				let gender_html =
+					'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性' +
+					'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				if (gender == '男') {
+					gender_html =
+						'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性' +
+						'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				} else {
+					gender_html =
+						'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px">男性' +
+						'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女" checked>女性</div><br/>'
+				}
+				let ethnicity_html =
+					'<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种" selected="selected">黄种' +
+					'</option><option value="白种">白种</option><option value="黑种">' +
+					'黑种</option><option value="印度">印度</option></select></div>';
+				if (ethnicity === '白种') {
+					ethnicity_html =
+						'<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种' +
+						'</option><option value="白种"  selected="selected">白种</option><option value="黑种">' +
+						'黑种</option><option value="印度">印度</option></select></div>';
+				} else if (ethnicity === '黑种') {
+					ethnicity_html =
+						'<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种' +
+						'</option><option value="白种">白种</option><option value="黑种"  selected="selected">' +
+						'黑种</option><option value="印度">印度</option></select></div>';
+				} else if (ethnicity === '印度') {
+					ethnicity_html =
+						'<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种' +
+						'</option><option value="白种">白种</option><option value="黑种">' +
+						'黑种</option><option value="印度"  selected="selected">印度</option></select></div>';
+				} else {
+					ethnicity_html =
+						'<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种" selected="selected">黄种' +
+						'</option><option value="白种">白种</option><option value="黑种">' +
+						'黑种</option><option value="印度">印度</option></select></div>';
+				}
+				var btnArray = ['取消', '确定'];
+				var html =
+					'<br><div style="font-size:16px">姓名：<input id="name" type="text" autofocus="autofocus" value="" placeholder="' +
+					name + '" style="height:25px;width:134px"></div>' +
+					'<div style="font-size:16px">年龄：<input id="age" type="text" value="" placeholder="' + age +
+					'" style="height:25px;width:134px"></div>' + gender_html + ethnicity_html +
+					'<div style="font-size:16px">颜值：<input id="beauty" type="text" value="' + beauty +
+					'" readonly style="height:25px;width:134px"></div>';
+				mui.confirm(html, '信息修改', btnArray, function(e) {
+					// $("#gender").prop("checked",true);
 					if (e.index == 1) {
-						if (e.value == null || e.value == '') {
-							showPerson.innerHTML == person_text;
+						var person_name = name;
+						var person_age = age;
+						var name_value = $("#name").val();
+						var age_value = $("#age").val();
+						var person_gender = $("input:radio:checked").val();
+						var person_ethnicity = $("select#ethnic option:selected").val();
+						if (name_value == "" || name_value == null) {
+							person_name = name;
 						} else {
-							var group_info = e.value;
-							showPerson.innerHTML = e.value + '&nbsp;<span class="iconfont icon-write"></span>';
-							UpdateToName(person_id, group_info);
+							person_name = name_value;
 						}
+						if (age_value == "" || age_value == null) {
+							person_age = age;
+						} else {
+							person_age = age_value;
+						}
+						UpdateToName(id, person_name).then(function() {
+							UpdatePersonInfo(id, person_age, person_gender, person_ethnicity).then(function(){
+								UpdateFaceInfo(id, person_age, person_gender, person_ethnicity);
+							});							
+						});
+						setTopHtml();
 					}
 				}, 'div');
 			}

@@ -439,12 +439,12 @@ function UpdateToName(person_id, person_name) {
 	return pm;
 }
 
-function UpdatePersonInfo(person_id, age, gender) {
+function UpdatePersonInfo(person_id, age, gender, ethnicity) {
 	websqlOpenDB();
-	var insertSQL = 'UPDATE person SET age=?,gender=? WHERE person_id=? ';
+	var insertSQL = 'UPDATE person SET age=?,gender=?,ethnicity=? WHERE person_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [age, gender, person_id], function(ctx, result) {
+			ctx.executeSql(insertSQL, [age, gender, ethnicity, person_id], function(ctx, result) {
 					console.log("更新成功");
 					resolve(result);
 				},
@@ -671,12 +671,12 @@ function UpdateToFaceToken(image_path, face_token, face_rec) {
 	return pm;
 }
 
-function UpdateFaceInfo(person_id, age, gender) {
+function UpdateFaceInfo(person_id, age, gender, ethnicity) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE face SET age=?,gender=? WHERE person_id=? ';
+	var updateSQL = 'UPDATE face SET age=?,gender=?,ethnicity=? WHERE person_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [age, gender, person_id], function(ctx, result) {
+			ctx.executeSql(updateSQL, [age, gender, ethnicity, person_id], function(ctx, result) {
 					// console.log("更新成功");
 					resolve(result);
 				},

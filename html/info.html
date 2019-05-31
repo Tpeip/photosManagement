@@ -141,23 +141,23 @@
 			var path = decodeURIComponent(path1);
 			var typeArr = ['','单人照','双人照','合照','自拍','漂亮小姐姐','帅气小鲜肉','可爱小宝贝','活力青少年','明星','证件照','风景','美食','文本','建筑','卡通','交通工具','动物','屏幕截图','其他'];
 			console.log(path);
-// 			var img = document.getElementById('img');
-// 			img.src = path;
-			mui.plusReady(function(){
+			// 			var img = document.getElementById('img');
+			// 			img.src = path;
+			mui.plusReady(function() {
 				setHtml();
 			});
-			
-			function setHtml(){
+
+			function setHtml() {
 				jQuery('#content').empty();
-				getImageByPath(path).then(function(result){
+				getImageByPath(path).then(function(result) {
 					var person_num = result.rows.item(0).person_num;
 					var date = result.rows.item(0).image_date;
 					var items = result.rows.item(0).image_keyword;
 					var item = items.split('-');
-					getOneImageType(path).then(function(typeRes){
+					getOneImageType(path).then(function(typeRes) {
 						var type = [];
 						console.log(typeRes.rows.length);
-						for(let m = 0; m < typeRes.rows.length; m++){
+						for (let m = 0; m < typeRes.rows.length; m++) {
 							let type_id = typeRes.rows.item(m).type_id;
 							console.log(type_id);
 							let type_name = typeArr[type_id];
@@ -192,46 +192,55 @@
 							'<div class="mui-media mui-col-xs-8">' + tags + '</div>' +
 							'<div class="mui-media mui-col-xs-1"></div>' +
 							'</div>';
-						if(Number(person_num) >= 1) {
+						if (Number(person_num) >= 1) {
 							var persons_html = '';
-							getImageFace(path).then(function(e){
+							getImageFace(path).then(function(e) {
 								var length = e.rows.length;
 								console.log(length);
 								let promiseArr = [];
-								for(let i =0; i<length; i++){
+								for (let i = 0; i < length; i++) {
 									let person_id = e.rows.item(i).person_id;
 									let face_token = e.rows.item(i).face_token;
 									let face_src = e.rows.item(i).face_src;
 									// let face_rect = e.rows.item(i).face_rectangle;
 									// let face_url = getFaceData(face_rect);
 									// UpdateToPerson(path,face_token,face_url);
-									let age = e.rows.item(i).age;								
+									let age = e.rows.item(i).age;
 									let gender = e.rows.item(i).gender;
 									let beauty = e.rows.item(i).beauty;
-									let ethnicity = e.rows.item(i).ethnicity; 
-									let emotion = e.rows.item(i).emotion;  
+									let ethnicity = e.rows.item(i).ethnicity;
+									let emotion = e.rows.item(i).emotion;
 									promiseArr.push(
-									getOnePerson(person_id).then(function(res){
-										let person_name = res.rows.item(0).person_name;
-										var person_html = '<div class="mui-row">' +
-											'<div class="mui-media mui-col-xs-3">' +
-											'<img class="face" src=\"' + face_src + '\" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age + '\',\'' + gender + '\')" />' +
-											'</div>' +
-											'<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">' +
-											'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age + '\',\'' + gender + '\')">姓名：<label style="color:#2e84db">' + person_name + '</label></p>' +
-											'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age + '\',\'' + gender + '\')">年龄：<label style="color:#2e84db">' + age + '</label></p>' +
-											'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age + '\',\'' + gender + '\')">性别：<label style="color:#2e84db">' + gender + '</label></p>' +
-											'<p class="person-tags">颜值：<label>' + beauty + '</label></p>' +
-											'<p class="person-tags">种族：<label>' + ethnicity + '</label></p>' +
-											'<p class="person-tags">表情：<label>' + emotion + '</label></p>' +
-											'</div>' +
-											'</div>';
-										persons_html = persons_html + person_html;
-									})
+										getOnePerson(person_id).then(function(res) {
+											let person_name = res.rows.item(0).person_name;
+											var person_html = '<div class="mui-row">' +
+												'<div class="mui-media mui-col-xs-3">' +
+												'<img class="face" src=\"' + face_src + '\" onclick="modifyInfo(\'' + person_id + '\',\'' +
+												person_name + '\',\'' + age + '\',\'' + gender + '\',\'' + ethnicity + '\')" />' +
+												'</div>' +
+												'<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">' +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'\',\'' + gender + '\',\'' + ethnicity + '\')">姓名：<label style="color:#2e84db">' + person_name +
+												'</label></p>' +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'\',\'' + gender + '\',\'' + ethnicity + '\')">年龄：<label style="color:#2e84db">' + age +
+												'</label></p>' +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'\',\'' + gender + '\',\'' + ethnicity + '\')">性别：<label style="color:#2e84db">' + gender +
+												'</label></p>' +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'\',\'' + gender + '\',\'' + ethnicity + '\')">种族：<label  style="color:#2e84db">' + ethnicity +
+												'</label></p>' +
+												'<p class="person-tags">颜值：<label>' + beauty + '</label></p>' +
+												'<p class="person-tags">表情：<label>' + emotion + '</label></p>' +
+												'</div>' +
+												'</div>';
+											persons_html = persons_html + person_html;
+										})
 									);
 									// console.log('132425');
 								}
-								Promise.all(promiseArr).then(function(){
+								Promise.all(promiseArr).then(function() {
 									photo_html = '<div class="mui-row">' +
 										'<div class="mui-media mui-col-xs-3" style="left:45px">' +
 										'<span class="mui-media-object iconfont icon-people"></span>' +
@@ -241,61 +250,87 @@
 									html = image_html + date_html + photo_html + tag_html;
 									jQuery('#content').append(html);
 								})
-							}).catch(function(e){
+							}).catch(function(e) {
 								console.log(JSON.stringify(e));
 							});
-							
-						}else{
+
+						} else {
 							html = image_html + date_html + tag_html;
 							jQuery('#content').append(html);
 						}
-					})				
+					})
 				});
 			}
-			
-			function modifyInfo(id, name, age, gender){
+
+			function modifyInfo(id, name, age, gender, ethnicity) {
 				console.log(name);
 				console.log(age);
 				console.log(gender);
+				console.log(ethnicity);
+				let gender_html =
+					'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性'+
+					'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				if (gender == '男') {
+					gender_html =
+						'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性'+
+						'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				} else {
+					gender_html =
+						'<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px">男性'+
+						'</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女" checked>女性</div><br/>'
+				}
+				let ethnicity_html = '<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种" selected="selected">黄种'+
+					'</option><option value="白种">白种</option><option value="黑种">'+'黑种</option><option value="印度">印度</option></select></div>';
+				if(ethnicity === '白种'){
+					ethnicity_html = '<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种'+
+						'</option><option value="白种"  selected="selected">白种</option><option value="黑种">'+'黑种</option><option value="印度">印度</option></select></div>';
+				}
+				else if(ethnicity === '黑种'){
+					ethnicity_html = '<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种'+
+						'</option><option value="白种">白种</option><option value="黑种"  selected="selected">'+'黑种</option><option value="印度">印度</option></select></div>';
+				}
+				else if(ethnicity === '印度'){
+					ethnicity_html = '<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种">黄种'+
+						'</option><option value="白种">白种</option><option value="黑种">'+'黑种</option><option value="印度"  selected="selected">印度</option></select></div>';
+				}
+				else{
+					ethnicity_html = '<div style="font-size:16px;margin-top:-10px">种族：<select id="ethnic" style="height:35px;width:134px;"><option value="黄种" selected="selected">黄种'+
+						'</option><option value="白种">白种</option><option value="黑种">'+'黑种</option><option value="印度">印度</option></select></div>';
+				}
 				var btnArray = ['取消', '确定'];
-				var html = '<br><div style="font-size:16px">姓名：<input id="name" type="text" autofocus="autofocus" value="" placeholder="'+ name +'" style="height:25px;width:134px"></div>'+
-				          '<div style="font-size:16px">年龄：<input id="age" type="text" value="" placeholder="'+ age +'" style="height:25px;width:134px"></div>'+
-						  // '<label style="font-size:16px;">性别：<select id="gender" style="height:40px;width:180px;font-size:14px"><option value="男">男</option><option value="女">女</option></select></label>';
-						  '<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				var html =
+					'<br><div style="font-size:16px">姓名：<input id="name" type="text" autofocus="autofocus" value="" placeholder="' +
+					name + '" style="height:25px;width:134px"></div>' +
+					'<div style="font-size:16px">年龄：<input id="age" type="text" value="" placeholder="' + age +
+					'" style="height:25px;width:134px"></div>' + gender_html + ethnicity_html;					
 				mui.confirm(html, '信息修改', btnArray, function(e) {
-					// $("#gender").prop("checked",true);
-					var person_name = name;
-					var person_age = age;
-					var person_gender = gender;
-					var name_value = $("#name").val();
-					var age_value = $("#age").val();
-					var gender_value = $("#gender").val();
-					if(name_value == "" || name_value == null){
-						person_name = name;
-					}
-					else{
-						person_name = name_value;
-					}
-					if(age_value == "" || age_value == null){
-						person_age = age;
-					}
-					else{
-						person_age = age_value;
-					}
-					if(gender_value == "男"){
-						person_gender = gender;
-					}else{
-						person_gender = gender_value;
-					}
-					console.log(person_name);
-					console.log(person_age);
-					console.log(person_gender);
-					UpdateToName(id, person_name).then(function(){
-						UpdatePersonInfo(id, person_age, person_gender);
-					});
-
-					setHtml();
-				},'div');
+				    if(e.index == 1){
+						var person_name = name;
+						var person_age = age;
+						var name_value = $("#name").val();
+						var age_value = $("#age").val();
+						var person_gender = $("input:radio:checked").val();
+						var person_ethnicity = $("select#ethnic option:selected").val();
+						if (name_value == "" || name_value == null) {
+							person_name = name;
+						} else {
+							person_name = name_value;
+						}
+						if (age_value == "" || age_value == null) {
+							person_age = age;
+						} else {
+							person_age = age_value;
+						}				
+						
+						console.log(person_name);
+						console.log(person_age);
+						console.log(person_gender);
+						UpdateToName(id, person_name).then(function() {
+							UpdateFaceInfo(id, person_age, person_gender, person_ethnicity);
+						});
+						setHtml();
+					}					
+				}, 'div');
 			}
 		</script>
 	</body>

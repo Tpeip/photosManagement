@@ -644,7 +644,7 @@ var allPerson = [];
 function getPersonData() {
 	allPerson = [];
 	var promiseArr = [];
-	return getPerson().then(function(e) {
+	return getAllPerson().then(function(e) {
 		for (let i = 0; i < e.rows.length; i++) {
 			let person_id = e.rows.item(i).person_id;
 			let person_name = e.rows.item(i).person_name;

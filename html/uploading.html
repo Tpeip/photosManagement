@@ -638,10 +638,30 @@
 										gender = '男';
 										beauty = e.faces[k].attributes.beauty.male_score;
 									}
-									let ethnicity = e.faces[k].attributes.ethnicity.value;
+									let ethnicity_value = e.faces[k].attributes.ethnicity.value;
 									let emotions = e.faces[k].attributes.emotion;
 									let emotionEng = 'sadness';
 									let score = emotions.sadness;
+									let ethnicity = '黄种人';
+									switch (ethnicity_value) {
+										case 'ASIAN': {
+											ethnicity = '黄种';
+											break;
+										}
+										case 'WHITE': {
+											ethnicity = '白种';
+											break;
+										}
+										case 'BLACK': {
+											ethnicity = '黑种';
+											break;
+										}
+										case 'INDIA': {
+											ethnicity = '印度';
+											break;
+										}
+										default: break;
+									};
 									for (let t in emotions) {
 										if (emotions[t] > score) {
 											emotionEng = t;
