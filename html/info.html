@@ -291,13 +291,9 @@
 					console.log(person_age);
 					console.log(person_gender);
 					UpdateToName(id, person_name).then(function(){
-						UpdatePersonInfo(id, person_age, person_gender).then(function(){
-							UpdateFaceInfo(id, person_age, person_gender);
-						});
-						
+						UpdatePersonInfo(id, person_age, person_gender);
 					});
-					
-					
+
 					setHtml();
 				},'div');
 			}

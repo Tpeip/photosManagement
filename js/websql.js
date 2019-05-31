@@ -457,23 +457,23 @@ function UpdatePersonInfo(person_id, age, gender) {
 	return pm;
 }
 
-// function UpdateImageNum(person_id, image_num) {
-// 	websqlOpenDB();
-// 	var updateSQL = 'UPDATE person SET image_num=? WHERE person_id=? ';
-// 	var pm = new Promise(function(resolve, reject) {
-// 		dataBase.transaction(function(ctx) {
-// 			ctx.executeSql(updateSQL, [image_num, person_id], function(ctx, result) {
-// 					// console.log("更新成功");
-// 					resolve(result);
-// 				},
-// 				function(tx, error) {
-// 					console.log('更新失败: ' + error.message);
-// 					reject(error);
-// 				});
-// 		});
-// 	});
-// 	return pm;
-// }
+function UpdatePersonAllInfo(person_id, age, gender, beauty, ethnicity) {
+	websqlOpenDB();
+	var insertSQL = 'UPDATE person SET age=?,gender=?,beauty=?,ethnicity=? WHERE person_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, [age, gender, person_id, beauty, ethnicity], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
 
 
 function DeletePerson(person_id) {

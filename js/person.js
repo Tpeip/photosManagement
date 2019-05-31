@@ -68,30 +68,38 @@ function UpdatePersonInFace() {
 
 }
 
-//获取每个组的人脸,并存入数据库
-function getPersonGroup() {
-	getGroup().then(function(group_res) {
-		let num = group_res.rows.length;
-		for (let i = 0; i < num; i++) {
-			let image_path = group_res.rows.item(i).image_path;
-			let person_id = group_res.rows.item(i).person_id;
-			let face_rec = group_res.rows.item(i).face_rec.split("-");
-			let face_src = getFaceSrc(face_rec, image_path);
-			// console.log(face_src);
-			let image_num = group_res.rows.item(i).image_num;
-			// console.log(111111);
-			getGroupFaceById(person_id).then(function(res) {
-				if (res.rows.length == 0) {
-					InsertToGroupFace(person_id, face_src, image_num);
+function updateInfo(){
+	getAllPerson().then(function(personRes){
+		for(let i = 0; i<personRes.rows.length; i++){
+			let person_id = personRes.rows.item(i).person_id;
+			getFaceByPerson(person_id).then(function(faceRes)){
+				let age_sum = 0;
+				let person_gender = '';
+				let beauty_sum = 0;
+				let person_ethnic = '';
+				let num = faceRes.rows.length;
+				for(let j = 0;j<num; j++){
+					let age = faceRes.rows.item(j).age;
+					let gender = faceRes.rows.item(j).gender;
+					let beauty = faceRes.rows.item(j).beauty;
+					let ethnic = faceRes.rows.item(j).ethnicity;
+					age_sum = age_sum + Number(age);
+					beauty_sum = beauty_sum + Number(beauty);
+					if(person_gender == ''){
+						person_gender = gender;
+					}
+					if(person_ethnic == ''){
+						person_ethnic = ethnic;
+					}
 				}
-				UpdateImageNum(person_id, image_num);
-			}).catch(function(err) {
-				console.log(err);
-			});
+				let person_age = Number(age_sum/num);
+				let person_beauty = beauty_sum/num;
+				UpdatePersonAllInfo(person_id, person_age, person_gender, person_beauty, person_ethnic);
+			}
 		}
-	}).catch(function(err) {
-		console.log(err);
-	});
+	}).catch(function(Err){
+		console.log(Err);
+	})
 }
 
 function getFaceSrc(face_rec, path) {
