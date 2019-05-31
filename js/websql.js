@@ -205,7 +205,7 @@ function InsertToType(num, typeArr) {
 
 function InsertAllType(){
 	let typeArr = ['单人照','双人照','合照','自拍','漂亮小姐姐',
-	'帅气小鲜肉','可爱小宝贝','活力青少年','明星','屏幕截图','风景','证件照','美食','文本','建筑','卡通','交通工具','动物','其他'];
+	'帅气小鲜肉','可爱小宝贝','活力青少年','明星','证件照','风景','美食','文本','建筑','卡通','交通工具','动物','屏幕截图','其他'];
 	InsertToType(typeArr.length, typeArr);
 }
 
@@ -271,7 +271,7 @@ function InsertToImageType(type_id, image_path) {
 
 function getOneTypeImage(type_id) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM image_type where type_id=?';
+	var selectSQL = 'SELECT * FROM image_type where type_id=? ORDER BY rowid DESC';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [type_id], function(ctx, result) {

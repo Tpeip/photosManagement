@@ -288,7 +288,8 @@
 			if (type == '漂亮小姐姐' || type == '帅气小鲜肉' || type == '可爱小宝贝' || type == '活力青少年' || type == '明星') {
 				let html = '';
 				if (num > 0) {
-					html = '<div class="image-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + allImage + '\')">' +
+					let image = allImage.join('**123**');
+					html = '<div class="image-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + image + '\')">' +
 						'<img class="images" src="' + allImage[0] + '" />' +
 						'<p class="label-photo" style="text-align:left">' + type + '</p><br></div>';
 					jQuery("#photos").append(html);
@@ -296,7 +297,8 @@
 			} else {
 				let html = '';
 				if (num > 0) {
-					html = '<div class="img-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + allImage + '\')">' +
+					let image = allImage.join('**123**');
+					html = '<div class="img-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + image + '\')">' +
 						'<img class="images" src="' + allImage[0] + '" />' +
 						'<p class="label-type">' + type + '</p>' +
 						'<p style="padding-left: 6px;word-spacing: 1px;">' + num + '张</p><br></div>';
@@ -315,6 +317,7 @@
 		
 		function turnTo(type, allImage) {
 			localStorage.setItem("type", type);
+			console.log(allImage);
 			localStorage.setItem("allImage", allImage);
 			mui.openWindow({
 				url: 'tab-types-photo.html',
@@ -322,7 +325,7 @@
 					autoShow: true,
 					aniShow: 'slide-in-right',
 					duration: 200
-				}
+				},
 			});
 		}
 	</script>

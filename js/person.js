@@ -72,7 +72,7 @@ function updateInfo(){
 	getAllPerson().then(function(personRes){
 		for(let i = 0; i<personRes.rows.length; i++){
 			let person_id = personRes.rows.item(i).person_id;
-			getFaceByPerson(person_id).then(function(faceRes)){
+			getFaceByPerson(person_id).then(function(faceRes){
 				let age_sum = 0;
 				let person_gender = '';
 				let beauty_sum = 0;
@@ -95,7 +95,7 @@ function updateInfo(){
 				let person_age = Number(age_sum/num);
 				let person_beauty = beauty_sum/num;
 				UpdatePersonAllInfo(person_id, person_age, person_gender, person_beauty, person_ethnic);
-			}
+			})
 		}
 	}).catch(function(Err){
 		console.log(Err);
