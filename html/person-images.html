@@ -320,6 +320,10 @@
 					var person_gender = e.rows.item(0).gender;
 					var person_ethnicity = e.rows.item(0).ethnicity;
 					var person_beauty = e.rows.item(0).beauty;
+					console.log(person_name);
+					console.log(person_age);
+					console.log(person_ethnicity);
+					console.log(person_beauty);
 					getFaceByPerson(person_id).then(function(res) {
 						var face_src = res.rows.item(0).face_src;
 						var image_num = res.rows.length;
@@ -371,6 +375,11 @@
 
 			//修改人物姓名
 			function modifyPersonInfo(name, age, gender, ethnicity, beauty, emotion) {
+				console.log(age);
+				console.log(gender);
+				console.log(ethnicity);
+				console.log(beauty);
+				console.log(emotion);
 				// e.detail.gesture.preventDefault(); //修复iOS 8.x平台存在的bug，使用plus.nativeUI.prompt会造成输入法闪一下又没了
 				var btnArray = ['取消', '确定'];
 				let gender_html =
