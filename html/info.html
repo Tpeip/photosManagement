@@ -60,6 +60,9 @@
 				width: 45px;
 				border-radius: 45px;
 			}
+			select{
+				-webkit-appearance: menulist !important;
+			}
 		</style>
 	</head>
 
@@ -133,114 +136,133 @@
 		<script src="../js/jquery.min.js"></script>
 		<script src="../js/websql.js"></script>
 		<script type="text/javascript">
-			
 			mui.init();
 			var path1 = localStorage.getItem('path');
 			var path = decodeURIComponent(path1);
 			console.log(path);
-// 			var img = document.getElementById('img');
-// 			img.src = path;
-			mui.plusReady(function(){
-				getImageByPath(path).then(function(result){
+			// 			var img = document.getElementById('img');
+			// 			img.src = path;
+			mui.plusReady(function() {
+				getImageByPath(path).then(function(result) {
 					var type = result.rows.item(0).image_type.split('-');
 					var date = result.rows.item(0).image_date;
 					var items = result.rows.item(0).image_keyword;
 					var item = items.split('-');
 					tags = '';
-					for(let i=0; i<item.length; i++){
-						tag = '<button class="mui-btn biaoqian-btn">'+item[i]+'</button>';
+					for (let i = 0; i < item.length; i++) {
+						tag = '<button class="mui-btn biaoqian-btn">' + item[i] + '</button>';
 						tags = tags + tag;
 					}
-					image_html='<div class="mui-row">'+
-									'<div class="mui-media mui-col-xs-3" style="left:45px">'+
-										'<span class="mui-media-object iconfont icon-pic "></span>'+
-									'</div>'+
-									'<div class="mui-media mui-col-xs-9">'+
-										'<label class="mui-tab-label mui-ellipsis">'+ type +'</label>'+
-									'</div>'+
-								'</div>';
-					date_html='<div class="mui-row">'+
-								'<div class="mui-media mui-col-xs-3" style="left:45px">'+
-									'<span class="mui-media-object iconfont icon-calendar"></span>'+
-								'</div>'+
-								'<div class="mui-media mui-col-xs-9">'+
-									'<label class="mui-tab-label mui-ellipsis">'+ date +'</label>'+
-								'</div>'+
-							  '</div>';
-					tag_html='<div class="mui-row">'+
-								'<div class="mui-media mui-col-xs-3" style="left:45px">'+
-									'<span class="mui-media-object iconfont icon-tag"></span>'+
-								'</div>'+
-								'<div class="mui-media mui-col-xs-8">'+ tags +'</div>'+									
-								'<div class="mui-media mui-col-xs-1"></div>'+
-							  '</div>';
-					if(type.indexOf('人物') != -1) {
+					image_html = '<div class="mui-row">' +
+						'<div class="mui-media mui-col-xs-3" style="left:45px">' +
+						'<span class="mui-media-object iconfont icon-pic "></span>' +
+						'</div>' +
+						'<div class="mui-media mui-col-xs-9">' +
+						'<label class="mui-tab-label mui-ellipsis">' + type + '</label>' +
+						'</div>' +
+						'</div>';
+					date_html = '<div class="mui-row">' +
+						'<div class="mui-media mui-col-xs-3" style="left:45px">' +
+						'<span class="mui-media-object iconfont icon-calendar"></span>' +
+						'</div>' +
+						'<div class="mui-media mui-col-xs-9">' +
+						'<label class="mui-tab-label mui-ellipsis">' + date + '</label>' +
+						'</div>' +
+						'</div>';
+					tag_html = '<div class="mui-row">' +
+						'<div class="mui-media mui-col-xs-3" style="left:45px">' +
+						'<span class="mui-media-object iconfont icon-tag"></span>' +
+						'</div>' +
+						'<div class="mui-media mui-col-xs-8">' + tags + '</div>' +
+						'<div class="mui-media mui-col-xs-1"></div>' +
+						'</div>';
+					if (type.indexOf('人物') != -1) {
 						var persons_html = '';
-						getPersonImage(path).then(function(e){
+						getPersonImage(path).then(function(e) {
 							var length = e.rows.item(0).person_num;
 							console.log(length);
-							for(let i =0; i<length; i++){
+							for (let i = 0; i < length; i++) {
 								let face_token = e.rows.item(i).face_token;
 								let face_src = e.rows.item(i).face_src;
-								// let face_rect = e.rows.item(i).face_rectangle;
-								// let face_url = getFaceData(face_rect);
-								// UpdateToPerson(path,face_token,face_url);
-								let age = e.rows.item(i).age;								
+								let age = e.rows.item(i).age;
 								let gender = e.rows.item(i).gender;
 								let beauty = e.rows.item(i).beauty;
-								let ethnicity = e.rows.item(i).ethnicity; 
-								let emotion = e.rows.item(i).emotion;  
-                                var person_html = '<div class="mui-row">'+
-													   '<div class="mui-media mui-col-xs-3">'+
-														   '<img class="face" src=\"'+ face_src +'\" />'+
-													   '</div>'+
-													   '<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">'+
-														   '<p class="person-tags">年龄：<label>'+ age +'</label></p>'+
-														   '<p class="person-tags">性别：<label>'+ gender +'</label></p>'+
-														   '<p class="person-tags">颜值：<label>'+ beauty +'</label></p>'+
-														   '<p class="person-tags">种族：<label>'+ ethnicity +'</label></p>'+
-														   '<p class="person-tags">表情：<label>'+ emotion +'</label></p>'+
-														'</div>'+
-												   '</div>';
+								let ethnicity = e.rows.item(i).ethnicity;
+								let emotion = e.rows.item(i).emotion;
+								var person_html = '<div class="mui-row">' +
+									'<div class="mui-media mui-col-xs-3">' +
+									'<img class="face" src=\"' + face_src + '\" onclick="modifyInfo(\'' + 'id' + '\',\'' + '未命名' + '\',\'' + age + '\',\'' + gender + '\')" />' +
+									'</div>' +
+									'<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">' +
+									'<p class="person-tags" onclick="modifyInfo(\'' + 'id' + '\',\'' + '未命名' + '\',\'' + age + '\',\'' + gender + '\')">姓名：<label style="color:#2e84db">' + '未命名' + '</label></p>' +
+									'<p class="person-tags" onclick="modifyInfo(\'' + 'id' + '\',\'' + '未命名' + '\',\'' + age + '\',\'' + gender + '\')">年龄：<label style="color:#2e84db">' + age + '</label></p>' +
+									'<p class="person-tags" onclick="modifyInfo(\'' + 'id' + '\',\'' + '未命名' + '\',\'' + age + '\',\'' + gender + '\')">性别：<label style="color:#2e84db">' + gender + '</label></p>' +
+									'<p class="person-tags">颜值：<label>' + beauty + '</label></p>' +
+									'<p class="person-tags">种族：<label>' + ethnicity + '</label></p>' +
+									'<p class="person-tags">表情：<label>' + emotion + '</label></p>' +
+									'</div>' +
+									'</div>';
 								persons_html = persons_html + person_html;
-								// console.log('132425');
-								
-							}	
-							photo_html = '<div class="mui-row">'+
-											'<div class="mui-media mui-col-xs-3" style="left:45px">'+
-												'<span class="mui-media-object iconfont icon-people"></span>'+
-											'</div>'+
-											'<div class="mui-media mui-col-xs-9">'+ persons_html + '</div>'+
-										  '</div>';										
+
+							}
+							photo_html = '<div class="mui-row">' +
+								'<div class="mui-media mui-col-xs-3" style="left:45px">' +
+								'<span class="mui-media-object iconfont icon-people"></span>' +
+								'</div>' +
+								'<div class="mui-media mui-col-xs-9">' + persons_html + '</div>' +
+								'</div>';
 							html = image_html + date_html + photo_html + tag_html;
 							jQuery('#content').append(html);
-						}).catch(function(e){
+						}).catch(function(e) {
 							console.log(JSON.stringify(e));
 						});
-						
-					}else{
+
+					} else {
 						html = image_html + date_html + tag_html;
 						jQuery('#content').append(html);
 					}
-					
+
 				});
 			});
 			
-			//获取人脸区域的路径
-// 			function getFaceData(face_rect){
-// 				var rects = face_rect.split('-');
-// 				var faceW = rects[0];
-// 				var faceY = rects[1];
-// 				var faceX = rects[2];
-// 				var faceH = rects[3];
-// 				let image = document.getElementById('img');
-// 				let c =document.getElementById('can');
-// 				var ctx = c.getContext('2d');
-// 				ctx.drawImage(image,faceX,faceY,faceW,faceH,0,0,300,150);
-// 				var face_url = c.toDataURL('image/png');
-// 				return face_url;
-// 			}
-			
+			function modifyInfo(id, name, age, gender){
+				console.log(name);
+				console.log(age);
+				console.log(gender);
+				var btnArray = ['取消', '确定'];
+				var html = '<br><div style="font-size:16px">姓名：<input id="name" type="text" autofocus="autofocus" value="" placeholder="'+ name +'" style="height:25px;width:134px"></div>'+
+				          '<div style="font-size:16px">年龄：<input id="age" type="text" value="" placeholder="'+ age +'" style="height:25px;width:134px"></div>'+
+						  // '<label style="font-size:16px;">性别：<select id="gender" style="height:40px;width:180px;font-size:14px"><option value="男">男</option><option value="女">女</option></select></label>';
+						  '<div style="font-size:16px;">性别：<label ><input id="gender" type="radio" name="gender" value="男" style="margin-left:5px;width:30px" checked>男性</label>&nbsp;&nbsp;<input type="radio" name="gender" style="width:30px;" value="女">女性</div><br/>';
+				mui.confirm(html, '信息修改', btnArray, function(e) {					
+					var person_name = name;
+					var person_age = age;
+					var person_gender = gender;
+					var name_value = $("#name").val();
+					var age_value = $("#age").val();
+					var gender_value = $("#gender").val();
+					if(name_value == "" || name_value == null){
+						person_name = name;
+					}
+					else{
+						person_name = name_value;
+					}
+					if(age_value == "" || age_value == null){
+						person_age = age;
+					}
+					else{
+						person_age = age_value;
+					}
+					if(gender_value == "男"){
+						person_gender = gender;
+					}else{
+						person_gender = gender_value;
+					}
+					console.log(person_name);
+					console.log(person_age);
+					console.log(person_gender);
+				},'div');
+			}
 		</script>
 	</body>
 

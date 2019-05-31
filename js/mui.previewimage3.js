@@ -182,7 +182,6 @@
 							// document.getElementById(image_path).classList.add("hidden");
 							// getPersonGroup();
 							getFace();
-							getImages();
 // 							 var list = plus.webview.currentWebview().opener();
 // 							//触发列表界面的自定义事件（refresh）,从而进行数据刷新
 // 							mui.fire(list, 'fresh');							
