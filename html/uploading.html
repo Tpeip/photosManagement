@@ -267,6 +267,8 @@
 				<span style="font-size: 18px;">导入</span>
 			</button>
 		</header>
+		<img id="img" style="display:none" />
+		<canvas id="can" style="display:none;width:200px;height:200px"></canvas>
 		<div class="mui-content mui-content-padded" style="background-color:#fff">
 			<ul id="imgs" class="mui-table-view mui-grid-view">
 				<li class="mui-table-view-cell mui-media mui-col-xs-4 image-border">
@@ -298,6 +300,7 @@
 <script type="text/javascript" src="../js/mui.imageViewer.js"></script>
 <script src="../js/mui.previewimage1.js"></script>
 <script type="text/javascript" src="../js/facepp_sdk.js"></script>
+<script type="text/javascript" src="../js/person.js"></script>
 <script>
 	mui.previewImage();
 	var fileArr = [];
@@ -308,8 +311,10 @@
 	var face = [];
 	var face_num = 0;
 	var per_path = [];
+	var typeJson = [];
 	var facepp = new FACEPP(APIKEY, APISERET, 1);
-
+	var typeAll = ['','单人照','双人照','合照','自拍','漂亮小姐姐',
+	'帅气小鲜肉','可爱小宝贝','活力青少年','明星','屏幕截图','风景','证件照','美食','文本','建筑','卡通','交通工具','动物','其他'];
 	mui.init({
 		// 		beforeback: function() {
 		// 			//获得列表界面的webview
@@ -577,18 +582,15 @@
 				if(ani >= 2){
 					typeArr.push('动物');
 				}
-				if(peo >= 1){
-					typeArr.push('人物');
-				}
-				if(typeArr.length == 0){
-					typeArr.push('其他');
-				}
-				
+				// if(peo >= 1){
+				// 	typeArr.push('人物');
+				// }
+				let person_num = 0;
 				let pro =new Promise(function(resolve,reject){
 					resolve();
 				});
 				//人脸识别
-				if(typeArr.indexOf('人物') != -1){
+				if(peo >= 1){
 					let image_face = facepp.getFaceBase64Image(img);
 					let params = {
 						'image_base64': image_face,
@@ -602,6 +604,7 @@
 								typeArr.splice(nu, 1);
 							} else {
 								per_path.push(image_path);
+								person_num = face_num;
 								if (face_num > 5) {
 									face_num = 5;
 								}
@@ -621,8 +624,9 @@
 									if(Math.round(proper) >= 15){
 										typeArr.push('自拍');
 									}
-									
+									let rec = [width, top, left, height];
 									let face_rec = width + '-' + top + '-' + left + '-' + height;
+									let face_src = getFaceSrc(rec, image_path);
 									let age = e.faces[k].attributes.age.value;
 									let gd = e.faces[k].attributes.gender.value;
 									let gender;
@@ -684,10 +688,10 @@
 										default:
 											break;
 									}
-									person.push(image_path);
-									person.push(face_num);
 									person.push(face_token);
+									person.push(image_path);
 									person.push(face_rec);
+									person.push(face_src);
 									person.push(age);
 									person.push(gender);
 									person.push(beauty);
@@ -705,13 +709,27 @@
 				}
 				
 				pro.then(function(){
-					let image_type = typeArr.join("-");
 					let image_keyword = keyArr.join("-");
 					let image_date = getNowFormatDate();
 					imageArr.push(image_path);
-					imageArr.push(image_type);
 					imageArr.push(image_keyword);
 					imageArr.push(image_date);
+					imageArr.push(person_num);
+					if(person_num == 1){
+						typeArr.push('单人照');
+					}
+					if(person_num == 2){
+						typeArr.push('双人照');
+					}
+					if(person_num > 2){
+						typeArr.push('合照');
+					}
+					if(typeArr.length == 0){
+						typeArr.push('其他');
+					}
+					let imageType ={'image_path': image_path,
+									'type': typeArr};
+					typeJson.push(imageType);
 				});
 				return pro;
 
@@ -741,6 +759,10 @@
 			per_num = per_num - nm;
 			person.splice(ps, nm * 9);
 		}
+		let index = typeJson.findIndex(function(x) {
+			return x.image_path == fileSrc;
+		});
+		typeJson.splice(index, 1);
 	}
 
 	//取消上传照片
@@ -775,8 +797,8 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
-		console.log(imageArr);
-		console.log(person);
+		// console.log(imageArr);
+		// console.log(person);
 		Promise.all(pm).then(function() {
 			let num = files.length;
 			return InsertToImage(num, imageArr);
@@ -784,7 +806,18 @@
 			if (per_num == 0)
 				return result;
 			else
-				return InsertToPerson(per_num, person);
+				return InsertToFace(per_num, person);
+		}).then(function(result){
+			let pro =[];
+			for(let i = 0;i <typeJson.length; i++){
+				let image_path = typeJson[i].image_path;
+				for(let j = 0;j<typeJson[i].type.length; j++){
+					let image_type = typeJson[i].type[j];
+					let type_id = typeAll.indexOf(image_type);
+					pro.push(InsertToImageType(type_id, image_path));
+				}
+			}
+			return Promise.all(pro);
 		}).then(function(result) {
 			let len = per_path.length;
 			let proArr = [];
@@ -820,7 +853,7 @@
 						let left = e.faces[m].face_rectangle.left;
 						let height = e.faces[m].face_rectangle.height;
 
-						getPersonImage(perImg.src).then(function(res) {
+						getImageFace(perImg.src).then(function(res) {
 							let length = res.rows.length;
 							// console.log(perImg.src);
 							// console.log(length);
@@ -893,6 +926,7 @@
 			}, 'div');
 		}).catch(function(err) {
 			console.log(JSON.stringify(err));
+			console.log(err);
 			wt.close();
 			var length = fileArr.length;
 			var btnArray = ['确定'];

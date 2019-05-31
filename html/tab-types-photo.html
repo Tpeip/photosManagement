@@ -257,7 +257,7 @@
 		var allImage = localStorage.getItem('allImage');
 		var flag = 0;
 		var pathArr = [];
-		
+		var typeArr = ['','单人照','双人照','合照','自拍','漂亮小姐姐','帅气小鲜肉','可爱小宝贝','活力青少年','明星','屏幕截图','风景','证件照','美食','文本','建筑','卡通','交通工具','动物','其他'];
 
 		mui.plusReady(function() {
 			replaceHeader();
@@ -281,7 +281,7 @@
 				image = '<p id="'+ src +'" class="image-border"><img class="images" src="' + src +
 					'" data-preview-src="" data-preview-group="1" />'+
 					// '<span id="move" class="mui-icon mui-icon-close icon-move" onclick="move(\'' + src + '\')"></span>' +
-					'<input id="check" type="checkbox" class="mui-checkbox icon-move hiddenimg" value="'+src+'" style="zoom:130%">'+
+					'<input id="check" type="checkbox" class="mui-checkbox icon-move hiddenimg" value="'+src+'" style="zoom:150%">'+
 					'</p>';
 				jQuery('#image-content').append(image);
 			}
@@ -417,7 +417,10 @@
 				console.log(items[0].value);
 				var album = items[0].value;
 				pathArr.forEach(function(path){
-					// updateAlbum(type, path, album);
+					let type_id = typeArr.indexOf(type);
+					let new_type = typeArr.indexOf(album);
+					DeleteImageType(type_id, path);
+					InsertToImageType(new_type, path);
 					document.getElementById(path).classList.add("hiddenimg");
 				});
 			});

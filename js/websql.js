@@ -41,31 +41,12 @@ function websqlCreatTable(tableName, params) {
 /**
  * 创建image表单
  */
-function createImageTable() {
+function createImage() {
 	var tableName = 'image';
 	var params =
-		"image_id INTEGER PRIMARY KEY AUTOINCREMENT,image_path text NOT NULL,image_type text NOT NULL,image_keyword text NOT NULL,image_date text NOT NULL";
+		"image_path text PRIMARY KEY NOT NULL, image_keyword text NOT NULL,image_date text NOT NULL,person_num INTEGER NOT NULL";
 	websqlCreatTable(tableName, params);
 }
-
-function getAllImage() {
-	websqlOpenDB();
-	var selectALLSQL = 'SELECT * FROM image ORDER BY image_id DESC';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectALLSQL, [], function(ctx, result) {
-					//      console.log("查询" +   + "成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('查询失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
 
 function getNowFormatDate() {
 	var date = new Date();
@@ -81,6 +62,46 @@ function getNowFormatDate() {
 	}
 	var currentdate = year + seperator1 + month + seperator1 + strDate;
 	return currentdate;
+}
+
+function InsertToImage(num, imageArr) {
+	websqlOpenDB();
+	var insertImageSQL =
+		'INSERT INTO image(image_path, image_keyword, image_date, person_num) VALUES (?,?,?,?)';
+	for (var i = 0; i < num - 1; i++) {
+		insertImageSQL += ',(?,?,?,?)';
+	}
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertImageSQL, imageArr, function(ctx, result) {
+					// console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function getAllImage() {
+	websqlOpenDB();
+	var selectALLSQL = 'SELECT * FROM image ORDER BY image_date DESC';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectALLSQL, [], function(ctx, result) {
+					//      console.log("查询" +   + "成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('查询失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
 }
 
 function getAllDate() {
@@ -103,7 +124,7 @@ function getAllDate() {
 
 function getImageByDate(date) {
 	websqlOpenDB();
-	var selectALLSQL = 'SELECT * FROM image WHERE image_date = ? ORDER BY image_id DESC';
+	var selectALLSQL = 'SELECT * FROM image WHERE image_date = ? ORDER BY rowid DESC';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectALLSQL, [date], function(ctx, result) {
@@ -139,29 +160,6 @@ function getImageByPath(path) {
 	return pm;
 }
 
-
-function InsertToImage(num, imageArr) {
-	websqlOpenDB();
-	var insertImageSQL =
-		'INSERT INTO image (image_path,image_type,image_keyword,image_date) VALUES (?,?,?,?)';
-	for (var i = 0; i < num - 1; i++) {
-		insertImageSQL += ',(?,?,?,?)';
-	}
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertImageSQL, imageArr, function(ctx, result) {
-					// console.log("插入成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('插入失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
 function deleteOneImage(image_path) {
 	var deleteSQL = 'DELETE FROM image where image_path=?';
 	var pm = new Promise(function(resolve, reject) {
@@ -178,36 +176,236 @@ function deleteOneImage(image_path) {
 	return pm;
 }
 
-/**
- * image中删除数据
- */
-function deleteAllImage() {
-	var deleteSQL = 'DELETE FROM image';
+function createType() {
+	var tableName = 'type';
+	var params ="type_id INTEGER PRIMARY KEY AUTOINCREMENT, type_name text NOT NULL" ;
+	websqlCreatTable(tableName, params);
+}
+
+function InsertToType(num, typeArr) {
+	websqlOpenDB();
+	var insertTypeSQL ='INSERT INTO type(type_name) VALUES (?)';
+	for (var i = 0; i < num - 1; i++) {
+		insertTypeSQL += ',(?)';
+	}
 	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx, result) {
-			ctx.executeSql(deleteSQL, [], function(ctx, result) {
-				// console.log("删除表数据成功 ");
-				resolve(result);
-			}, function(tx, error) {
-				console.log('删除表数据失败:' + error.message);
-				reject(error);
-			});
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertTypeSQL, typeArr, function(ctx, result) {
+					 console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('插入失败: ' + error.message);
+					reject(error);
+				});
 		});
 	});
 	return pm;
 }
 
-function createPersonImage() {
-	var tableName = 'person';
-	var params =
-		"face_token text ,personImg_id INTEGER PRIMARY KEY AUTOINCREMENT, image_path text NOT NULL, person_num INTEGER," +
-		" face_rec text, age INTEGER, gender text, beauty text, ethnicity text, emotion text, face_src text, group_id text";
+function InsertAllType(){
+	let typeArr = ['单人照','双人照','合照','自拍','漂亮小姐姐',
+	'帅气小鲜肉','可爱小宝贝','活力青少年','明星','屏幕截图','风景','证件照','美食','文本','建筑','卡通','交通工具','动物','其他'];
+	InsertToType(typeArr.length, typeArr);
+}
+
+function getAllType() {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM type';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getTypeId(type_name) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT type_id FROM type where type_name = ?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [type_name], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+
+
+function createImageType() {
+	var tableName = 'image_type';
+	var params ="type_id INTEGER, image_path text, PRIMARY KEY(type_id, image_path),FOREIGN KEY(type_id) REFERENCES type(type_id),FOREIGN KEY(image_path) REFERENCES image(image_path)";
 	websqlCreatTable(tableName, params);
 }
 
-function getOnePerson(){
+function InsertToImageType(type_id, image_path) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM person ORDER BY personImg_id DESC';
+	var insertImageTypeSQL ='INSERT INTO image_type(type_id, image_path) VALUES (?,?)';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertImageTypeSQL, [type_id, image_path], function(ctx, result) {
+					 console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					//console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function getOneTypeImage(type_id) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM image_type where type_id=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [type_id], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getOneImageType(image_path) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM image_type where image_path=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [image_path], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getImageType(type_id,image_path) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM image_type where type_id=? and image_path=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [type_id, image_path], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function DeleteImageType(type_id, image_path) {
+	websqlOpenDB();
+	var deleteImageTypeSQL ='DELETE FROM image_type WHERE type_id=? AND image_path=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteImageTypeSQL, [type_id, image_path], function(ctx, result) {
+					 console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					//console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function DeleteImageInType(image_path) {
+	websqlOpenDB();
+	var deleteImageTypeSQL ='DELETE FROM image_type WHERE image_path=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteImageTypeSQL, [image_path], function(ctx, result) {
+					 console.log("删除成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					//console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
+
+
+function createPerson() {
+	var tableName = 'person';
+	// var params = " person_id text PRIMARY KEY NOT NULL, person_name text, image_num INTEGER, age INTEGER, gender text, beauty text,ethnicity text";
+	var params = " person_id text PRIMARY KEY NOT NULL, person_name text, age INTEGER, gender text, beauty text,ethnicity text";
+	websqlCreatTable(tableName, params);
+}
+
+function InsertToPerson(person_id) {
+	websqlOpenDB();
+	var person_name = '未命名';
+	var insertFaceSQL = 'INSERT INTO person (person_id , person_name) VALUES (?,?)';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertFaceSQL, [person_id, person_name], function(ctx, result) {
+					// console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
+function getOnePerson(person_id) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM person WHERE person_id=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [person_id], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getAllPerson() {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM person ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [], function(ctx, result) {
@@ -222,9 +420,117 @@ function getOnePerson(){
 	return pm;
 }
 
-function getGroup() {
+
+function UpdateToName(person_id, person_name) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT image_path, group_id, face_rec, face_src, COUNT(*) image_num FROM person GROUP BY group_id';
+	var insertSQL = 'UPDATE person SET person_name=? WHERE person_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, [person_name, person_id], function(ctx, result) {
+					// console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function UpdatePersonInfo(person_id, age, gender) {
+	websqlOpenDB();
+	var insertSQL = 'UPDATE person SET age=?,gender=? WHERE person_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, [age, gender, person_id], function(ctx, result) {
+					console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+// function UpdateImageNum(person_id, image_num) {
+// 	websqlOpenDB();
+// 	var updateSQL = 'UPDATE person SET image_num=? WHERE person_id=? ';
+// 	var pm = new Promise(function(resolve, reject) {
+// 		dataBase.transaction(function(ctx) {
+// 			ctx.executeSql(updateSQL, [image_num, person_id], function(ctx, result) {
+// 					// console.log("更新成功");
+// 					resolve(result);
+// 				},
+// 				function(tx, error) {
+// 					console.log('更新失败: ' + error.message);
+// 					reject(error);
+// 				});
+// 		});
+// 	});
+// 	return pm;
+// }
+
+
+function DeletePerson(person_id) {
+	websqlOpenDB();
+	var deleteSQL = 'DELETE FROM person WHERE person_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteSQL, [person_id], function(ctx, result) {
+					// console.log("删除成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('删除失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
+function createFace() {
+	var tableName = 'face';
+	var params =
+		"face_token text PRIMARY KEY, image_path text NOT NULL, face_rec text, face_src text," +
+		" age INTEGER, gender text, beauty text, ethnicity text, emotion text, person_id text, "+
+		"FOREIGN KEY(image_path) REFERENCES image(image_path), FOREIGN KEY(person_id) REFERENCES person(person_id)";
+	websqlCreatTable(tableName, params);
+}
+
+
+function InsertToFace(num, faceArr) {
+	websqlOpenDB();
+	var insertSQL =
+		'INSERT INTO face ( face_token, image_path, face_rec, face_src, age, gender, beauty, ethnicity, emotion) VALUES (?,?,?,?,?,?,?,?,?)';
+	for (var i = 0; i < num - 1; i++) {
+		insertSQL += ',(?,?,?,?,?,?,?,?,?)';
+	}
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(insertSQL, faceArr, function(ctx, result) {
+					 console.log("插入成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+
+function getAllFace(){
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM face';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(selectSQL, [], function(ctx, result) {
@@ -239,9 +545,43 @@ function getGroup() {
 	return pm;
 }
 
-function getPersonImage(image_path) {
+function getPerson() {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM person where image_path=?';
+	var selectSQL = 'SELECT image_path, person_id, face_rec, face_src, COUNT(*) image_num FROM face GROUP BY person_id';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getExitFace(face_token) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM face where face_token=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [face_token], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getImageFace(image_path) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM face where image_path=?';
 	// console.log(path);
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
@@ -260,12 +600,12 @@ function getPersonImage(image_path) {
 }
 
 
-function getFaceByGroup(group_id) {
+function getFaceByPerson(person_id) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM person WHERE group_id=? ORDER BY personImg_id DESC';
+	var selectSQL = 'SELECT * FROM face WHERE person_id=? ORDER BY rowid DESC';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [group_id], function(ctx, result) {
+			ctx.executeSql(selectSQL, [person_id], function(ctx, result) {
 				// console.log("查询成功");
 				resolve(result);
 			}, function(tx, err) {
@@ -277,12 +617,12 @@ function getFaceByGroup(group_id) {
 	return pm;
 }
 
-function getFaceByFacesrc(group_id, face_src) {
+function getFaceByFacesrc(person_id, face_src) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM person WHERE group_id=? and face_src=?';
+	var selectSQL = 'SELECT * FROM face WHERE person_id=? and face_src=?';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [group_id, face_src], function(ctx, result) {
+			ctx.executeSql(selectSQL, [person_id, face_src], function(ctx, result) {
 				// console.log("查询成功");
 				resolve(result);
 			}, function(tx, err) {
@@ -294,52 +634,13 @@ function getFaceByFacesrc(group_id, face_src) {
 	return pm;
 }
 
-function InsertToPerson(num, personArr) {
-	websqlOpenDB();
-	var insertImageSQL =
-		'INSERT INTO person (image_path,person_num, face_token, face_rec, age, gender, beauty, ethnicity, emotion) VALUES (?,?,?,?,?,?,?,?,?)';
-	for (var i = 0; i < num - 1; i++) {
-		insertImageSQL += ',(?,?,?,?,?,?,?,?,?)';
-	}
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertImageSQL, personArr, function(ctx, result) {
-					 console.log("插入成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('插入失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
 
-function UpdateToPerson( face_token, face_src) {
+function UpdatePersonId(face_token, person_id) {
 	websqlOpenDB();
-	var insertImageSQL = 'UPDATE person SET face_src=? WHERE face_token=? ';
+	var updateSQL = 'UPDATE face SET person_id=? WHERE face_token=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertImageSQL, [face_src, face_token], function(ctx, result) {
-					// console.log("更新成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
-function UpdateToFace(face_token, group_id) {
-	websqlOpenDB();
-	var updateSQL = 'UPDATE person SET group_id=? WHERE face_token=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [group_id, face_token], function(ctx, result) {
+			ctx.executeSql(updateSQL, [person_id, face_token], function(ctx, result) {
 					// console.log("更新成功");
 					resolve(result);
 				},
@@ -354,7 +655,7 @@ function UpdateToFace(face_token, group_id) {
 
 function UpdateToFaceToken(image_path, face_token, face_rec) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE person SET face_token=? WHERE image_path=? and face_rec=? ';
+	var updateSQL = 'UPDATE face SET face_token=? WHERE image_path=? and face_rec=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(updateSQL, [face_token, image_path, face_rec], function(ctx, result) {
@@ -370,8 +671,26 @@ function UpdateToFaceToken(image_path, face_token, face_rec) {
 	return pm;
 }
 
-function deleteOnePerson(image_path) {
-	var deleteSQL = 'DELETE FROM person where image_path=?';
+function UpdateFaceInfo(person_id, age, gender) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE face SET age=?,gender=? WHERE person_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [age, gender, person_id], function(ctx, result) {
+					// console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
+function deleteImageToFace(image_path) {
+	var deleteSQL = 'DELETE FROM face where image_path=?';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx, result) {
 			ctx.executeSql(deleteSQL, [image_path], function(ctx, result) {
@@ -385,183 +704,21 @@ function deleteOnePerson(image_path) {
 }
 
 
-function createGroupFace() {
-	var tableName = 'groupface';
-	var params = " group_id text PRIMARY KEY NOT NULL, face_src text, group_info text, image_num integer";
-	websqlCreatTable(tableName, params);
-}
-
-function getGroupFaceById(group_id) {
-	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM groupface WHERE group_id=?';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [group_id], function(ctx, result) {
-				// console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-function getGroupFace() {
-	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM groupface ORDER BY image_num DESC';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [], function(ctx, result) {
-				// console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-function InsertToGroupFace(group_id, face_src, image_num) {
-	websqlOpenDB();
-	var insertFaceSQL = 'INSERT INTO groupface (group_id ,face_src, image_num) VALUES (?,?,?)';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertFaceSQL, [group_id, face_src, image_num], function(ctx, result) {
-					// console.log("插入成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('插入失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
-function UpdateToInfo(group_id, group_info) {
-	websqlOpenDB();
-	var insertSQL = 'UPDATE groupface SET group_info=? WHERE group_id=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [group_info, group_id], function(ctx, result) {
-					// console.log("更新成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
-function UpdateGroupFaceSrc(group_id, face_src) {
-	websqlOpenDB();
-	var insertSQL = 'UPDATE groupface SET face_src=? WHERE group_id=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [face_src, group_id], function(ctx, result) {
-					// console.log("更新成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
-function UpdateImageNum(group_id, image_num) {
-	websqlOpenDB();
-	var updateSQL = 'UPDATE groupface SET image_num=? WHERE group_id=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [image_num, group_id], function(ctx, result) {
-					// console.log("更新成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('更新失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
-
-function DeleteGroup(group_id) {
-	websqlOpenDB();
-	var deleteSQL = 'DELETE FROM groupface WHERE group_id=? ';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(deleteSQL, [group_id], function(ctx, result) {
-					// console.log("删除成功");
-					resolve(result);
-				},
-				function(tx, error) {
-					console.log('删除失败: ' + error.message);
-					reject(error);
-				});
-		});
-	});
-	return pm;
-}
 
 function createRelation() {
 	var tableName = 'relation';
-	var params = " person_core text NOT NULL, person_main text NOT NULL, person_relation text, person_intimacy integer, image_num INTEGER, modify_flag INTEGER, PRIMARY KEY(person_core, person_main)";
+	var params = " personA_id text NOT NULL, personB_id text NOT NULL, person_relation text,"+
+	" person_intimacy INTEGER, image_num INTEGER, modify_flag INTEGER, PRIMARY KEY(personA_id, personB_id)"+
+	"FOREIGN KEY(personA_id) References person(person_id),FOREIGN KEY(personB_id) References person(person_id)";
 	websqlCreatTable(tableName, params);
 }
 
-function getRelatedPerson(person_core) {
+function InsertToRelation(personA_id, personB_id, person_relation, person_intimacy, image_num) {
 	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM relation where person_core=?';
+	var insertSQL = 'INSERT INTO relation (personA_id, personB_id, person_relation, person_intimacy, image_num, modify_flag) VALUES (?,?,?,?,?,?)';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [person_core], function(ctx, result) {
-				// console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-function getOneRelation(person_core, person_main) {
-	websqlOpenDB();
-	var selectSQL = 'SELECT * FROM relation where person_core=? and person_main=?';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(selectSQL, [person_core, person_main], function(ctx, result) {
-				// console.log("查询成功");
-				resolve(result);
-			}, function(tx, err) {
-				console.log("查询失败");
-				reject(err);
-			})
-		})
-	});
-	return pm;
-}
-
-
-function InsertToRelation(person_core, person_main, person_relation, person_intimacy, image_num) {
-	websqlOpenDB();
-	var insertSQL = 'INSERT INTO relation (person_core, person_main, person_relation, person_intimacy, image_num, modify_flag) VALUES (?,?,?,?,?,?)';
-	var pm = new Promise(function(resolve, reject) {
-		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [person_core, person_main, person_relation, person_intimacy, image_num, 0], function(ctx, result) {
+			ctx.executeSql(insertSQL, [personA_id, personB_id, person_relation, person_intimacy, image_num, 0], function(ctx, result) {
 					// console.log("插入成功");
 					resolve(result);
 				},
@@ -574,10 +731,44 @@ function InsertToRelation(person_core, person_main, person_relation, person_inti
 	return pm;
 }
 
-
-function UpdatePersonRelation(person_core, person_main, person_relation) {
+function getRelatedPerson(personA_id) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE relation SET person_relation=?,modify_flag=? WHERE person_core=? and person_main=? ';
+	var selectSQL = 'SELECT * FROM relation where personA_id=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [personA_id], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+function getOneRelation(personA_id, personB_id) {
+	websqlOpenDB();
+	var selectSQL = 'SELECT * FROM relation where personA_id=? and personB_id=?';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(selectSQL, [personA_id, personB_id], function(ctx, result) {
+				// console.log("查询成功");
+				resolve(result);
+			}, function(tx, err) {
+				console.log("查询失败");
+				reject(err);
+			})
+		})
+	});
+	return pm;
+}
+
+
+function UpdatePersonRelation(personA_id, personB_id, person_relation) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE relation SET person_relation=?,modify_flag=? WHERE personA_id=? and personB_id=? ';
 	var pm ;
 	if(person_relation == '爱人' ||person_relation == '父母' || person_relation == '孩子' || person_relation == '同学' || person_relation == '同事'){
 		var person_relation1 = person_relation;
@@ -589,7 +780,7 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 		}
 		pm = new Promise(function(resolve, reject) {
 			dataBase.transaction(function(ctx) {
-				ctx.executeSql(updateSQL, [person_relation, 1, person_core, person_main], function(ctx, result) {
+				ctx.executeSql(updateSQL, [person_relation, 1, personA_id, personB_id], function(ctx, result) {
 						console.log("更新成功");
 						// resolve(result);
 						//return ;
@@ -598,7 +789,7 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 						console.log('更新失败: ' + error.message);
 						reject(error);
 					});
-				ctx.executeSql(updateSQL, [person_relation1, 1, person_main, person_core], function(ctx, result) {
+				ctx.executeSql(updateSQL, [person_relation1, 1, personB_id, personA_id], function(ctx, result) {
 						console.log("更新成功");
 						resolve(result);
 					},
@@ -611,7 +802,7 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 	}else{
 		pm = new Promise(function(resolve, reject) {
 			dataBase.transaction(function(ctx) {
-				ctx.executeSql(updateSQL, [person_relation, 1, person_core, person_main], function(ctx, result) {
+				ctx.executeSql(updateSQL, [person_relation, 1, personA_id, personB_id], function(ctx, result) {
 						console.log("更新成功");
 						 resolve(result);
 						//return ;
@@ -627,12 +818,12 @@ function UpdatePersonRelation(person_core, person_main, person_relation) {
 	return pm;
 }
 
-function UpdatePersonIntimacy(person_core, person_main, person_relation, person_intimacy, image_num) {
+function UpdatePersonIntimacy(personA_id, personB_id, person_relation, person_intimacy, image_num) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE relation SET person_relation=?,person_intimacy=?,image_num=? WHERE person_core=? and person_main=? ';
+	var updateSQL = 'UPDATE relation SET person_relation=?,person_intimacy=?,image_num=? WHERE personA_id=? and personB_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [person_relation, person_intimacy, image_num, person_core, person_main], function(ctx, result) {
+			ctx.executeSql(updateSQL, [person_relation, person_intimacy, image_num, personA_id, personB_id], function(ctx, result) {
 					// console.log("更新成功");
 					resolve(result);
 				},
@@ -645,12 +836,12 @@ function UpdatePersonIntimacy(person_core, person_main, person_relation, person_
 	return pm;
 }
 
-function UpdateRelationImageNum(person_core, person_main, image_num) {
+function UpdateRelationImageNum(personA_id, personB_id, image_num) {
 	websqlOpenDB();
-	var updateSQL = 'UPDATE relation SET image_num=? WHERE person_core=? and person_main=? ';
+	var updateSQL = 'UPDATE relation SET image_num=? WHERE personA_id=? and personB_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(updateSQL, [image_num, person_core, person_main], function(ctx, result) {
+			ctx.executeSql(updateSQL, [image_num, personA_id, personB_id], function(ctx, result) {
 					console.log("更新成功");
 					resolve(result);
 				},
@@ -663,12 +854,12 @@ function UpdateRelationImageNum(person_core, person_main, image_num) {
 	return pm;
 }
 
-function DeleteRelation(group_id) {
+function DeleteRelation(person_id) {
 	websqlOpenDB();
-	var deleteSQL = 'DELETE FROM relation WHERE person_core=? or person_main=? ';
+	var deleteSQL = 'DELETE FROM relation WHERE personA_id=? or personB_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(deleteSQL, [group_id, group_id], function(ctx, result) {
+			ctx.executeSql(deleteSQL, [person_id, person_id], function(ctx, result) {
 					// console.log("删除成功");
 					resolve(result);
 				},
@@ -681,12 +872,12 @@ function DeleteRelation(group_id) {
 	return pm;
 }
 
-function DeleteOneRelation(person_core, person_main) {
+function DeleteOneRelation(personA_id, personB_id) {
 	websqlOpenDB();
-	var deleteSQL = 'DELETE FROM relation WHERE person_core=? and person_main=? ';
+	var deleteSQL = 'DELETE FROM relation WHERE personA_id=? and personB_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(deleteSQL, [person_core, person_main], function(ctx, result) {
+			ctx.executeSql(deleteSQL, [personA_id, personB_id], function(ctx, result) {
 					// console.log("删除成功");
 					resolve(result);
 				},
@@ -698,3 +889,17 @@ function DeleteOneRelation(person_core, person_main) {
 	});
 	return pm;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

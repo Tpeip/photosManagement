@@ -112,32 +112,40 @@
 			function setHtml() {
 				jQuery('#content').empty();
 				var html = '';
-				getGroupFace().then(function(e) {
+				getAllPerson().then(function(e) {
 // 					console.log(e.rows.length);
 // 					console.log(e.rows.item(0));
+					let proArr = [];
 					for (let i = 0; i < e.rows.length; i++) {
-						let face_src = e.rows.item(i).face_src;
-						let group_id = e.rows.item(i).group_id;
-						let image_num = e.rows.item(i).image_num;
-						let group_info = e.rows.item(i).group_info;
-						if (group_info == null || '') {
-							group_info = '未命名';
-						}
-						var face_html = '<p class="image-border" onclick="turnTo(\'' + group_id + '\')">' +
-							'<img class="images" src="' + face_src + '" />' +
-							'<a>' + group_info + '</a><br>' +
-							'<label>' + image_num + '张</label>' +
-							'</p>';
-						html += face_html;
+						let person_id = e.rows.item(i).person_id;
+						let group_info = e.rows.item(i).person_name;
+						proArr.push(
+						getFaceByPerson(person_id).then(function(res){
+							var face_src = res.rows.item(0).face_src;
+							var image_num = res.rows.length;
+								if (group_info == null || group_info == '') {
+									group_info = '未命名';
+								}
+								var face_html = '<p class="image-border" onclick="turnTo(\'' + person_id + '\')">' +
+									'<img class="images" src="' + face_src + '" />' +
+									'<a>' + group_info + '</a><br>' +
+									'<label>' + image_num + '张</label>' +
+									'</p>';
+								html += face_html;
+						})
+						);
 					}
-					jQuery('#content').append(html);
+					Promise.all(proArr).then(function(){
+						jQuery('#content').append(html);
+					})
+
 				}).catch(function(e) {
 					console.log(e);
 				});
 			}
 
-			function turnTo(group_id) {
-				localStorage.setItem('id', group_id);
+			function turnTo(person_id) {
+				localStorage.setItem('id', person_id);
 				mui.openWindow({
 					url: 'person-images.html',
 					show: {

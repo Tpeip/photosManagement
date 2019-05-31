@@ -171,64 +171,59 @@
 		var deleteImage = function(path){
 			var image_path = decodeURIComponent(path);
 			getImageByPath(image_path).then(function(imageRes){
-				let image_type = imageRes.rows.item(0).image_type.split('-');
-				if(image_type.indexOf('人物') != -1){
-					getPersonImage(image_path).then(function(personRes){
-						deleteOnePerson(image_path);
-						deleteOneImage(image_path).then(function(){					
-							setHtml();	
-							getPersonGroup();
-						});
-						let length = personRes.rows.length;
-						let group = [];
-						for(let i = 0;i < length; i++){
-							let group_id = personRes.rows.item(i).group_id;
-							group.push(group_id);
-							let face_src = personRes.rows.item(i).face_src;
-							getGroupFaceById(group_id).then(function(groupRes){
-								let image_num = groupRes.rows.item(0).image_num;
-								let group_face_src = groupRes.rows.item(0).face_src;
-								if(image_num == 1){
-									DeleteGroup(group_id);
-									DeleteRelation(group_id);
-								}else{
-									if(face_src == group_face_src){
-										getFaceByGroup(group_id).then(function(res){
-											let new_face_src = res.rows.item(0).face_src;
-											UpdateGroupFaceSrc(group_id, new_face_src);
-										})
-									}
-								}
-							})
-						}
-						for(let i = 0;i < group.length; i++){
-							let person_core = group[i];
-							for(let j = 0; j < group.length; j++){
-								let person_main = group[j];
-								if(person_core != person_main){
-									getOneRelation(person_core, person_main).then(function(relRes){
-										if(relRes.rows.length !=0){
-											let old_image_num = relRes.rows.item(0).image_num;
-											let image_num = old_image_num - 1;
-											if(image_num == 0){
-												DeleteOneRelation(person_core, person_main);
-											}else{
-												UpdateRelationImageNum(person_core, person_main, image_num);
-											}
+				let person_num1 = imageRes.rows.item(0).person_num;
+				let person_num = Number(person_num1);
+				DeleteImageInType(image_path).then(function(e){
+					if(person_num >= 1 ){
+						console.log(person_num);
+						getImageFace(image_path).then(function(faceRes){
+							deleteImageToFace(image_path);
+							deleteOneImage(image_path).then(function(e){
+								setHtml();
+							});
+								let length = faceRes.rows.length;
+								let person = [];
+								for(let i = 0; i<length; i++){
+									let person_id = faceRes.rows.item(i).person_id;
+									person.push(person_id);
+									getFaceByPerson(person_id).then(function(personRes){
+										let num = personRes.rows.length;
+										if(num == 0){
+											DeleteRelation(person_id).then(function(e){
+												DeletePerson(person_id);
+											});
 										}
 									})
 								}
+								for(let i = 0;i < person.length; i++){
+									let personA_id = person[i];
+									for(let j = 0; j < person.length; j++){
+										let personB_id = person[j];
+										if(personA_id != personB_id){
+										getOneRelation(personA_id, personB_id).then(function(relRes){
+											if(relRes.rows.length !=0){
+												let old_image_num = relRes.rows.item(0).image_num;
+												let image_num = old_image_num - 1;
+												if(image_num == 0){
+													DeleteOneRelation(personA_id, personB_id);
+												}else{
+													UpdateRelationImageNum(personA_id, personB_id, image_num);
+												}
+											}
+										})
+									}
+								}
 							}
-						}
-					})
-				}else{
-					deleteOneImage(image_path).then(function(){					
-						setHtml();	
-						getPersonGroup();
-					});
-				}
-				
+							
+						})
+					}else{
+						deleteOneImage(image_path).then(function(e){
+							setHtml();
+						});
+					}
+				})
 			})
+			
 		};
 		var laterForwardEvent = function(){
 				var ids = [{

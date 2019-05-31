@@ -288,10 +288,12 @@
 		console.log('照片');
 		var image_template = document.getElementById('image-content');
 		var facepp = new FACEPP(APIKEY, APISERET, 1);
-		createImageTable();
-		createPersonImage();
-		// createFace();
-		createGroupFace();
+		createImage();
+		createType();
+		insertType();
+		createPerson();
+		createFace();
+		createImageType();
 		createRelation();
 		// 		window.addEventListener('refresh', function(event) {
 		// 			//通过event.detail可获得传递过来的参数内容
@@ -301,7 +303,8 @@
 		mui.plusReady(function() {
 			CreateAlbum();
 			setHtml();
-			UpdateGroup();
+			UpdatePersonInFace();
+			insertType();
 			//getPersonFace();
 			// getPersonGroup();
 			plus.share.getServices(function(s) {

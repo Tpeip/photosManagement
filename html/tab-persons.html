@@ -98,10 +98,7 @@
 			// location.reload();
 			getAllRelation();
 			setFaceHtml();
-			// getPersonGroup();
-			// var group_id = localStorage.getItem('id');
-			// showAllRelation();
-			// showOneRelation(group_id);
+
 		});
 
 		mui.plusReady(function() {
@@ -130,27 +127,32 @@
 			jQuery('#img-faces').empty();
 			var length = $("#img-faces").children("img").length;
 			var html = '';
-			getGroupFace().then(function(e) {
+			getAllPerson().then(function(e) {
 				var length = e.rows.length;
 				if (length == 0) {
 					showOneRelation("");
 					n++;
 				} else {
-					var person_one = e.rows.item(0).group_id;
+					var person_one = e.rows.item(0).person_id;
 					// if(n == 0){
 						showAllRelation();
 // 					}else{
 // 						var id = localStorage.getItem("id");
 // 						showOneRelation(id);
 // 					}					
+					let allArr = [];
 					for (let i = 0; i < length; i++) {
-						let face_url = e.rows.item(i).face_src;
-						let group_id = e.rows.item(i).group_id;
-						var face_html = '<img src="' + face_url + '" onclick="turnTo(\'' + group_id + '\')" />'
-						html += face_html;
+						let person_id = e.rows.item(i).person_id;
+						allArr.push(getFaceByPerson(person_id).then(function(res){
+							let face_url = res.rows.item(0).face_src;
+							var face_html = '<img src="' + face_url + '" onclick="turnTo(\'' + person_id + '\')" />'
+							html += face_html;
+						}));
 					}
-					html = html + '<img id="more" src="../images/more.png"  onclick="showPersons()"/>';
-					jQuery('#img-faces').append(html);
+					Promise.all(allArr).then(function(e){
+						html = html + '<img id="more" src="../images/more.png"  onclick="showPersons()"/>';
+						jQuery('#img-faces').append(html);
+					}) 
 				}
 			}).catch(function(e) {
 				console.log(JSON.stringify(e));
@@ -170,26 +172,26 @@
 			});
 		}
 
-		function turnTo(group_id) {
-			showOneRelation(group_id);
+		function turnTo(person_id) {
+			showOneRelation(person_id);
 		}
 		//显示核心人物的人脉关系图
-		function showOneRelation(group_id) {
+		function showOneRelation(person_id) {
 			var modify = document.getElementById('modify');
 			modify.classList.remove('showtext');
 			var graph = document.getElementById('graph');
 			graph.classList.remove('showtext');
 			var update = document.getElementById('update');
 			update.classList.add('showtext');
-			// console.log(group_id);
+			// console.log(person_id);
 			var faceArr = [];
 			var linkArr = [];
-			if (group_id == null || group_id == '') {
+			if (person_id == null || person_id == '') {
 				drawOneGraph(faceArr, linkArr);
 			} else {
-				let id = group_id;
+				let id = person_id;
 				let key = allPerson.findIndex(function(x) {
-					return x.group_id == id;
+					return x.person_id == id;
 				});
 				let core_face_src = allPerson[key].face_src;
 				let core_group_info = allPerson[key].group_info;
@@ -214,7 +216,7 @@
 						let size = setNodeSize(person_intimacy);
 						let index = relations.indexOf(person_relation) + 1;
 						let k = allPerson.findIndex(function(x) {
-							return x.group_id == person_id;
+							return x.person_id == person_id;
 						});
 						let info = allPerson[k].group_info;
 						let main_face_src = allPerson[k].face_src;
@@ -481,10 +483,10 @@
 				} else {
 					var mod = localStorage.getItem('mod');
 					if (mod == 1) {
-						let group_id = param.data.core_id;
+						let person_id = param.data.core_id;
 						let person_main = param.data.main_id;
 						let person_relation = param.data.person_relation;
-						modifyRelation(group_id, person_main, person_relation);
+						modifyRelation(person_id, person_main, person_relation);
 					} else {
 						showOneRelation(param.data.main_id);
 					}
@@ -494,7 +496,7 @@
 
 
 		//修改人物间关系
-		function modifyRelation(group_id, person_main, person_relation) {
+		function modifyRelation(person_id, person_main, person_relation) {
 			var userPicker = new mui.PopPicker();
 			userPicker.setData([{
 				value: '朋友',
@@ -527,17 +529,17 @@
 			var relation = person_relation;
 			userPicker.show(function(items) {
 				relation = items[0].value;
-				UpdateOneRelation(group_id, person_main, relation);
+				UpdateOneRelation(person_id, person_main, relation);
 
 				//返回 false 可以阻止选择框的关闭
 				//return false;
 			});
 		}
 
-		function UpdateOneRelation(group_id, person_main, relation) {
-			let id = group_id;
+		function UpdateOneRelation(person_id, person_main, relation) {
+			let id = person_id;
 			let key = allPerson.findIndex(function(x) {
-				return x.group_id == id;
+				return x.person_id == id;
 			});
 			let persons = allPerson[key].persons;
 			let k = persons.findIndex(function(e) {
@@ -547,7 +549,7 @@
 			if (relation == '爱人' || relation == '父母' || relation == '孩子' || relation == '同学' || relation == '同事') {
 				let core_id = persons[k].id;
 				let m = allPerson.findIndex(function(e) {
-					return e.group_id == core_id;
+					return e.person_id == core_id;
 				});
 				let main_persons = allPerson[m].persons;
 				let n = main_persons.findIndex(function(e) {
@@ -569,7 +571,7 @@
 					allPerson[m].persons[n].relation = '同事';
 				}
 			}
-			UpdatePersonRelation(group_id, person_main, relation).then(function() {
+			UpdatePersonRelation(person_id, person_main, relation).then(function() {
 				mui.toast("修改成功");
 				showOneRelation(id);
 			});
@@ -590,12 +592,12 @@
 			getPersonData().then(function() {
 				for (let i = 0; i < allPerson.length; i++) {}
 				for (let i = 0; i < allPerson.length; i++) {
-					let group_id = allPerson[i].group_id;
+					let person_id = allPerson[i].person_id;
 					let core_face_src = allPerson[i].face_src;
 					let group_info = allPerson[i].group_info;
-					if (visited.indexOf(group_id) < 0) {
+					if (visited.indexOf(person_id) < 0) {
 						proArr.push(
-							wideTraversal(group_id, core_face_src, i)
+							wideTraversal(person_id, core_face_src, i)
 						);
 					}
 				}
@@ -640,7 +642,7 @@
 				while (queue.length > 0) {
 					let core = queue.shift();
 					let key = allPerson.findIndex(function(x) {
-						return x.group_id == core;
+						return x.person_id == core;
 					});
 					let len = allPerson[key].persons.length;
 					for (let i = 0; i < len; i++) {
@@ -650,7 +652,7 @@
 // 						let size = setNodeSize(intimacy);
 						let index = relations.indexOf(relation) + 1;
 						let main_key = allPerson.findIndex(function(x) {
-							return x.group_id == main_person;
+							return x.person_id == main_person;
 						});
 						if (visited.indexOf(main_person) < 0) {
 							let main_face_src = allPerson[main_key].face_src;

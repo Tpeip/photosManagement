@@ -297,7 +297,7 @@
 					return true;
 				}
 			});
-			var group_id = localStorage.getItem('id');
+			var person_id = localStorage.getItem('id');
 
 			// mui.plusReady(function() {
 			getFace();
@@ -312,16 +312,18 @@
 
 			//获取当前页面的人脸
 			function getFace() {
-				var group_id = localStorage.getItem('id');
-				console.log(group_id);
-				getGroupFaceById(group_id).then(function(e) {
-					var face_src = e.rows.item(0).face_src;
-					var person_text = e.rows.item(0).group_info;
-					var image_num = e.rows.item(0).image_num;
-					if (person_text == null || person_text == '') {
-						person_text = '这是谁';
-					}
-					setTopHtml(face_src, person_text, image_num);
+				var person_id = localStorage.getItem('id');
+				console.log(person_id);
+				getOnePerson(person_id).then(function(e) {
+					var person_text = e.rows.item(0).person_name;
+					getFaceByPerson(person_id).then(function(res){
+						var face_src = res.rows.item(0).face_src;
+						var image_num = res.rows.length;
+						if (person_text == null || person_text == '') {
+							person_text = '这是谁';
+						}
+						setTopHtml(face_src, person_text, image_num);
+					})
 				}).catch(function(e) {
 					console.log(JSON.stringify(e));
 				});
@@ -329,9 +331,9 @@
 
 			//获取该人物的所有照片并显示
 			function getImages() {
-				var group_id = localStorage.getItem('id');
+				var person_id = localStorage.getItem('id');
 				jQuery('#bottom').empty();
-				getFaceByGroup(group_id).then(function(e) {
+				getFaceByPerson(person_id).then(function(e) {
 					var bottom_html = '<p class="mui-ellipsis">相关照片</p>';
 					for (let i = 0; i < e.rows.length; i++) {
 						var image_path = e.rows.item(i).image_path;
@@ -372,7 +374,7 @@
 						} else {
 							var group_info = e.value;
 							showPerson.innerHTML = e.value + '&nbsp;<span class="iconfont icon-write"></span>';
-							UpdateToInfo(group_id, group_info);
+							UpdateToName(person_id, group_info);
 						}
 					}
 				}, 'div');
