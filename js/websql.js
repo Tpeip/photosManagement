@@ -462,7 +462,7 @@ function UpdatePersonAllInfo(person_id, age, gender, beauty, ethnicity) {
 	var insertSQL = 'UPDATE person SET age=?,gender=?,beauty=?,ethnicity=? WHERE person_id=? ';
 	var pm = new Promise(function(resolve, reject) {
 		dataBase.transaction(function(ctx) {
-			ctx.executeSql(insertSQL, [age, gender, person_id, beauty, ethnicity], function(ctx, result) {
+			ctx.executeSql(insertSQL, [age, gender, beauty, ethnicity,person_id], function(ctx, result) {
 					console.log("更新成功");
 					resolve(result);
 				},

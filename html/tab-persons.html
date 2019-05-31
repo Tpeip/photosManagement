@@ -95,6 +95,7 @@
 
 		//监听页面刷新
 		window.addEventListener('fresh', function() {
+			n++;
 			// location.reload();
 			getAllRelation();
 			setFaceHtml();
@@ -136,12 +137,12 @@
 					n++;
 				} else {
 					var person_one = e.rows.item(0).person_id;
-					// if(n == 0){
+					 if(n == 0){
 						showAllRelation();
-// 					}else{
-// 						var id = localStorage.getItem("id");
-// 						showOneRelation(id);
-// 					}					
+					}else{
+						var id = localStorage.getItem("id");
+						showOneRelation(id);
+					}					
 					let allArr = [];
 					for (let i = 0; i < length; i++) {
 						let person_id = e.rows.item(i).person_id;
@@ -185,73 +186,76 @@
 			graph.classList.remove('showtext');
 			var update = document.getElementById('update');
 			update.classList.add('showtext');
-			// console.log(person_id);
-			var faceArr = [];
-			var linkArr = [];
-			if (person_id == null || person_id == '') {
-				drawOneGraph(faceArr, linkArr);
-			} else {
-				let id = person_id;
-				let key = allPerson.findIndex(function(x) {
-					return x.person_id == id;
-				});
-				let core_face_src = allPerson[key].face_src;
-				let core_group_info = allPerson[key].group_info;
-				let persons = allPerson[key].persons;
-				let core_person = {
-					category: 0,
-					name: core_group_info,
-					symbol: 'image://' + getImgData(core_face_src),
-					symbolSize: [70, 70],
-					value: 10,
-					person: id
-				};
-				faceArr.push(core_person);
-				if (persons.length > 0) {
-					for (let i = 0; i < persons.length; i++) {
-						let person_id = persons[i].id;
-						let person_relation = persons[i].relation;
-						let person_intimacy = persons[i].intimacy;
-						// 						let size = Math.floor(person_intimacy * 100 / 100);
-						// 						console.log(person_intimacy);
-						// 						console.log(size);
-						let size = setNodeSize(person_intimacy);
-						let index = relations.indexOf(person_relation) + 1;
-						let k = allPerson.findIndex(function(x) {
-							return x.person_id == person_id;
-						});
-						let info = allPerson[k].group_info;
-						let main_face_src = allPerson[k].face_src;
-						let main_person = {
-							category: index,
-							name: info,
-							symbol: 'image://' + getImgData(main_face_src),
-							symbolSize: [size, size],
-							value: 10,
-							core_id: id,
-							main_id: person_id,
-							person_relation: person_relation
-						}
-						faceArr.push(main_person);
-						let j = i + 1;
-						var main_link = {
-							source: j,
-							target: 0,
-							name: person_relation
-						};
-						linkArr.push(main_link);
+			getPersonData().then(function(){
+				var faceArr = [];
+				var linkArr = [];
+				if (person_id == null || person_id == '') {
+					drawOneGraph(faceArr, linkArr);
+				} else {
+					let id = person_id;
+					let key = allPerson.findIndex(function(x) {
+						return x.person_id == id;
+					});
+					let core_face_src = allPerson[key].face_src;
+					let core_group_info = allPerson[key].group_info;
+					let persons = allPerson[key].persons;
+					let core_person = {
+						category: 0,
+						name: core_group_info,
+						symbol: 'image://' + getImgData(core_face_src),
+						symbolSize: [70, 70],
+						value: 10,
+						person: id
 					};
-					// 					faceArr.push(main_person);
-					// 					let j = i + 1;
-					// 					var main_link = {
-					// 						source: j,
-					// 						target: 0,
-					// 						weight: j
-					// 					};
-					// 					linkArr.push(main_link);
+					faceArr.push(core_person);
+					if (persons.length > 0) {
+						for (let i = 0; i < persons.length; i++) {
+							let person_id = persons[i].id;
+							let person_relation = persons[i].relation;
+							let person_intimacy = persons[i].intimacy;
+							// 						let size = Math.floor(person_intimacy * 100 / 100);
+							// 						console.log(person_intimacy);
+							// 						console.log(size);
+							let size = setNodeSize(person_intimacy);
+							let index = relations.indexOf(person_relation) + 1;
+							let k = allPerson.findIndex(function(x) {
+								return x.person_id == person_id;
+							});
+							let info = allPerson[k].group_info;
+							let main_face_src = allPerson[k].face_src;
+							let main_person = {
+								category: index,
+								name: info,
+								symbol: 'image://' + getImgData(main_face_src),
+								symbolSize: [size, size],
+								value: 10,
+								core_id: id,
+								main_id: person_id,
+								person_relation: person_relation
+							}
+							faceArr.push(main_person);
+							let j = i + 1;
+							var main_link = {
+								source: j,
+								target: 0,
+								name: person_relation
+							};
+							linkArr.push(main_link);
+						};
+						// 					faceArr.push(main_person);
+						// 					let j = i + 1;
+						// 					var main_link = {
+						// 						source: j,
+						// 						target: 0,
+						// 						weight: j
+						// 					};
+						// 					linkArr.push(main_link);
+					}
 				}
-			}
-			drawOneGraph(faceArr, linkArr);
+				drawOneGraph(faceArr, linkArr);
+			})
+			// console.log(person_id);
+			
 
 		}
 
