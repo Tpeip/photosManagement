@@ -671,6 +671,24 @@ function UpdateToFaceToken(image_path, face_token, face_rec) {
 	return pm;
 }
 
+function UpdateOneFaceInfo(face_token, age, gender, ethnicity) {
+	websqlOpenDB();
+	var updateSQL = 'UPDATE face SET age=?,gender=?,ethnicity=? WHERE face_token=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(updateSQL, [age, gender, ethnicity, face_token], function(ctx, result) {
+					// console.log("更新成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					console.log('更新失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
 function UpdateFaceInfo(person_id, age, gender, ethnicity) {
 	websqlOpenDB();
 	var updateSQL = 'UPDATE face SET age=?,gender=?,ethnicity=? WHERE person_id=? ';

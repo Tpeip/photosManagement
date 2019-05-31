@@ -215,20 +215,20 @@
 											let person_name = res.rows.item(0).person_name;
 											var person_html = '<div class="mui-row">' +
 												'<div class="mui-media mui-col-xs-3">' +
-												'<img class="face" src=\"' + face_src + '\" onclick="modifyInfo(\'' + person_id + '\',\'' +
+												'<img class="face" src=\"' + face_src + '\" onclick="modifyInfo(\'' + person_id + '\',\'' + face_token + '\',\'' +
 												person_name + '\',\'' + age + '\',\'' + gender + '\',\'' + ethnicity + '\')" />' +
 												'</div>' +
 												'<div class="mui-media mui-col-xs-9" style="margin-bottom: 12px;">' +
-												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + face_token + '\',\'' + person_name + '\',\'' + age +
 												'\',\'' + gender + '\',\'' + ethnicity + '\')">姓名：<label style="color:#2e84db">' + person_name +
 												'</label></p>' +
-												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + face_token + '\',\'' + person_name + '\',\'' + age +
 												'\',\'' + gender + '\',\'' + ethnicity + '\')">年龄：<label style="color:#2e84db">' + age +
 												'</label></p>' +
-												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + face_token + '\',\'' + person_name + '\',\'' + age +
 												'\',\'' + gender + '\',\'' + ethnicity + '\')">性别：<label style="color:#2e84db">' + gender +
 												'</label></p>' +
-												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + person_name + '\',\'' + age +
+												'<p class="person-tags" onclick="modifyInfo(\'' + person_id + '\',\'' + face_token + '\',\'' + person_name + '\',\'' + age +
 												'\',\'' + gender + '\',\'' + ethnicity + '\')">种族：<label  style="color:#2e84db">' + ethnicity +
 												'</label></p>' +
 												'<p class="person-tags">颜值：<label>' + beauty + '</label></p>' +
@@ -262,7 +262,7 @@
 				});
 			}
 
-			function modifyInfo(id, name, age, gender, ethnicity) {
+			function modifyInfo(id, face_token, name, age, gender, ethnicity) {
 				console.log(name);
 				console.log(age);
 				console.log(gender);
@@ -327,6 +327,7 @@
 						console.log(person_gender);
 						UpdateToName(id, person_name).then(function() {
 							UpdatePersonInfo(id, person_age, person_gender, person_ethnicity);
+							UpdateOneFaceInfo(face_token, person_age, person_gender, person_ethnicity);
 						});
 						setHtml();
 					}					
