@@ -55,13 +55,7 @@ function UpdatePersonInFace() {
 		})
 	});
 	promise.then(function() {
-		// getPersonFace();
-	}).then(function() {
-		// getPersonGroup();
-	}).then(function() {
 		updatePerson();
-	}).then(function() {
-		// verifyFace();
 	}).catch(function(err) {
 		console.log(err);
 	})
@@ -92,7 +86,7 @@ function updateInfo(){
 						person_ethnic = ethnic;
 					}
 				}
-				let person_age = Number(age_sum/num);
+				let person_age = Math.floor(age_sum/num);
 				let person_beauty = beauty_sum/num;
 				UpdatePersonAllInfo(person_id, person_age, person_gender, person_beauty, person_ethnic);
 			})
