@@ -184,7 +184,7 @@
 						getImageFace(image_path).then(function(faceRes){
 							deleteImageToFace(image_path);
 							deleteOneImage(image_path).then(function(e){
-								document.getElementById(image_path).classList.add('showImage');
+								document.getElementById(image_path).classList.add('hiddenimg');
 							});
 								let length = faceRes.rows.length;
 								let person = [];
