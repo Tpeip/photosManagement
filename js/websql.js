@@ -258,7 +258,6 @@ function InsertToImageType(type_id, image_path) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(insertImageTypeSQL, [type_id, image_path], function(ctx, result) {
 					 console.log("插入成功");
-					 console.log("****************");
 					resolve(result);
 				},
 				function(tx, error) {
@@ -356,6 +355,26 @@ function DeleteImageInType(image_path) {
 	});
 	return pm;
 }
+
+
+function DeleteTypeInImage(type_id) {
+	websqlOpenDB();
+	var deleteImageTypeSQL ='DELETE FROM image_type WHERE type_id=? ';
+	var pm = new Promise(function(resolve, reject) {
+		dataBase.transaction(function(ctx) {
+			ctx.executeSql(deleteImageTypeSQL, [type_id], function(ctx, result) {
+					 console.log("删除成功");
+					resolve(result);
+				},
+				function(tx, error) {
+					//console.log('插入失败: ' + error.message);
+					reject(error);
+				});
+		});
+	});
+	return pm;
+}
+
 
 
 

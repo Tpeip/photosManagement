@@ -9,15 +9,15 @@ function getOtherTypeRes() {
 		var teen = [];
 		var promiseArr = [];
 		let length = imageRes.rows.length;
+		for(let i = 5; i <10; i++){
+			promiseArr.push(DeleteTypeInImage(i));
+		}
 		for (let i = 0; i < length; i++) {
 			let image_path = imageRes.rows.item(i).image_path;
 			let person_num = imageRes.rows.item(i).person_num;
 			let keyword = imageRes.rows.item(i).image_keyword;
 			if (keyword.search("公众人物") != -1) {
 				publicman.push(image_path);
-			}
-			if (keyword.search("儿童") != -1) {
-				baby.push(image_path);
 			}
 			if (person_num >= 1) {
 				promiseArr.push(getImageFace(image_path).then(function(personRes) {
@@ -82,55 +82,35 @@ function getOtherTypeRes() {
 				let type_id = typeArr.indexOf('漂亮小姐姐');
 				let image_path = beauty[i];
 				proArr.push(
-				getImageType(type_id,image_path).then(function(res){
-					if(res.rows.length == 0){
-						return InsertToImageType(type_id, image_path);
-					}
-				})
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< youngboy.length; i++){
 				let type_id = typeArr.indexOf('帅气小鲜肉');
 				let image_path = youngboy[i];
 				proArr.push(
-				getImageType(type_id,image_path).then(function(res){
-					if(res.rows.length == 0){
-						return InsertToImageType(type_id, image_path);
-					}
-				})
+					 InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< baby.length; i++){
 				let type_id = typeArr.indexOf('可爱小宝贝');
 				let image_path = baby[i];
 				proArr.push(
-				getImageType(type_id,image_path).then(function(res){
-					if(res.rows.length == 0){
-						return InsertToImageType(type_id, image_path);
-					}
-				})
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< teen.length; i++){
 				let type_id = typeArr.indexOf('活力青少年');
 				let image_path = teen[i];
 				proArr.push(
-				getImageType(type_id,image_path).then(function(res){
-					if(res.rows.length == 0){
-						return InsertToImageType(type_id, image_path);
-					}
-				})
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< publicman.length; i++){
 				let type_id = typeArr.indexOf('明星');
 				let image_path = publicman[i];
 				proArr.push(
-				getImageType(type_id,image_path).then(function(res){
-					if(res.rows.length == 0){
-						return InsertToImageType(type_id, image_path);
-					}
-				})
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			return Promise.all(proArr);

@@ -420,12 +420,9 @@
 					DeleteImageType(type_id, path);
 					console.log(new_type);
 					InsertToImageType(new_type, path);	
-					console.log("12334345");
 					$("input:checkbox[value='"+path +"']").prop("checked",false);
 					document.getElementById(path).classList.add("hiddenimg");
 					
-// 					let index = imgArr.indexOf(path);
-// 					imgArr.splice(index);
 				});
 				pathArr = [];
 				// location.reload();
