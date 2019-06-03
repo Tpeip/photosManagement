@@ -10,7 +10,7 @@ function getOtherTypeRes() {
 		var promiseArr = [];
 		let length = imageRes.rows.length;
 		for(let i = 5; i <10; i++){
-			DeleteTypeInImage(i);
+			promiseArr.push(DeleteTypeInImage(i));
 		}
 		for (let i = 0; i < length; i++) {
 			let image_path = imageRes.rows.item(i).image_path;
