@@ -441,7 +441,7 @@
 		}, {
 			filter: "image",
 			multiple: true,
-			//maximum: 5,
+			maximum: 5,
 			system: false,
 			onmaxed: function() {
 				plus.nativeUI.alert('最多只能选择5张图片');
@@ -495,7 +495,7 @@
 			let image_base64 = getBase64Image(img);
 			let image_path = fileSrc;
 			pm.push(AIPImageClassify(image_base64).then(function(res) {
-				// console.log(JSON.stringify(res));
+				console.log(JSON.stringify(res));
 				
 				var screenshot =[ "屏幕截图"];
 				var card = ['身份证', '信用卡', '名片', '银行卡'];
@@ -598,7 +598,7 @@
 					};
 					pro = new Promise((resolve, reject) => {
 						facepp.detectFace(params, function success(e) {
-							console.log(JSON.stringify(e));
+							// console.log(JSON.stringify(e));
 							let face_num = e.faces.length;
 							if (face_num == 0) {
 
@@ -769,19 +769,26 @@
 			fileArr[i] = fileArr[i + 1];
 		}
 		fileArr.length--;
-
+		
 		let num = imageArr.indexOf(fileSrc);
-		imageArr.splice(num, 4);
+		
+		console.log(num);
+		console.log(imageArr);
+		if(num != -1){
+			let nn = num+3;
+			let nm = imageArr[nn];
+			imageArr.splice(num, 4);
+		}
 		let ps = person.indexOf(fileSrc);
 		if (ps != -1) {
-			let nm = person[ps + 1];
-			per_num = per_num - nm;
-			person.splice(ps, nm * 9);
+			per_num = per_num - Number(nm);
+			person.splice(ps-1, nm * 9);
 		}
 		let index = typeJson.findIndex(function(x) {
 			return x.image_path == fileSrc;
 		});
 		typeJson.splice(index, 1);
+		pm.splice(delpos);
 	}
 
 	//取消上传照片
@@ -816,16 +823,26 @@
 	document.getElementById('uploadImage').addEventListener('tap', function() {
 		var files = fileArr;
 		var wt = plus.nativeUI.showWaiting();
+		var image_flag = 0;
+		var face_flag = 0;
+		var type_flag = 0;
 		// console.log(imageArr);
 		// console.log(person);
 		Promise.all(pm).then(function() {
 			let num = files.length;
-			return InsertToImage(num, imageArr);
+			console.log(imageArr.length);
+			console.log(imageArr);
+			return InsertToImage(num, imageArr).then(function(){
+				image_flag = 1;
+			});
 		}).then(function(result) {
+			console.log(person.length);
 			if (per_num == 0)
 				return result;
 			else
-				return InsertToFace(per_num, person);
+				return InsertToFace(per_num, person).then(function(){
+					face_flag = 1;
+				});
 		}).then(function(result){
 			let pro =[];
 			for(let i = 0;i <typeJson.length; i++){
@@ -836,7 +853,9 @@
 					pro.push(InsertToImageType(type_id, image_path));
 				}
 			}
-			return Promise.all(pro);
+			return Promise.all(pro).then(function(){
+				type_flag = 1;
+			});
 		}).then(function(result) {
 			let len = per_path.length;
 			let proArr = [];
@@ -856,9 +875,9 @@
 						resolve(e);
 					}, function failed(err) {
 						//console.log(JSON.stringify(err));
-						if (err.responseJSON.error_message == 'NO_FACE_FOUND')
-							resolve();
-						else
+						// if (err.responseJSON.error_message == 'NO_FACE_FOUND')
+						// 	resolve();
+						// else
 							reject(err);
 					})
 				});
@@ -947,6 +966,25 @@
 			console.log(JSON.stringify(err));
 			console.log(err);
 			wt.close();
+			if(type_flag == 1){
+				for(let i = 0; i <files.length; i++){
+					let path = files[i].src;
+					DeleteImageInType(path);
+				}
+			}
+			if(face_flag == 1){
+				for(let i = 0; i <files.length; i++){
+					let path = files[i].src;
+					deleteImageToFace(path);
+				}
+			}
+			if(image_flag == 1){
+				for(let i = 0; i <files.length; i++){
+					let path = files[i].src;
+					deleteOneImage(path);
+				}
+			}
+			
 			var length = fileArr.length;
 			var btnArray = ['确定'];
 			let message='导入失败';
@@ -957,6 +995,13 @@
 					}
 				}, 'div');
 			} else {
+				console.log(err.message);
+				if(err.message != null){
+					// console.log("----");
+					if(err.message.search('19 UNIQUE constraint failed') != -1){
+						message = '导入失败：照片已存在！';
+					}
+				}
 				if(err.hasOwnProperty("statusText")){
 					if(err.statusText == 'timeout'){
 						message = '导入失败：网络超时！';

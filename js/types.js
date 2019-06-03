@@ -9,15 +9,15 @@ function getOtherTypeRes() {
 		var teen = [];
 		var promiseArr = [];
 		let length = imageRes.rows.length;
+		for(let i = 5; i <10; i++){
+			DeleteTypeInImage(i);
+		}
 		for (let i = 0; i < length; i++) {
 			let image_path = imageRes.rows.item(i).image_path;
 			let person_num = imageRes.rows.item(i).person_num;
 			let keyword = imageRes.rows.item(i).image_keyword;
 			if (keyword.search("公众人物") != -1) {
 				publicman.push(image_path);
-			}
-			if (keyword.search("儿童") != -1) {
-				baby.push(image_path);
 			}
 			if (person_num >= 1) {
 				promiseArr.push(getImageFace(image_path).then(function(personRes) {
