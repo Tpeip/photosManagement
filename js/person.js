@@ -62,6 +62,7 @@ function UpdatePersonInFace() {
 
 }
 
+//分析人物特征
 function updateInfo(){
 	getAllPerson().then(function(personRes){
 		for(let i = 0; i<personRes.rows.length; i++){
@@ -87,7 +88,7 @@ function updateInfo(){
 					}
 				}
 				let person_age = Math.floor(age_sum/num);
-				let person_beauty = beauty_sum/num;
+				let person_beauty = Math.floor(beauty_sum/num);
 				UpdatePersonAllInfo(person_id, person_age, person_gender, person_beauty, person_ethnic);
 			})
 		}
