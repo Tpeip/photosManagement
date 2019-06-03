@@ -285,6 +285,7 @@
 		});	
 		
 		function setTypeHtml(type, num, allImage) {
+			let type_name = type;
 			if (type == '漂亮小姐姐' || type == '帅气小鲜肉' || type == '可爱小宝贝' || type == '活力青少年' || type == '明星') {
 				let html = '';
 				if (num > 0) {
@@ -295,12 +296,15 @@
 					jQuery("#photos").append(html);
 				}
 			} else {
+				if(type == "合照"){
+					type_name = "集体照";
+				}
 				let html = '';
 				if (num > 0) {
 					let image = allImage.join('**123**');
-					html = '<div class="img-border" onclick="turnTo(\'' + type + '\'' + ',' + '\'' + image + '\')">' +
+					html = '<div class="img-border" onclick="turnTo(\'' + type_name + '\'' + ',' + '\'' + image + '\')">' +
 						'<img class="images" src="' + allImage[0] + '" />' +
-						'<p class="label-type">' + type + '</p>' +
+						'<p class="label-type">' + type_name + '</p>' +
 						'<p style="padding-left: 6px;word-spacing: 1px;">' + num + '张</p><br></div>';
 					jQuery("#types").append(html);
 				}

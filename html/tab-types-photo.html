@@ -235,7 +235,7 @@
 			<a id="cancel" class="mui-icon mui-pull-left hiddenimg" style="font-size: 18px;margin-top: 5px;">取消</a>
 			<h1 id="title" class="mui-title"> </h1>
 			<a id="move" class="mui-icon mui-pull-right" style="font-size: 18px;margin-top: 5px;">移动</a>
-			<a id="moveto" class="mui-icon mui-pull-right hiddenimg"  style="font-size: 18px;margin-top: 5px;">移动到</a>
+			<a id="moveto" class="mui-icon mui-pull-right hiddenimg" style="font-size: 18px;margin-top: 5px;">移动到</a>
 		</header>
 		<div id="image-content" class="mui-content"></div>
 
@@ -257,9 +257,12 @@
 		var allImage = localStorage.getItem('allImage');
 		var flag = 0;
 		var pathArr = [];
-		var typeArr = ['','单人照','双人照','合照','自拍','漂亮小姐姐','帅气小鲜肉','可爱小宝贝','活力青少年','明星','证件照','风景','美食','文本','建筑','卡通','交通工具','动物','屏幕截图','其他'];
-        var albumArr = ['漂亮小姐姐','帅气小鲜肉','可爱小宝贝','活力青少年','明星'];
-		
+		var typeArr = ['', '单人照', '双人照', '合照', '自拍', '漂亮小姐姐', '帅气小鲜肉', '可爱小宝贝', '活力青少年', '明星', '证件照', '风景', '美食', '文本', '建筑',
+			'卡通', '交通工具', '动物', '屏幕截图', '其他'
+		];
+		var imgArr = allImage.split("**123**");
+		var albumArr = ['漂亮小姐姐', '帅气小鲜肉', '可爱小宝贝', '活力青少年', '明星'];
+
 		mui.plusReady(function() {
 			replaceHeader();
 			setPhotoHtml();
@@ -274,18 +277,17 @@
 
 		function setPhotoHtml() {
 			jQuery('#image-content').empty();
-			var allImg = localStorage.getItem('allImage');
-			if(albumArr.indexOf(type)>=0){
+			if (albumArr.indexOf(type) >= 0) {
 				jQuery("#move").addClass("hiddenimg");
-			}
-			var imgArr = allImg.split("**123**");
+			}			
 			for (let i = 0; i < imgArr.length; i++) {
 				let src = imgArr[i];
 				console.log(src);
-				image = '<p id="'+ src +'" class="image-border"><img class="images" src="' + src +
-					'" data-preview-src="" data-preview-group="1" />'+
+				image = '<p id="' + src + '" class="image-border"><img class="images" src="' + src +
+					'" data-preview-src="" data-preview-group="1" />' +
 					// '<span id="move" class="mui-icon mui-icon-close icon-move" onclick="move(\'' + src + '\')"></span>' +
-					'<input id="check" type="checkbox" class="mui-checkbox icon-move hiddenimg" value="'+src+'" style="zoom:150%">'+
+					'<input id="check" type="checkbox" class="mui-checkbox icon-move hiddenimg" value="' + src +
+					'" style="zoom:150%">' +
 					'</p>';
 				jQuery('#image-content').append(image);
 			}
@@ -308,23 +310,23 @@
 			var el = document.getElementById('title').innerHTML;
 			document.getElementById('title').innerHTML = type;
 		}
-		
+
 		var backing = document.getElementById('backing');
 		var move = document.getElementById('move');
 		var check = document.getElementById('check');
 		var cancel = document.getElementById("cancel");
 		var moveto = document.getElementById("moveto");
-		
+
 		backing.addEventListener('tap', function() {
 			var listpage = plus.webview.currentWebview().opener();
 			//触发父页面的自定义事件(refresh),从而进行刷新
 			plus.webview.currentWebview().close();
 			mui.fire(listpage, 'update');
 		});
-		
-		move.addEventListener('tap',function(e){
-			$("input:checkbox").each(function(){
-				$(this).prop("checked",false);
+
+		move.addEventListener('tap', function(e) {
+			$("input:checkbox").each(function() {
+				$(this).prop("checked", false);
 			});
 			$("input").removeClass("hiddenimg");
 			cancel.classList.remove('hiddenimg');
@@ -333,8 +335,8 @@
 			backing.classList.add('hiddenimg');
 			flag = 1;
 		});
-		
-		cancel.addEventListener("tap",function(){
+
+		cancel.addEventListener("tap", function() {
 			$("input").addClass('hiddenimg');
 			cancel.classList.add('hiddenimg');
 			moveto.classList.add('hiddenimg');
@@ -343,21 +345,21 @@
 			flag = 0;
 			pathArr = [];
 		});
-		
-		
-		moveto.addEventListener('tap',function(){
+
+
+		moveto.addEventListener('tap', function() {
 			pathArr = [];
-			$("input:checkbox").each(function(){
-				if($(this).prop('checked') == true){
+			$("input:checkbox").each(function() {
+				if ($(this).prop('checked') == true) {
 					let path = $(this).val();
 					pathArr.push(path);
 				}
-			});	
+			});
 			moveToAblum(pathArr);
 			console.log(pathArr.length);
 		});
-		
-		function moveToAblum(pathArr){
+
+		function moveToAblum(pathArr) {
 			var albumPicker = new mui.PopPicker();
 			albumPicker.setData([{
 				value: '单人照',
@@ -403,19 +405,33 @@
 				text: '其他'
 			}]);
 			albumPicker.show(function(items) {
+				let type_name = type;
+				console.log(pathArr);
 				console.log(items[0].value);
 				var album = items[0].value;
-				pathArr.forEach(function(path){
-					let type_id = typeArr.indexOf(type);
+				if(items[0].value == "集体照"){
+					album = "合照";
+				}
+				if(type == "集体照"){
+					type_name = "合照";
+				}
+				pathArr.forEach(function(path) {
+					let type_id = typeArr.indexOf(type_name);
 					let new_type = typeArr.indexOf(album);
 					DeleteImageType(type_id, path);
-					InsertToImageType(new_type, path);
-					pathArr = [];
+					console.log(new_type);
+					InsertToImageType(new_type, path);	
+					console.log("12334345");
+					$("input:checkbox[value='"+path +"']").prop("checked",false);
 					document.getElementById(path).classList.add("hiddenimg");
+					
+// 					let index = imgArr.indexOf(path);
+// 					imgArr.splice(index);
 				});
+				pathArr = [];
+				// location.reload();
 			});
 		}
-		
 	</script>
 
 </html>

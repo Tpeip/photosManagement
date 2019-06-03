@@ -598,6 +598,7 @@
 					};
 					pro = new Promise((resolve, reject) => {
 						facepp.detectFace(params, function success(e) {
+							console.log(JSON.stringify(e));
 							let face_num = e.faces.length;
 							if (face_num == 0) {
 

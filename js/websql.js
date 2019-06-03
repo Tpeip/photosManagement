@@ -258,6 +258,7 @@ function InsertToImageType(type_id, image_path) {
 		dataBase.transaction(function(ctx) {
 			ctx.executeSql(insertImageTypeSQL, [type_id, image_path], function(ctx, result) {
 					 console.log("插入成功");
+					 console.log("****************");
 					resolve(result);
 				},
 				function(tx, error) {

@@ -178,6 +178,7 @@
 		function turnTo(person_id) {
 			showOneRelation(person_id);
 		}
+		
 		//显示核心人物的人脉关系图
 		function showOneRelation(person_id) {
 			var modify = document.getElementById('modify');
@@ -218,7 +219,7 @@
 							let k = allPerson.findIndex(function(x) {
 								return x.person_id == person_id;
 							});
-							let info = allPerson[k].person_name;
+							let info = allPerson[k].group_info;
 							let main_face_src = allPerson[k].face_src;
 							let main_person = {
 								category: index,
@@ -239,13 +240,12 @@
 							};
 							linkArr.push(main_link);
 						};
-						
 					}
 				}
 				drawOneGraph(faceArr, linkArr);
 			})
+			
 		}
-
 		function setNodeSize(intimacy) {
 			let size = 0;
 			if (intimacy > 80 && intimacy <= 100) {
@@ -265,6 +265,7 @@
 			}
 			return size;
 		}
+		
 		//绘制单个人物的人脉关系图
 		function drawOneGraph(faceArr, linkArr) {
 			var myChart = echarts.init(document.getElementById('main'));
@@ -272,11 +273,10 @@
 				tooltip: {
 					trigger: 'item',
 					formatter: function(param) {
-						let label = relations[param.data.category-1];
-						if(param.data.category == 0){
-							label = '人物';
-						}else{
-							label = relations[param.data.category-1];
+						let index = param.data.category - 1;
+						let label = relations[index];
+						if(index == -1){
+							label = "人物";
 						}						
 						let name = param.data.name;
 						var text = label + ": " + name;
@@ -307,7 +307,6 @@
 					layout: 'force',
 					symbolSize: 80,
 					roam: 'move',
-					// edgeSymbol: ['circle', 'arrow'],
 					edgeSymbolSize: [4, 10],
 					edgeLabel: {
 						normal: {
@@ -337,7 +336,6 @@
 							itemStyle: {
 								normal: {
 									shadowBlur: 50,
-									// shadowColor: '#007fff'
 									shadowColor: '#ff9900'
 								}
 							}
@@ -435,10 +433,6 @@
 						emphasis: {
 							label: {
 								show: false
-								// textStyle: null      // 默认使用全局文本样式，详见TEXTSTYLE
-							},
-							nodeStyle: {
-								//r: 30
 							},
 							linkStyle: {}
 						}
@@ -468,7 +462,6 @@
 					links: linkArr
 				}]
 			};
-
 			// 为echarts对象加载数据 
 			myChart.setOption(option);
 			myChart.on('click', function(param) {
@@ -491,6 +484,7 @@
 				}
 			});
 		}
+
 
 
 		//修改人物间关系
@@ -535,9 +529,9 @@
 		}
 
 		function UpdateOneRelation(person_id, person_main, relation) {
-			let id = person_id;
+			let id_value = person_id;
 			let key = allPerson.findIndex(function(x) {
-				return x.person_id == id;
+				return x.person_id == id_value;
 			});
 			let persons = allPerson[key].persons;
 			let k = persons.findIndex(function(e) {
