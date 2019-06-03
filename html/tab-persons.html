@@ -197,11 +197,11 @@
 						return x.person_id == id;
 					});
 					let core_face_src = allPerson[key].face_src;
-					let core_group_info = allPerson[key].group_info;
+					let core_person_name = allPerson[key].person_name;
 					let persons = allPerson[key].persons;
 					let core_person = {
 						category: 0,
-						name: core_group_info,
+						name: core_person_name,
 						symbol: 'image://' + getImgData(core_face_src),
 						symbolSize: [70, 70],
 						value: 10,
@@ -213,15 +213,12 @@
 							let person_id = persons[i].id;
 							let person_relation = persons[i].relation;
 							let person_intimacy = persons[i].intimacy;
-							// 						let size = Math.floor(person_intimacy * 100 / 100);
-							// 						console.log(person_intimacy);
-							// 						console.log(size);
 							let size = setNodeSize(person_intimacy);
 							let index = relations.indexOf(person_relation) + 1;
 							let k = allPerson.findIndex(function(x) {
 								return x.person_id == person_id;
 							});
-							let info = allPerson[k].group_info;
+							let info = allPerson[k].person_name;
 							let main_face_src = allPerson[k].face_src;
 							let main_person = {
 								category: index,
@@ -242,21 +239,11 @@
 							};
 							linkArr.push(main_link);
 						};
-						// 					faceArr.push(main_person);
-						// 					let j = i + 1;
-						// 					var main_link = {
-						// 						source: j,
-						// 						target: 0,
-						// 						weight: j
-						// 					};
-						// 					linkArr.push(main_link);
+						
 					}
 				}
 				drawOneGraph(faceArr, linkArr);
 			})
-			// console.log(person_id);
-			
-
 		}
 
 		function setNodeSize(intimacy) {
@@ -285,7 +272,12 @@
 				tooltip: {
 					trigger: 'item',
 					formatter: function(param) {
-						let label = relations[param.data.category - 1];
+						let label = relations[param.data.category-1];
+						if(param.data.category == 0){
+							label = '人物';
+						}else{
+							label = relations[param.data.category-1];
+						}						
 						let name = param.data.name;
 						var text = label + ": " + name;
 						if (name == null || name == "") {
@@ -600,7 +592,7 @@
 				for (let i = 0; i < allPerson.length; i++) {
 					let person_id = allPerson[i].person_id;
 					let core_face_src = allPerson[i].face_src;
-					let group_info = allPerson[i].group_info;
+					let person_name = allPerson[i].person_name;
 					if (visited.indexOf(person_id) < 0) {
 						proArr.push(
 							wideTraversal(person_id, core_face_src, i)
