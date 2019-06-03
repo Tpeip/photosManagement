@@ -271,7 +271,7 @@
 			var myChart = echarts.init(document.getElementById('main'));
 			option = {
 				tooltip: {
-					trigger: 'item',
+					trigger: 'axis',
 					formatter: function(param) {
 						let index = param.data.category - 1;
 						let label = relations[index];
@@ -565,7 +565,7 @@
 			}
 			UpdatePersonRelation(person_id, person_main, relation).then(function() {
 				mui.toast("修改成功");
-				showOneRelation(id);
+				showOneRelation(id_value);
 			});
 		}
 
@@ -582,7 +582,6 @@
 			graph.classList.add('showtext');
 			var proArr = [];
 			getPersonData().then(function() {
-				for (let i = 0; i < allPerson.length; i++) {}
 				for (let i = 0; i < allPerson.length; i++) {
 					let person_id = allPerson[i].person_id;
 					let core_face_src = allPerson[i].face_src;
@@ -685,16 +684,12 @@
 		function drawAllGraph(faceArr, linkArr) {
 			var myChart = echarts.init(document.getElementById('main'));
 			var option = {
-				// 				title: {
-				// 					text: '人脉关系图'
-				// 				},
 				isShowScrollBar: false,
 				series: [{
 					type: 'graph',
 					layout: 'force',
 					symbolSize: 80,
 					roam: 'move',
-					// edgeSymbol: ['circle', 'arrow'],
 					edgeSymbolSize: [4, 10],
 					edgeLabel: {
 						normal: {

@@ -50,7 +50,7 @@ function getOtherTypeRes() {
 								baby.push(image_path);
 							}
 						}
-						if (age <= 18 && age >= 12) {
+						if (age <= 18 && age > 12) {
 							if (teen.indexOf(image_path) == -1) {
 								teen.push(image_path);
 							}

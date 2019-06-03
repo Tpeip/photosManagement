@@ -299,16 +299,9 @@
 			});
 			var person_id = localStorage.getItem('id');
 
-			// mui.plusReady(function() {
 			getFace();
 			getImages();
-			// })
-			// 			mui.init();
-			// 			document.getElementById('backing').addEventListener('tap', function() {
-			// 				plus.webview.currentWebview().close();				
-			// 			});
-
-
+			
 
 			//获取当前页面的人脸
 			function getFace() {
@@ -421,9 +414,9 @@
 				var btnArray = ['取消', '确定'];
 				var html =
 					'<br><div style="font-size:16px">姓名：<input id="name" type="text" autofocus="autofocus" value="' + name +
-					'" style="height:25px;width:134px"></div>' +
+					'" placeholder="'+ name +'" style="height:25px;width:134px"></div>' +
 					'<div style="font-size:16px">年龄：<input id="age" type="text" value="' + age + '"'+
-				'style="height:25px;width:134px"></div>' + gender_html + ethnicity_html +
+				'placeholder="'+ age + '" style="height:25px;width:134px"></div>' + gender_html + ethnicity_html +
 					'<div style="font-size:16px">颜值：<input id="beauty" type="text" placeholder="' + beauty +
 					'" readonly style="height:25px;width:134px"></div>';
 				mui.confirm(html, '信息修改', btnArray, function(e) {
@@ -435,8 +428,8 @@
 						var age_value = $("#age").val();
 						var person_gender = $("input:radio:checked").val();
 						var person_ethnicity = $("select#ethnic option:selected").val();
-						if (name_value == '这是谁') {
-							person_name = name;
+						if (name_value == "这是谁" || name_value == "") {
+							person_name = "未命名";
 						} else {
 							person_name = name_value;
 						}
