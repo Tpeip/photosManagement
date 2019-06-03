@@ -410,6 +410,7 @@
 					let new_type = typeArr.indexOf(album);
 					DeleteImageType(type_id, path);
 					InsertToImageType(new_type, path);
+					pathArr = [];
 					document.getElementById(path).classList.add("hiddenimg");
 				});
 			});
