@@ -709,3 +709,75 @@ function getImgData(imgSrc) {
 	let src = canvas.toDataURL('image/png', 1);
 	return src;
 }
+
+function UpdateFaceToPerson() {
+	getAllFace().then(function(res) {
+		let group = 0;
+		localStorage.setItem('group', group);
+		for (let i = 0; i < res.rows.length; i++) {
+			let face_token = res.rows.item(i).face_token;
+			let id = res.rows.item(i).person_id;
+			let face_src = res.rows.item(i).face_src;
+			if (id == '' || id == null) {
+				getAllPerson().then(function(personRes) {
+						let promiseArr = [];
+						let flag = 0;
+						for (let j = 0; j < personRes.rows.length; j++) {
+							let person_id = personRes.rows.item(j).person_id;
+							let similar_num = 0;
+							promiseArr.push(
+							getFaceByPerson(person_id).then(function(faceRes){
+								let proArr = [];
+								let image_num = faceRes.rows.length;
+								for(let k = 0; k<image_num; k++){
+									let face_token2 = personRes.rows.item(j).face_token;
+									let params = {
+										'face_token1': face_token,
+										'face_token2': face_token2
+									};
+									let pro = new Promise((resolve, reject) => {
+										facepp.compareFace(params, function success(e) {
+											if (Number(e.confidence) >= 80) {
+												similar_num++;
+											}
+											resolve(e);
+										}, function fail(err) {
+											reject(err);
+											console.log(JSON.stringify(err));
+										});
+									});
+									proArr.push(pro);
+								}
+								return Promise.all(proArr).then(function(e) {
+									let num = image_num * 0.2;
+									if(similar_num >= num){
+										flag = 1;
+										UpdatePersonId(face_token, person_id);
+									}
+									});
+							})
+							);
+							
+						}
+						Promise.all(promiseArr).then(function(e){
+							if (flag == 0) {
+								let group = Number(localStorage.getItem('group'));
+								group++;
+								InsertToPerson(group);
+								UpdatePersonId(face_token, group);
+								localStorage.setItem('group', group);
+							}
+						});
+
+				}).catch(function(err) {
+					console.log(err);
+				})
+			}
+
+		}
+	}).catch(function(err) {
+		console.log(err);
+	});
+
+}
+

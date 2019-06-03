@@ -188,10 +188,10 @@
 									person.push(person_id);
 									getFaceByPerson(person_id).then(function(personRes){
 										let num = personRes.rows.length;
-										if(num == 0){
-											DeleteRelation(person_id).then(function(e){
+										console.log(num);
+										if(num == 1){
+											DeleteRelation(person_id);
 												DeletePerson(person_id);
-											});
 										}
 									})
 								}
