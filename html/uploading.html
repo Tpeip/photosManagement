@@ -600,8 +600,7 @@
 						facepp.detectFace(params, function success(e) {
 							let face_num = e.faces.length;
 							if (face_num == 0) {
-								let nu = typeArr.indexOf('人物');
-								typeArr.splice(nu, 1);
+
 							} else {
 								per_path.push(image_path);
 								person_num = face_num;
@@ -718,9 +717,8 @@
 									person.push(ethnicity);
 									person.push(emotion);
 								}
-								resolve(e);
 							}
-					
+							resolve(e);
 						}, function failed(err) {
 							console.log(JSON.stringify(err));
 							reject(err);
