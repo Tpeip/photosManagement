@@ -82,35 +82,35 @@ function getOtherTypeRes() {
 				let type_id = typeArr.indexOf('漂亮小姐姐');
 				let image_path = beauty[i];
 				proArr.push(
-						InsertToImageType(type_id, image_path);
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< youngboy.length; i++){
 				let type_id = typeArr.indexOf('帅气小鲜肉');
 				let image_path = youngboy[i];
 				proArr.push(
-					 InsertToImageType(type_id, image_path);
+					 InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< baby.length; i++){
 				let type_id = typeArr.indexOf('可爱小宝贝');
 				let image_path = baby[i];
 				proArr.push(
-						InsertToImageType(type_id, image_path);
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< teen.length; i++){
 				let type_id = typeArr.indexOf('活力青少年');
 				let image_path = teen[i];
 				proArr.push(
-						InsertToImageType(type_id, image_path);
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			for(let i = 0; i< publicman.length; i++){
 				let type_id = typeArr.indexOf('明星');
 				let image_path = publicman[i];
 				proArr.push(
-						InsertToImageType(type_id, image_path);
+						InsertToImageType(type_id, image_path)
 				);
 			}
 			return Promise.all(proArr);
